@@ -1,3 +1,3 @@
 # Decisions
 
-My life's decisions captured as github's issues.
+My decisions & thoughts captured as blog based articles here.
