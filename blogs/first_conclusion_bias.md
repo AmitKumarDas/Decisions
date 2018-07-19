@@ -5,6 +5,6 @@ almost always deceiving. __ Safal Niveshak & Probably Others
 
 Vishal explains the _**why part**_ very lucidly. He says, "Well, evolution has wired our brains in such a manner that
 it avoids anything which depletes the energy. And nothing consumes more energy in the brain cells than an
-unresolved observation. Unexplained events are calorie hoggers for our grey matter. Our genes are programmed
+unresolved observation. _**Unexplained events are calorie hoggers for our grey matter**_. Our genes are programmed
 to conserve energy and embracing the first answer to any problem is a very effective strategy. That’s why we all
 jump to conclusions by making inferences and assumptions in most things we do in life, and it often helps us."
