@@ -1,4 +1,4 @@
-This is an extract from go standard library. Let us try to understand this snippet:
+This is a go snippet code extracted from [link](http://redhat-crypto.gitlab.io/defensive-coding-guide/#chap-Defensive_Coding-Go). Let us try to understand this snippet:
 
 ```go
 type Processor interface {
