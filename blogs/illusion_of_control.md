@@ -7,8 +7,8 @@ doing? I'm keeping the giraffes away. But there aren't any giraffes here. Well, 
 
 Trying to increase your confidence by **gathering information that is supposedly unknown to most others** really only 
 **makes you more comfortable with your decisions, not better at them**, and is generally an unproductive use of your 
-limited time. In the world of technology this applies to testing. In addition, prevelance of open source software is
-a testimony to above hypothesis.
+limited time. In the world of technology this applies to testing i.e. _addition of more and more tests does not imply
+absence of bugs_. Speaking of current trend, prevelance of open source software is a testimony to this hypothesis.
 
 In the world of investments, listen to what Safal Niveshak has to say: "Business related information is highly 
 perishable. Economic conditions change, industries are transformed, and business results are volatile. The effort 
