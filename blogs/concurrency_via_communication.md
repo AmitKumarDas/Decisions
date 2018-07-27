@@ -9,9 +9,10 @@ technique to handle concurrency in this article.
 
 Imagine a pipe connected across all the threads. A memory object can pass via this pipe and reach to all the threads 
 one at a time. This sounds like threads need not do the typical housekeeping stuff. In other words, threads need not worry
-about putting up locks & then remembering to un-lock when job is done. This is otherwise treated as "**_explicitly dealings with locks_**". In Go terms, the pipe is known as channel & threads are goroutines. 
+about putting up locks & then remembering to un-lock when job is done. This worry is otherwise termed as "**_explicitly 
+dealing with locks_**". 
 
-Now that we understand how only one go routine has access to shared data at any given time, let us get into other details.
+In Go terms, the pipe is known as channel & threads are goroutines. Now that we understand how only one go routine has access to shared data at any given time, let us get into other details.
 
 References:
 - https://blog.golang.org/share-memory-by-communicating
