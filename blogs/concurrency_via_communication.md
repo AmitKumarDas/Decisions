@@ -1,7 +1,7 @@
 WIP - These are my thoughts on the topic "Share Memory By Communicating".
 
-Typical languages make use of threads & lock to operate on memory which is now referred to as shared memory. Go tries to
-invert this problem of sharing. In other words, threads need not vie for ownership of a memory rather they are provided 
+Typical languages make use of threads & lock to operate on memory which can now be referred to as shared memory. Go tries 
+to invert this problem of sharing. In other words, threads need not vie for ownership of a memory rather they are provided 
 with the shared memory at appropriate time; removing the need for housekeeping stuff i.e. lock & un-lock. 
 
 Well, there are other approaches as well, e.g. use of thread safe data structures. However, we shall concentrate on Go's
