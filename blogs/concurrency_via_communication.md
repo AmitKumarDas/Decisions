@@ -1,21 +1,22 @@
-These are my learnings on the topic "Share Memory By Communicating".
+### My learnings on Sharing Memory By Communicating
 
 Most programming languages make use of threads & lock to operate on memory _referred to as shared memory_. Go tries 
 to invert this problem of sharing by passing this memory object. In other words, threads need not vie for ownership 
-of a memory rather they are provided with this shared memory at appropriate time; removing the need for housekeeping
-stuff i.e. use of lock & un-lock. 
+of a memory rather they are provided with this shared memory at appropriate time; removing the need for extra checks
+i.e. remembering to use lock & un-lock. 
 
 Well, there are other approaches as well, e.g. use of thread safe data structures. However, we shall concentrate on Go's
 technique to handle concurrency in this article.
 
 Imagine a pipe connected across all the threads. A memory object can pass via this pipe and reach to all the threads 
-one at a time. This sounds like threads need not do the typical housekeeping stuff. In other words, threads need not 
-worry about putting up locks & then remembering to un-lock when job is done. This worry is otherwise termed as 
+one at a time. This sounds like threads need not be coded with any orthogonal concerns. In other words, threads need 
+not worry about putting up locks & then remembering to un-lock when job is done. This worry is otherwise termed as 
 "**_explicitly dealing with locks_**". 
 
-In Go terms, this pipe is known as channel & threads are goroutines. Now that we understand how only one go routine has access to shared data at any given time, let us get into other details.
+In Go terminology, this pipe is called as channel & threads as goroutines. Now that we are told about how only one go
+routine has access to shared memory at any given time, let us get into usage details.
 
-For example, there is a structure that has _lock_ i.e.
+For example, this is the older approach i.e. a structure with _lock_ as one of its propertues:
 
 ```go
 type Resources struct {
@@ -24,13 +25,13 @@ type Resources struct {
 }
 ```
 
-Above is typical to other langauges and is an indication to future code that is not clean. This is apparent when
+Above is typical coding style that indicative of further code/functions to invoke lock & unlock. This is apparent when
 above struct gets used in a function that is invoked by multiple threads. One would notice that this function has 
-a lot to do in terms of housekeeping i.e. use of lock & unlock.
+a lot to do in terms of remembering when to use lock & when to unlock the same. Unlock should further take into account failure cases as well.
 
 ```go
 func Poller(res *Resources){
-   // never ending loop
+   // a never ending loop
    for {
      res.lock.Lock()
      ...
@@ -57,9 +58,9 @@ func Poller(in, out chan *Resource) {
 
 While above is a very simple example to understand use of channel(s) instead of mutex, ther is one important fact that has not yet been told. And that is each receive or send on channels are blocking. In fact these very blocking nature of channels, ensures proper working of _passing memory by communicating_. If one needs to use non-blocking sends, receives from one or more channels, then _select with a default case_ can achieve it. 
 
-In addition, there may be understanding (_code readability_) issues w.r.t difference in implementation of channel 
-versus using the mutex approach. These complexities can be attributed to the way we implement passing the memory
-via channels. However, this readability issue(s) can be addressed if one follows good coding practices. 
+In addition, there may be understanding (_code readability_) issues w.r.t difference in implementation of channel versus
+using the mutex approach. These complexities can be attributed to the way we implement passing the memory via channels.
+However, this readability issue(s) can be addressed if one follows effective coding practices. 
 
 Let me list down some coding practices, I have encountered with w.r.t use of channels:
 - One channel may not be sufficient to replace a resource's mutex 
@@ -73,7 +74,7 @@ Let me list down some coding practices, I have encountered with w.r.t use of cha
 - A resource is typically retrieved from a channel with a loop logic i.e. `for := range`
 - A resource can also be retrieved from a channel within a select case which is in turn within a never ending for loop
 
-On the whole, if one gets a good grasp of functional programming, understadning use of function closures, then implementing
+On the whole, if one gets a good grasp of functional programming, understanding use of function closures, then implementing
 concurrency via channels will get simpler.
 
 Below is a code snippet that I have copied from one of the reference links. This snippet is the go implementation to 
