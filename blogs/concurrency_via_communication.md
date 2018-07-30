@@ -16,6 +16,7 @@ not worry about putting up locks & then remembering to un-lock when job is done.
 In Go terminology, this pipe is called as channel & threads as goroutines. Now that we are told about how only one go
 routine has access to shared memory at any given time, let us get into usage details.
 
+### Old Way Most of Us Know
 For example, this is the older approach i.e. a structure with _lock_ as one of its propertues:
 
 ```go
@@ -44,6 +45,7 @@ func Poller(res *Resources){
 }
 ```
 
+### New yet Simple Approach
 Now imagine if above can be re-factored to follow _passing memory by communicating_ philosophy. We were told about pipes i.e. channels which can be used to pass these shared memories. In other words, go channel will pass `&Resources{...}`. Our Poller
 function will look something like below:
 
@@ -56,6 +58,7 @@ func Poller(in, out chan *Resource) {
 }
 ```
 
+### Simple is not Easy though
 While above is a very simple example to understand use of channel(s) instead of mutex, there is one important fact that is
 still under wraps. And that is, each receive or send on channels are blocking. In fact these very blocking nature of channels, ensures proper working of _passing memory by communicating_. If one needs to use non-blocking sends, receives from one or more channels, then _select with a default case_ can achieve it. 
 
@@ -63,6 +66,8 @@ In addition, there may be understanding (_code readability_) issues w.r.t differ
 using the mutex approach. These complexities can be attributed to the way we implement passing the memory via channels.
 However, this readability issue(s) can be addressed if one follows effective coding practices. 
 
+
+### Channel based habits to the rescue
 Let me list down some coding practices, I have encountered with w.r.t use of channels:
 - One channel may not be sufficient to replace a resource's mutex 
 - Multiple channels may be needed to orchestrate the entire concurrency
@@ -75,6 +80,7 @@ Let me list down some coding practices, I have encountered with w.r.t use of cha
 - A resource is typically retrieved from a channel with a loop logic i.e. `for := range`
 - A resource can also be retrieved from a channel within a select case which is in turn within a never ending for loop
 
+### Use functions as your final weapon
 On the whole, if one gets a good grasp of functional programming, understanding use of function closures, then implementing
 concurrency via channels will get simpler.
 
