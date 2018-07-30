@@ -56,7 +56,8 @@ func Poller(in, out chan *Resource) {
 }
 ```
 
-While above is a very simple example to understand use of channel(s) instead of mutex, ther is one important fact that has not yet been told. And that is each receive or send on channels are blocking. In fact these very blocking nature of channels, ensures proper working of _passing memory by communicating_. If one needs to use non-blocking sends, receives from one or more channels, then _select with a default case_ can achieve it. 
+While above is a very simple example to understand use of channel(s) instead of mutex, there is one important fact that is
+still under wraps. And that is, each receive or send on channels are blocking. In fact these very blocking nature of channels, ensures proper working of _passing memory by communicating_. If one needs to use non-blocking sends, receives from one or more channels, then _select with a default case_ can achieve it. 
 
 In addition, there may be understanding (_code readability_) issues w.r.t difference in implementation of channel versus
 using the mutex approach. These complexities can be attributed to the way we implement passing the memory via channels.
