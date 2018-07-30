@@ -55,8 +55,11 @@ func Poller(in, out chan *Resource) {
 }
 ```
 
-While above is a very simple example to understand use of channel(s) instead of mutex, there are a varitety of other complexities that can arise. These complexities can be attributed to the way we design a channel code. Like every
-other complexity this too can be handled gracefully if one follows good coding practices. 
+While above is a very simple example to understand use of channel(s) instead of mutex, ther is one important fact that has not yet been told. And that is each receive or send on channels are blocking. In fact these very blocking nature of channels, ensures proper working of _passing memory by communicating_. If one needs to use non-blocking sends, receives from one or more channels, then _select with a default case_ can achieve it. 
+
+In addition, there may be understanding (_code readability_) issues w.r.t difference in implementation of channel 
+versus using the mutex approach. These complexities can be attributed to the way we implement passing the memory
+via channels. However, this readability issue(s) can be addressed if one follows good coding practices. 
 
 Let me list down some coding practices, I have encountered with w.r.t use of channels:
 - One channel may not be sufficient to replace a resource's mutex 
@@ -67,9 +70,36 @@ Let me list down some coding practices, I have encountered with w.r.t use of cha
   - Embeds this channel handler logic in an immediately invocable anonymous function i.e. iife
   - Run this IIFE i.e. core channel handler as a goroutine
   - Function can finally return this channel, which will be used outside to feed into this channel
-- Retrieving resource from a channel is blocking & hence this entire design works
 - A resource is typically retrieved from a channel with a loop logic i.e. `for := range`
 - A resource can also be retrieved from a channel within a select case which is in turn within a never ending for loop
+
+On the whole, if one gets a good grasp of functional programming, understadning use of function closures, then implementing
+concurrency via channels will get simpler.
+
+Below is a code snippet that I have copied from one of the reference links. This snippet is the go implementation to 
+what I just pointed out earlier.
+
+```go
+// StateMonitor maintains a map that stores the state of the URLs being
+// polled, and prints the current state every updateInterval nanoseconds.
+// It returns a chan State to which resource state should be sent.
+func StateMonitor(updateInterval time.Duration) chan<- State {
+	updates := make(chan State)
+	urlStatus := make(map[string]string)
+	ticker := time.NewTicker(updateInterval)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				logState(urlStatus)
+			case s := <-updates:
+				urlStatus[s.url] = s.status
+			}
+		}
+	}()
+	return updates
+}
+```
 
 References:
 - https://blog.golang.org/share-memory-by-communicating
