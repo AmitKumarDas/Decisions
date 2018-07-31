@@ -53,9 +53,10 @@ func main() {
   // just cast the anonymous function to functional interface type
   lesscode := SingleMethodFunc(
     func(x, y int) int{
-      // can do anything here -- probably return a hardcoded int
-      // this logic is delegated to client -- runtime polymorphism
-      // will be very helpful writing UnitTest code -- imagine !!
+      // can do anything **here** -- probably return a hardcoded int
+      // implementing this logic here implies logic is delegated to client/caller
+      // in other words runtime polymorphism is done via function closures
+      // will also be very helpful writing Unit Test code i.e. mocking the interface in similar fashion
       return x+y
     }
   )
