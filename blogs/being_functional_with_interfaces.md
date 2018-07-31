@@ -46,6 +46,8 @@ Let us get inside a code snippet once again:
 
 ```go
 func main() {
+  // anonymous function is where we do not need to write struct & properties
+  // i.e. less code to bother
   // cast the anonymous function to exact type
   lesscode := SingleMethodFunc(
     func(x, y int) int{
