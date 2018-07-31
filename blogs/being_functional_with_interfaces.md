@@ -46,9 +46,11 @@ Let us get inside a code snippet once again:
 
 ```go
 func main() {
-  // anonymous function is where we do not need to write struct & properties
-  // i.e. less code to bother
-  // cast the anonymous function to exact type
+  // anonymous function helps us in writing less code 
+  // i.e. we do not need to write struct & properties
+  // i.e. less code to bother / maintain
+  // i.e. a just in time implementation
+  // just cast the anonymous function to functional interface type
   lesscode := SingleMethodFunc(
     func(x, y int) int{
       // can do anything here -- probably return a hardcoded int
