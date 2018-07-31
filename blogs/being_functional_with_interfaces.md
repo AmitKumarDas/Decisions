@@ -12,7 +12,7 @@ However, ensuring use of single method only interfaces is not simple. In some la
 the entire business logic is lost with these explosion of interfaces. Go helps us a lot in this regard. Any structure in go 
 can adhere to an interface contract just by defining a method that has same signature to that of the targeted interface. On 
 similar lines, in go language one can define a typed function that abides an interface. This is easy with our first rule i.e.
-interface exposes a single method.
+with interface exposing a single method.
 
 Let us dive into a code snippet to provide more clarity:
 
