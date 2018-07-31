@@ -1,7 +1,6 @@
 ## Being Functional With Interfaces
 I would be talking about go language in particular here. We all have heard of or might even have experienced the benefits of
-interface oriented programming. To those who are not aware of the benefits, an interface can be used to switch impmenetations
-at runtime thereby providing maximum flexibility while implementing programs.
+interface oriented programming. To those who are not aware of the benefits, an interface can be used to switch implementations at runtime thereby providing maximum flexibility while implementing programs.
 
 ### Single Method Interface
 While interfaces are used most often for above said benefits, there is one good practice with respect to interface that should 
