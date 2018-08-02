@@ -1,4 +1,4 @@
-## WIP - Delegate concerns to middleware
+## Delegate concerns to middleware
 The topic may sound quite absurd. Well, it sounds absurd as I have mixed English with Go language's jargon. However, I felt
 that this topic is fairly simple enough to be remembered & hence is easy enough to be referred to later.
 
