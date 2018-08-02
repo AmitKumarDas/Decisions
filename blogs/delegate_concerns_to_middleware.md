@@ -34,7 +34,19 @@ type DoItMiddleware func(DoIt) DoIt
 
 // Here goes the delegation of concerns to middleware(s)
 // Auditor
-func DoItAuditor(a *myAuditPackage) DoIt {
-
+func DoItAuditor(a *myAuditPackage) DoItMiddleware {
+  // concrete logic for DoItMiddleware function
+  return func(d DoIt) DoIt {
+    // annonymous function has the concrete logic 
+    // that matches the DoIt interface & in addition decorates 
+    // the original DoIt instance
+    fn := func(input string) string {
+      // do the audit
+      // doit execution
+      return d(input)
+    }
+    // cast to a DoIt implementor
+    return DoItFunc(fn)
+  }
 }
 ```
