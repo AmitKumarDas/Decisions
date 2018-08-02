@@ -50,3 +50,6 @@ func DoItAuditor(a *myAuditPackage) DoItMiddleware {
   }
 }
 ```
+
+### References
+- https://www.bartfokker.nl/posts/decorators/
