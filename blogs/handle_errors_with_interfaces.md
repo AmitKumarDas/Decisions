@@ -29,7 +29,7 @@ func RegularError(buf []byte, processor Processor,
 - Interface ensures adhering to write logic in an idiomatic way
 - Utility functions are better off with interfaces or primitives as arguments
   - Think twice if you are passing or returning structures
-  - Dealing with structs is not bad but interfaces if possible will save us a lot of trouble
+  - Dealing with structs is not bad but interfaces if possible will save us a lot of churn i.e. technical debt
 - Compose interface(s) in struct(s)
 - Pass interface(s) as arguments
 
