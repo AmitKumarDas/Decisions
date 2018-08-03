@@ -76,7 +76,9 @@ func main() {
 
 ### What did we see?
 In my opinion, I find this to be a lot more appealing than writing a interface & necessary typed function adhering those
-interfaces. In short a lot less code.
+interfaces. In short a lot less code. The strategy itself i.e. approach to implement the polymorphic behaviour can be of
+many abstractions i.e. typed functions. Then one can have multiple specifics to each strategy and this ensures a idiomatic
+approach minus lots of lines of code. This is amazing in my opinion.
 
 ### References
 - https://golang.org/doc/codewalk/functions/
