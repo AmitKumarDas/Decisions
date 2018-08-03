@@ -24,7 +24,8 @@ type data struct {
 // action defines a typed function
 //
 // NOTE:
-//  This is similar to a contract signature of an interface
+//  This is similar to a contract signature of an interface but
+// without a interface. So less code.
 type action func(given *data) (response *data, ok bool)
 
 // actOne is a specific action 
@@ -47,7 +48,16 @@ func actNoop(given *data) (response *data, ok bool) {
   return
 }
 
-// strategy is a typed function that can be used to choose an action
+// strategy is a typed function that can be used to 
+// choose an action based on given data
+//
+// NOTE:
+//  Onc can have multiple such strategic typed functions
+// with varying signatures depending on requirements.
+//
+// NOTE:
+//  Again this is similar to a contract signature of an 
+// interface but without a interface. So less code.
 type strategy func(given *data) action
 
 // actBasedOnTime is a specific strategy
