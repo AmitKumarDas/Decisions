@@ -37,6 +37,8 @@ type DoItMiddleware func(DoIt) DoIt
 func DoItAuditor(a *myAuditPackage) DoItMiddleware {
   // concrete logic for DoItMiddleware function
   return func(d DoIt) DoIt {
+    // Step 1
+    //
     // annonymous function has the concrete logic 
     // that matches the DoIt interface & in addition decorates 
     // the original DoIt instance
@@ -45,6 +47,8 @@ func DoItAuditor(a *myAuditPackage) DoItMiddleware {
       // doit execution
       return d(input)
     }
+    // Step 2
+    //
     // cast to a DoIt implementor
     return DoItFunc(fn)
   }
