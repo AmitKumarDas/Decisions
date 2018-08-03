@@ -121,7 +121,7 @@ main() {
 	errFn(err)
 	
 	// vs.
-	// looks to be simpler
+	// looks to be even simpler
 	// same as the first snippet with functional implementation of interfaces
 	msg, err = processorWithErrHandler(buf, abcProcessorFn, sendErrFn)
 }
