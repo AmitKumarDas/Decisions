@@ -55,5 +55,9 @@ func DoItAuditor(a *myAuditPackage) DoItMiddleware {
 }
 ```
 
+### Concluding Notes
+Do not use this as your primary weapon. This should be used only for concerns or non-functional requirements. How about 
+using this to inject bugs?
+
 ### References
 - https://www.bartfokker.nl/posts/decorators/
