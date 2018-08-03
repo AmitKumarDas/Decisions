@@ -74,10 +74,10 @@ var sendErrFn = ErrorHandlerFn(
 	}
 )
 
-// abcProcessor is a specific implementation of Processor
+// abcProcessorFn is a specific implementation of Processor
 //
 // NOTE: assume 'abc' as a 3rd party lib
-var abcProcessor = ProcessorFn(
+var abcProcessorFn = ProcessorFn(
 	func(buf []byte) (message string, err error){
 		return abc.Buffer(buf)
 	}
@@ -87,7 +87,7 @@ var abcProcessor = ProcessorFn(
 // sent to an external system
 var abcProcessorWithErrSender = ProcessorFn(
 	func(buf []byte) (message string, err error){
-		message, err = abcProcessor()(buf)
+		message, err = abcProcessorFn()(buf)
 		if err != nil {
 			sendErrFn()(err)
 		}
@@ -96,17 +96,29 @@ var abcProcessorWithErrSender = ProcessorFn(
 	}
 )
 
+// processorWithErrHandler is a generic processor with error handler
+func processorWithErrHandler(buf []byte, processor Processor, handler ErrorHandler) (msg string, err error) {
+	msg, err = processor.Process(buf)
+	if err != nil {
+		handler.Handle(err)
+	}
+	return
+}
+
 main() {
-	// seems over engineering
+	// seems over-engineering
 	buf = []byte("i have some bytes")
 	msg, err := abcProcessorWithErrSender()(buf)
 	
 	// vs.
-
 	// seems simple
 	errFn := sendErrFn()
 	msg, err := abcProcessor()(buf)
 	errFn(err)
+	
+	// vs.
+	// looks to be simpler
+	msg, err = processorWithErrHandler(buf, abcProcessorFn, sendErrFn)
 }
 ```
 
