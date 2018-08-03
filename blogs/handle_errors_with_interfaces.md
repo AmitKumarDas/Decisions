@@ -97,12 +97,12 @@ var abcProcessorWithErrSender = ProcessorFn(
 )
 
 // processorWithErrHandler is a generic processor with error handler
-func processorWithErrHandler(buf []byte, processor Processor, handler ErrorHandler) (msg string, err error) {
-	msg, err = processor.Process(buf)
+func processorWithErrHandler(buf []byte, processor Processor, handler ErrorHandler) (string, error) {
+	msg, err := processor.Process(buf)
 	if err != nil {
 		handler.Handle(err)
 	}
-	return
+	return msg, err
 }
 
 main() {
@@ -118,6 +118,7 @@ main() {
 	
 	// vs.
 	// looks to be simpler
+	// same as the first snippet with functional implementation of interfaces
 	msg, err = processorWithErrHandler(buf, abcProcessorFn, sendErrFn)
 }
 ```
