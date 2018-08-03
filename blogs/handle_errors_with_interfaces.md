@@ -68,6 +68,8 @@ func (fn ErrorHandlerFn) Handle(err error) {
 }
 
 // sendErrFn sends error to an external system
+//
+// NOTE: This is a concrete implementation
 var sendErrFn = ErrorHandlerFn(
 	func(err error) {
 		external.Send(err)
@@ -77,6 +79,8 @@ var sendErrFn = ErrorHandlerFn(
 // abcProcessorFn is a specific implementation of Processor
 //
 // NOTE: assume 'abc' as a 3rd party lib
+//
+// NOTE: This is a concrete implementation
 var abcProcessorFn = ProcessorFn(
 	func(buf []byte) (message string, err error){
 		return abc.Buffer(buf)
