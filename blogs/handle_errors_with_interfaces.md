@@ -13,6 +13,7 @@ type ErrorHandler interface {
 	Handle(err error)
 }
 
+// Query - How do you build instances for Processor & ErrorHandler ?
 func RegularError(buf []byte, processor Processor,
 	handler ErrorHandler) (message string, err error) {
 	message, err = processor.Process(buf)
