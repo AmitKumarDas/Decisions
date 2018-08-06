@@ -37,7 +37,7 @@ On a concluding note, this move from being an activity to a process should not e
 ### How it all started
 I will try to write down my thoughts for installer in following sections:
 
-#### First Conclusions
+#### First Level Conclusions
 - Install should solve the problem of end users trying to deploy massive amounts of yamls
 - Make use of ENV to install or un-install
 - Install the current release only
@@ -48,18 +48,18 @@ I will try to write down my thoughts for installer in following sections:
 - Install based on the install yaml
 - Un-install based on the un-install yaml
 
-#### Second Conclusions
+#### Second Level Conclusions
 - Make use of Integration Tests to test install & un-install
 - Make use of go templates to implement install & un-install
 
-#### Third Conclusions
+#### Third Level Conclusions
 - Install should solve problems faced by facing teams i.e. internal & external
   - Install can solve above by exposing helm like templating
 - Install should be able to accept values from helm
 - Install should be able to accept overlay yamls from kustomize
 - Make use of interface oriented programming
 
-#### Fourth Conclusions
+#### Fourth Level Conclusions
 - Install should not bother dealing with helm, kustomize or something else
 - Install should be able to work with any tool without being a provider of that tool
 - Make use of ConfigMap as a config to install and un-install
@@ -72,20 +72,58 @@ I will try to write down my thoughts for installer in following sections:
 - Make use of pkg/errors while throwing errors
 - Accumulate error(s) during install and un-install
 - Do not panic due to install or un-install errors
-- Install can install multiple versions
-- Install can un-install multiple versions
+- An install resource can be a native kubernetes resource or a custom resource
+- Install will install all the runtasks as-is
+- Install can install multiple versions of a resource
+- Install can un-install multiple versions of a resource
+- Install can install multiple flavours of a resource
+- Install & Un-install will be coupled to resource
 - User is free to not use this install & un-install feature
 - Make use of versioning in namespaces to manage the technical debt without impact
 - Install will default to re-install i.e. remove if already installed & re-install once again
 
-#### Fifth Conclusions
+#### Fifth Level Conclusions
 - Install will default to install if not installed
 - Install will `update` or `patch` or `do nothing` if already installed (RnD)
 - Install will not un-install during a panic of installer
 - Install will not un-install during a shutdown of installer
 
-### This is how it looks:
+#### Sixth Level Conclusions
+- Install will install the resource with a custom label e.g. `installer.openebs.io/release: 0.7.0`
+- Install will re-install i.e. remove & add if a resource already exists
+- Above will continue till kubectl like _**apply**_ feature is exposed via client-go
+- Install will manage very specific resources like CASTemplate & RunTasks in its first release
+
+### Install Config Design:
+#### Fifth Level Install Config Conclusions
 ```yaml
 install:
+  # release version to install
+  - version: 0.7.0
+    # will make use of this namespace for all the appropriate resources
+    namespace:
+    # will make use of this service account for all the appropriate resources
+    serviceAccountName:
+    # specific resources of this release to override
+    # can specify a complete resource as well that should be installed
+    resources:
+    - kind:
+      namespace:
+    - kind:
+      apiVersion:
+      namespace:
+    - kind:
+      name:
+      namespace:
+      # override the entire spec
+      spec: |
 uninstall:
+  # remove all resources from test namespace with 0.7.0 as the version
+  - version: 0.7.0
+    namespace: test
+  # remove all the resources from openebs namespace with 0.6.5 as the version
+  - version: 0.6.5
+    namespace: openebs
+  # remove all the resources from all namespaces with 0.6.6 as the version
+  - version: 0.6.6
 ```
