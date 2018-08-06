@@ -1,5 +1,5 @@
 ### What if you programmed ABC as XYZ
-Welcome back! Have you often come out with ideas that you think now is better than the earlier solution you implemented to a
+Welcome back! Have you often come out with ideas that you think is better than the earlier solution you implemented to a
 given problem statement. On the hindsight we are slaves to our first conclusion bias. Our brains shut off any other 
 possibilities once it gets attracted to a particular solution. Human brains are wired to optimise its use of energy into 
 approving an idea to being a great solution indeed stamping it as the only solution possible. It often relies on past 
