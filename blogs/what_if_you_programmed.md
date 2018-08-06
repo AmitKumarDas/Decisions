@@ -7,8 +7,8 @@ experiences, current mood, ongoing interactions with others, and so many other f
 one's control.
 
 ### How to overcome then?
-This is an issue which can be solved in an elegant manner, which is write down all your incoming ideas. Start putting down 
-your loved ideas and then start disconfirming them. Tip: Use your notepad.
+This is an issue which can be solved in an elegant manner, by following a really simple process. Start putting down your
+much loved ideas and then start disconfirming them one by one. Tip: Use your notepad.
 - Write down your belief versus three possibilities that stands against this belief
 - Being intelligent on the topic versus applying wisdom from across the subject
 - Calculating answers versus considering possibilities
