@@ -17,7 +17,7 @@ much loved ideas and then start disconfirming them one by one. Tip: Use your not
 
 #### Programming conclusions and their disconfirming alternatives
 - Plain logic of switch case statement vs.
-  - Case to _**specific strategies**_
+  - Each case statement invoking a _**specific strategy**_
   - Note - A specific strategy can be a higher order function
   - Note - A specific strategy can be an interface based abstraction
 - Plain function or method implementing a switch statement vs.
