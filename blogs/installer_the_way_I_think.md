@@ -95,7 +95,7 @@ I will try to write down my thoughts for installer in following sections:
 - Install will manage very specific resources like CASTemplate & RunTasks in its first release
 
 ### Install Config Design:
-#### Fifth Level Install Config Conclusions
+#### Sixth Level Install Config Conclusions
 ```yaml
 install:
   # release version to install
@@ -104,19 +104,23 @@ install:
     namespace:
     # will make use of this service account for all the appropriate resources
     serviceAccountName:
-    # specific resources of this release to override
-    # can specify a complete resource as well that should be installed
+    # will add these label(s) to all the resources
+    labels:
+    # will add these annotation(s) to all the resources
+    annotations:
+    # specify complete resource or partial resource spec to install
+    # a future item; may or may not required; a classic case for overlays
     resources:
+    # kind can be CASTemplate
     - kind:
-      namespace:
-    - kind:
-      apiVersion:
-      namespace:
-    - kind:
-      name:
-      namespace:
-      # override the entire spec
+      # make use of specific parts of the kind
       spec: |
+        # type can be SPC or CStor Volume or Jiva Volume
+        type:
+        defaultConfig:
+    - kind:
+      # doc can be the entire resource
+      doc: |
 uninstall:
   # remove all resources from test namespace with 0.7.0 as the version
   - version: 0.7.0
