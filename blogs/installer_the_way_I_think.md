@@ -102,26 +102,27 @@ thoughts that hit my brain. I try to write down several thoughts that come in la
 
 ### Final Install Config:
 ```yaml
-install:
-  # release version to install
-  - version: 0.7.0
-    # will make use of this namespace for all the appropriate resources
-    namespace:
-    # will make use of this service account for all the appropriate resources
-    serviceAccountName:
-    # will add these label(s) to all the resources
-    labels:
-    # will add these annotation(s) to all the resources
-    annotations:
-uninstall:
-  # remove all resources from test namespace with 0.7.0 as the version
-  - version: 0.7.0
-    namespace: test
-  # remove all the resources from openebs namespace with 0.6.5 as the version
-  - version: 0.6.5
-    namespace: openebs
-  # remove all the resources from all namespaces with 0.6.6 as the version
-  - version: 0.6.6
+spec:
+  install:
+    # release version to install
+    - version: 0.7.0
+      # will make use of this namespace for all the appropriate resources
+      namespace:
+      # will make use of this service account for all the appropriate resources
+      serviceAccountName:
+      # will add these label(s) to all the resources
+      labels:
+      # will add these annotation(s) to all the resources
+      annotations:
+  uninstall:
+    # remove all resources from test namespace with 0.7.0 as the version
+    - version: 0.7.0
+      namespace: test
+    # remove all the resources from openebs namespace with 0.6.5 as the version
+    - version: 0.6.5
+      namespace: openebs
+    # remove all the resources from all namespaces with 0.6.6 as the version
+    - version: 0.6.6
 ```
 
 ### Low Level Design Decisions
