@@ -34,10 +34,10 @@ is no longer a one time activity but a reconcile loop that runs throughout the l
 
 On a concluding note, this move from being an activity to a process should not even be a thing of concern to the end users.
 
-### How it all started
+### Hypothesis to aid High Level Design Decisions
 I will try to write down my thoughts for installer in following sections:
 
-#### First Level Conclusions
+#### First Time Conclusions
 - Install should solve the problem of end users trying to deploy massive amounts of yamls
 - Make use of ENV to install or un-install
 - Install the current release only
@@ -48,18 +48,18 @@ I will try to write down my thoughts for installer in following sections:
 - Install based on the install yaml
 - Un-install based on the un-install yaml
 
-#### Second Level Conclusions
+#### Second Time Conclusions
 - Make use of Integration Tests to test install & un-install
 - Make use of go templates to implement install & un-install
 
-#### Third Level Conclusions
+#### Third Time Conclusions
 - Install should solve problems faced by facing teams i.e. internal & external
   - Install can solve above by exposing helm like templating
 - Install should be able to accept values from helm
 - Install should be able to accept overlay yamls from kustomize
 - Make use of interface oriented programming
 
-#### Fourth Level Conclusions
+#### Fourth Time Conclusions
 - Install should not bother dealing with helm, kustomize or something else
 - Install should be able to work with any tool without being a provider of that tool
 - Make use of ConfigMap as a config to install and un-install
@@ -82,20 +82,19 @@ I will try to write down my thoughts for installer in following sections:
 - Make use of versioning in namespaces to manage the technical debt without impact
 - Install will default to re-install i.e. remove if already installed & re-install once again
 
-#### Fifth Level Conclusions
+#### Fifth Time Conclusions
 - Install will default to install if not installed
 - Install will `update` or `patch` or `do nothing` if already installed (RnD)
 - Install will not un-install during a panic of installer
 - Install will not un-install during a shutdown of installer
 
-#### Sixth Level Conclusions
+#### Sixth Time Conclusions
 - Install will install the resource with a custom label e.g. `installer.openebs.io/release: 0.7.0`
 - Install will re-install i.e. remove & add if a resource already exists
 - Above will continue till kubectl like _**apply**_ feature is exposed via client-go
 - Install will manage very specific resources like CASTemplate & RunTasks in its first release
 
-### Install Config Design:
-#### Sixth Level Install Config Conclusions
+### Final Install Config:
 ```yaml
 install:
   # release version to install
@@ -108,19 +107,6 @@ install:
     labels:
     # will add these annotation(s) to all the resources
     annotations:
-    # specify complete resource or partial resource spec to install
-    # a future item; may or may not required; a classic case for overlays
-    resources:
-    # kind can be CASTemplate
-    - kind:
-      # make use of specific parts of the kind
-      spec: |
-        # type can be SPC or CStor Volume or Jiva Volume
-        type:
-        defaultConfig:
-    - kind:
-      # doc can be the entire resource
-      doc: |
 uninstall:
   # remove all resources from test namespace with 0.7.0 as the version
   - version: 0.7.0
@@ -131,3 +117,15 @@ uninstall:
   # remove all the resources from all namespaces with 0.6.6 as the version
   - version: 0.6.6
 ```
+
+### Hypothesis to aid Low Level Design Decisions
+#### First Time Conclusion
+- pkg/install/v1alpha1
+- pkg/k8s/v1alpha1
+- pkg/client/k8s/v1alpha1
+- install/v1alpha1-0.7.0/cstor-pool/
+- install/v1alpha1-0.7.0/cstor-volume/
+- install/v1alpha1-0.7.0/jiva-volume/
+
+#### Second Time Conclusion
+- cmd/maya-apiserver/app/command/start.go will trigger install
