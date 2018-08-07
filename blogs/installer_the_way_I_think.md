@@ -34,8 +34,9 @@ is no longer a one time activity but a reconcile loop that runs throughout the l
 
 On a concluding note, this move from being an activity to a process should not even be a thing of concern to the end users.
 
-### Hypothesis to aid High Level Design Decisions
-I will try to write down my thoughts for installer in following sections:
+### High Level Design Decisions
+I will try to write down my thoughts with respect to high level design. This enables me to remain un-biased with first
+thoughts that hit my brain. I try to write down several thoughts that come in later and either disconfirm or confirm with my earlier thoughts.
 
 #### First Time Conclusions
 - Install should solve the problem of end users trying to deploy massive amounts of yamls
@@ -118,14 +119,20 @@ uninstall:
   - version: 0.6.6
 ```
 
-### Hypothesis to aid Low Level Design Decisions
+### Low Level Design Decisions
+I follow the same approach with low level design thoughts as well. However, since this is pretty much a coding activity, it
+depends on how I start implementing the code and obviously depends a lot on my previous coding skills. Having said this, 
+code is also a derivative of brain's biasedness towards a particular style of implementation. The important point to 
+consider here is _"It is best to embrace simplicity than be stupid to attempt perfection from the word go"_.
+
 #### First Time Conclusions
-- pkg/install/v1alpha1
-- pkg/k8s/v1alpha1
-- pkg/client/k8s/v1alpha1
-- install/v1alpha1-0.7.0/cstor-pool/
-- install/v1alpha1-0.7.0/cstor-volume/
-- install/v1alpha1-0.7.0/jiva-volume/
+- Packaging structure consisting of versioned folders:
+  - pkg/install/v1alpha1
+  - pkg/k8s/v1alpha1
+  - pkg/client/k8s/v1alpha1
+  - install/v1alpha1-0.7.0/cstor-pool/
+  - install/v1alpha1-0.7.0/cstor-volume/
+  - install/v1alpha1-0.7.0/jiva-volume/
 
 #### Second Time Conclusions
 - cmd/maya-apiserver/app/command/start.go will trigger install
