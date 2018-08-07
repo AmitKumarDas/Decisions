@@ -6,7 +6,7 @@ would have assumed this to be a low returns on investment.
 ### Disconfirming Evidence
 Now lets try to think otherwise before getting biased with my first conclusion. There have been a few niggling problems 
 that I have been noticing with our existing installation practices. We depend on a tool called _**kubectl**_ and some 
-yaml files to deploy our components. We also have been making use of another tool called _**helm**_ to do the same but 
+yaml files to deploy our components. We have also been making use of another tool called _**helm**_ to do the same but 
 by delegating the defaults and other specifics to the end user. In other words, helm enables our users to specify 
 exactly how our product should get installed. However, there is no integration between the kubectl way & the helm way. 
 We have concluded ourselves that kubectl way is a simple way that a team either internal to our company or external 
