@@ -148,3 +148,14 @@ consider here is _"It is best to embrace simplicity than be stupid to attempt pe
   - Design a struct that implements above interface
   - Ensure this struct is composed of other high order functions, strategies, arguments or interfaces
 - Start with higher order function & refactor it to an interface if required
+- When the service structure that is composed of various interfaces, or functions needs to be set dynamically:
+  - Then create a builder of above structure
+  - In other words a fluent API might serve the requirements at the caller side
+  - For Example: 
+  ```go
+  ServiceBuilder()
+    .Config(xyzConfigFn)
+    .Executor(newExecutor())
+    .Build()
+  ```
+  - NOTE - A typical instantiation function like `NewService()` may not work out in these cases
