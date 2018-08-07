@@ -139,3 +139,4 @@ uninstall:
   - Then convert this high order function into a single method interface
   - Design a struct that implements above interface
   - Ensure this struct is composed of other high order functions, strategies, arguments or interfaces
+- Start with higher order function & refactor it to an interface if required
