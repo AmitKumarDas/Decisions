@@ -12,10 +12,10 @@ exactly how our product should get installed. However, there is no integration b
 We have concluded ourselves that kubectl way is a simple way that a team either internal to our company or external 
 i.e. our users, can use without bothering about the product internals.
 
-This was all fine till our teams wanted to install the product in a way that suits their purpose. By all the above logic, 
-oneassumes that this team should make use of helm. This is where things start to get murky. We need to update the helm 
-charts & are dependant on core maintainers for such activities. Some of the component installation require yet to be 
-released helm binary bringing our entire company to a standstill till above process is sorted out.
+This was all fine till our teams wanted to install the product in a way that suits their purpose. With above logic, one
+would advice this team to make use of helm. This is where things start to get murky. We need to update the helm charts & are
+dependant on core maintainers for such activities. Some of the component installation require yet to be released helm binary
+bringing our entire company to a standstill till above process is sorted out.
 
 The reader of this article would have probably concluded by now that we need a installer of our own. Some of the assumptions
 that might be doing rounds in the reader's mind are:
@@ -25,12 +25,13 @@ that might be doing rounds in the reader's mind are:
 
 ### There is lot more
 It is not just about decoupling from above tools to get the install done. There is lot more to installation than just 
-installing the solution on any given environment. Installation need to bother about cloud versus on-premise environments. 
-It needs to abstract away the product internals from the end user. Expecting all of these to be available in community 
-tools is not a convincing idea. In fact this is one of the reasons, we find a lot of home grown as well as community 
-developed  operators whose main job is to provide a lifecycle to install and ensure a smooth day two related operations. 
-Scale up, scale  down, upgrade, remove, etc are other factors that are very much a part of _**install lifecycle**_. Install
-is no longer a one time activity but a reconcile loop that runs throughout the lifecycle of the product.
+installing the solution on any given environment. On one hand, installation need to bother about cloud versus on-premise
+environments. At the same time, it must abstract away the product internals from the end user. Expecting these, which also
+sounds to be contradictory statements, to be available in community tools does not seem convincing. In fact this is one of
+the reasons, we find a lot of home grown as well as community developed  operators whose main job is to provide a lifecycle
+to install and ensure a smooth day two related operations. Scale up, scale  down, upgrade, remove, etc are other factors 
+that are very much a part of _**install lifecycle**_. Install is no longer a one time activity but a reconcile loop that 
+runs throughout the lifecycle of the product.
 
 On a concluding note, this move from being an activity to a process should not even be a thing of concern to the end users.
 
