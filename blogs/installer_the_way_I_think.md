@@ -119,7 +119,7 @@ uninstall:
 ```
 
 ### Hypothesis to aid Low Level Design Decisions
-#### First Time Conclusion
+#### First Time Conclusions
 - pkg/install/v1alpha1
 - pkg/k8s/v1alpha1
 - pkg/client/k8s/v1alpha1
@@ -127,5 +127,15 @@ uninstall:
 - install/v1alpha1-0.7.0/cstor-volume/
 - install/v1alpha1-0.7.0/jiva-volume/
 
-#### Second Time Conclusion
+#### Second Time Conclusions
 - cmd/maya-apiserver/app/command/start.go will trigger install
+
+#### Third Time Conclusions
+- Build high order function based strategies only if they are required
+  - One can always design a function based strategy & compose it inside the service based struct **later**
+  - Above refactoring will have little impact
+- High order functions are fine as long as they are tasked with single responsibility
+- If high order functions need to use other high order functions, or strategies, various arguments:
+  - Then convert this high order function into a single method interface
+  - Design a struct that implements above interface
+  - Ensure this struct is composed of other high order functions, strategies, arguments or interfaces
