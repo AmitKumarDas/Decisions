@@ -96,6 +96,10 @@ thoughts that hit my brain. I try to write down several thoughts that come in la
 - Above will continue till kubectl like _**apply**_ feature is exposed via client-go
 - Install will manage very specific resources like CASTemplate & RunTasks in its first release
 
+#### Seventh Time Conclusions
+- Install & UnInstall will deal with resources defined in installer
+- It is not a generic installer & un-installer
+
 ### Final Install Config:
 ```yaml
 install:
