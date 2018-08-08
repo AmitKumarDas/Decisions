@@ -37,7 +37,10 @@ On a concluding note, this move from being an activity to a process should not e
 
 ### High Level Design Decisions
 I will try to write down my thoughts with respect to high level design. This enables me to remain un-biased with first
-thoughts that hit my brain. I try to write down several thoughts that come in later and either disconfirm or confirm with my earlier thoughts.
+thoughts that hit my brain. I try to write down several thoughts that come in later and either disconfirm or confirm with my earlier thoughts. 
+
+_NOTE: There will be a lot of initial thoughts, which I have written down but may not (will not) actually implement based on
+the thoughts that come in later due to better evidence, interactions, findings, real needs versus speculations and so on._
 
 #### First Time Conclusions
 - Install should solve the problem of end users trying to deploy massive amounts of yamls
@@ -55,7 +58,7 @@ thoughts that hit my brain. I try to write down several thoughts that come in la
 - Make use of go templates to implement install & un-install
 
 #### Third Time Conclusions
-- Install should solve problems faced by facing teams i.e. internal & external
+- Install should solve problems faced by different teams i.e. internal & external
   - Install can solve above by exposing helm like templating
 - Install should be able to accept values from helm
 - Install should be able to accept overlay yamls from kustomize
