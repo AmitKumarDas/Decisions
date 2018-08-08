@@ -147,11 +147,12 @@ consider here is _"It is best to embrace simplicity than be stupid to attempt pe
 - Build high order function based strategies only if they are required
   - One can always design a function based strategy & compose it inside the service based struct **later**
   - Above refactoring will have little impact
-- High order functions are fine as long as they are tasked with single responsibility
-- If high order functions need to use other high order functions, or strategies, various arguments:
+- High order functions are fine as long as they are independent
+  - In other words, if functions do not depend on any other packages, then being a function suffices
+- If high order functions need to use other packages, or other functions, or strategies, or depend on multiple arguments:
   - Then convert this high order function into a single method interface
   - Design a struct that implements above interface
-  - Ensure this struct is composed of other high order functions, strategies, arguments or interfaces
+  - Ensure this struct is composed of other functions, strategies, arguments, interfaces
 - Start with higher order function & refactor it to an interface if required
 - When the service structure that is composed of various interfaces, or functions needs to be set dynamically:
   - Then create a builder of above structure
