@@ -110,13 +110,13 @@ spec:
     # release version to install
     - version: 0.7.0
       # will make use of this namespace for all the appropriate resources
-      namespace:
+      withNamespace:
       # will make use of this service account for all the appropriate resources
-      serviceAccountName:
+      withServiceAccount:
       # will add these label(s) to all the resources
-      labels:
+      withLabels:
       # will add these annotation(s) to all the resources
-      annotations:
+      withAnnotations:
   uninstall:
     # remove all resources from test namespace with 0.7.0 as the version
     - version: 0.7.0
