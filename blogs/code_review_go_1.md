@@ -169,4 +169,44 @@ func Wrapf(err error, format string, args ...interface{}) error {
 		callers(),
 	}
 }
+
+// Cause returns the underlying cause of the error, if possible.
+// An error value has a cause if it implements the following
+// interface:
+//
+//     type causer interface {
+//            Cause() error
+//     }
+//
+// If the error does not implement Cause, the original error will
+// be returned. If the error is nil, nil will be returned without further
+// investigation.
+//
+// Notes:
+// - Pretty smart way of naming this function
+// - This is just a function with different responsibility than the corresponding interface method
+// - Imagine if you are able to develop interface method(s) without any arguments;
+// - Then one can design / name a function as smartly as this
+// - Why smart? As it relates to the requirement very nicely without any learning curve
+// - Nice use of for logic. Terse yet effective.
+// - Use of Causer interface makes the find logic w.r.t root cause so simple
+// - One also notices how the entire interface is defined within this public package utility function;
+// - The first time I noticed this I was surprised. This is ok & one may or may not resort to this approach
+// - Remember do not try to surprise the fellow maintainers too often
+// - Rather make your code easy to understand and reason about
+// - However, I felt this function name & its implementation to be smart & reasonable
+func Cause(err error) error {
+	type causer interface {
+		Cause() error
+	}
+
+	for err != nil {
+		cause, ok := err.(causer)
+		if !ok {
+			break
+		}
+		err = cause.Cause()
+	}
+	return err
+}
 ```
