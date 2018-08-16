@@ -1,4 +1,4 @@
-## Code Review
+## Code Review - Episode 1
 This is first of the series of articles tagged under _Code Review_. The purpose of writing a code review of any open source 
 code is to learn coding from real world projects. Learning here involves writing down the same source code with comments of 
 my own, which in turn will negate any first conclusion bias-es I might chance upon during my first code reading.
