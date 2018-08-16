@@ -191,7 +191,8 @@ func Wrapf(err error, format string, args ...interface{}) error {
 // - Nice use of for logic. Terse yet effective.
 // - Use of Causer interface makes the find logic w.r.t root cause so simple
 // - One also notices how the entire interface is defined within this public package utility function;
-// - The first time I noticed this I was surprised. This is ok & one may or may not resort to this approach
+// - First time I noticed this I was surprised;
+// - This is ok & one may or may not resort to this approach
 // - Remember do not try to surprise the fellow maintainers too often
 // - Rather make your code easy to understand and reason about
 // - However, I felt this function name & its implementation to be smart & reasonable
