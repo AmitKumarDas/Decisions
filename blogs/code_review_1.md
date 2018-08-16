@@ -5,7 +5,7 @@ my own, which in turn will negate any first conclusion bias-es I might chance up
 
 As we shall see, there are a lot of things that can be learnt from reading, reviewing & subsequent writing down the review
 analysis than by just reading the best practices and writing software logic for an project. Have a careful look at the 
-code comments titled under Notes: section. These _Notes:_ are actually my review.
+code comments titled under _Notes:_ section. These `// Notes:` are actually my review comments.
 
 ### Show me the code !!
 I shall do a code review of https://github.com/pkg/errors/ project.
