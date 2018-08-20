@@ -102,6 +102,57 @@ func VersionedArtifactLister() ArtifactLister {
 	})
 }
 
-// One the whole above code seems good. The code is not verbose and is not too terse as well. I felt above code
-// as practical. However, is there any other approach that is good as well as pragmatic. Let us check below code snippets.
+// One the whole above code seems good. The code is not verbose and is not too terse as well. 
+// I felt above code as practical. 
+// However, is there any other approach that is good as well as pragmatic. 
+// Let us check below code snippets.
+
+// VersionArtifactLister abstracts listing of Artifacts based on version
+//
+// Notes:
+// - The interface is modified to focus on version based listing
+// - The argument of interface method makes use of version which seems to be very natural
+// - This also enables decoupling of creation from invocation as mentioned earlier
+//
+// - The main debate of practical code comes up here
+// - If the requirements will never make use of any other filtering abilities than version
+// - contd... this code seems to be more practical than the one above
+// - However, this is about being more practical versus less practical
+type VersionArtifactLister interface {
+	List(version string) (ArtifactList, error)
+}
+
+// VersionArtifactListerFunc is a functional implementation of 
+// VersionArtifactLister
+//
+// Notes:
+// - A functional type avoids creating a struct that implements above interface
+type VersionArtifactListerFunc func(version string) (ArtifactList, error)
+
+// List is an implementation of VersionArtifactLister
+func (fn VersionArtifactListerFunc) List(version string) (ArtifactList, error) {
+	return fn(version)
+}
+
+// VersionedArtifactLister returns a new instance of VersionArtifactLister that 
+// is capable of returning artifacts based on the provided version
+//
+// Notes:
+// - Very few changes here
+// - options is gone & version has taken its place
+func VersionedArtifactLister() ArtifactLister {
+	return ArtifactListerFunc(func(version string) (VersionArtifactLister, error) {
+		switch version {
+		case "0.7.0":
+			return RegisteredArtifactsFor070(), nil
+		default:
+			return ArtifactList{}, fmt.Errorf("invalid version '%s': failed to list artifacts by version", version)
+		}
+	})
+}
 ```
+
+### Conclusion
+Some may argue above representations did not showcase a smart code versus a practical one. I agree to this. Both the snippets
+seems practical. However, one can make use of above writings to detect & perhaps reject smart code and be more submissive
+to approve user (_read coder_) friendly code.
