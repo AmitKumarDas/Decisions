@@ -7,7 +7,7 @@ on a user's hat and review the code from its readability point of view.
 There are so many factors that a developer needs to keep in mind, while implementing a logic. There are chances this 
 developer goes too far keeping best practices in mind. At the end of the day, this logic will get `10/10` from various linting
 and other tools. This sounds great. However, the thing that I have come to realize rather late, is the ability to write code
-that is easy to understand by the reviewers and maintainers is what `all that matters`.
+that is easy to understand by the reviewers and maintainers is the only stuff that matters.
 
 ### Smart code vs. Good code
 What is smart code. Smart code will get 10 on 10 from the review hubs. Smart code is perhaps the best way to have the logic
