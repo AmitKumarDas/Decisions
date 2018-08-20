@@ -1,17 +1,24 @@
-### Code Review - Part 2
+### Code Review - Episode 2
 This article is part of a series of blogs related to code review. I keep writing down the source code of my own project or
 one from some open source community and start providing my own review comments as code level commments. This helps me in 
 avoiding any first conclusion bias(-es) I might form when I look at the code for the first time. This also helps me to think
 by putting on a user's hat and review the code from its readability point of view.
 
+I shall divide this blog into two parts:
+- Part 1 talks about my recents thoughts about programming in general
+- Part 2 talks about one of my latest source code and its code review
+
+NOTE: - Both the parts are not exactly related though.
+
+## Part 1
+### Smart code vs. Good code
 There are so many factors that a developer needs to keep in mind, while implementing a logic. There are chances this 
 developer goes too far keeping best practices in mind. At the end of the day, this logic will get `10/10` from various 
 linting and other tools. This sounds great. However, the thing that I have come to realize rather late, is the ability to 
 write code that is easy to understand by the reviewers and maintainers is the only stuff that matters.
 
-### Smart code vs. Good code
-What is smart code. Smart code will get 10 on 10 from the review hubs. Smart code is perhaps the best way to have the logic
-implemented for some piece of requirement. 
+So what is smart code then? Smart code will get 10 on 10 from the review hubs. Smart code is perhaps the best way to have 
+the logic implemented for some piece of requirement. 
 
 However, I have a different take with respect to code that is smart. I feel a code is given a smart tag, when a fellow 
 maintainer or reviewer looks at the code and does not feel at home. This other fella somehow feels it must be good code, 
@@ -26,7 +33,8 @@ While above was a discussion on how a code can show off it's smartness, I shall 
 easy to understand. I shall do it by pasting some source code as well as my review comments that hinges on ease of 
 understanding than being smart.
 
-### Here goes the code!
+## Part 2 
+### Here are the code reviews
 **Check for `Notes:` section in the code level comments**
 
 ```go
@@ -151,8 +159,3 @@ func VersionedArtifactLister() VersionArtifactLister {
 	})
 }
 ```
-
-### Conclusion
-Some may argue above representations did not showcase a smart code versus a practical one. I agree to this. Both the snippets
-seems practical. However, one can make use of above writings to detect & perhaps reject smart code and be more submissive
-to approve user (_read coder_) friendly code.
