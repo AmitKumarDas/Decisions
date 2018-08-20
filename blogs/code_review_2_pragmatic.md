@@ -11,14 +11,20 @@ write code that is easy to understand by the reviewers and maintainers is the on
 
 ### Smart code vs. Good code
 What is smart code. Smart code will get 10 on 10 from the review hubs. Smart code is perhaps the best way to have the logic
-implemented for some piece of requirement. Smart code is definitely the case, when a fellow maintainer or reviewer looks at 
-the code and does not feel at home. This other fella somehow feels it must be good code, since it looks terse and makes use 
-of some of the language features that is not so common. Only the one who lives in the language can write such a code. There 
-are no linting issues and has very good code coverage. This other chap now approves the code with LGTM.
+implemented for some piece of requirement. 
 
-### Being pragmatic
-While above was a discussion on how a code can talk about it's smartness, I shall delve into code that is more practical and
-easy to understand. I shall paste some source code as well as my review comments that hinge on pragmatism.
+However, I have a different take with respect to code that is smart. I feel a code is given a smart tag, when a fellow 
+maintainer or reviewer looks at the code and does not feel at home. This other fella somehow feels it must be good code, 
+since it looks terse and makes use of some of the language features that is not so common. Only the one who lives in the 
+language day in & day out can write such a code. There are no linting issues and it has very good code coverage. This pushes 
+this code reviewer to approve the code with a Looks Good To Me `LGTM`. Needless to say, this reviewer feels guilty about 
+approving this code which works fine but misses something which is difficult to describe. What is this something that is so
+difficult to explain?
+
+### Being user friendly
+While above was a discussion on how a code can show off it's smartness, I shall delve into code that is more practical and
+easy to understand. I shall do it by pasting some source code as well as my review comments that hinges on ease of 
+understanding than being smart.
 
 ### Here goes the code!
 **Check for _Notes:_ in the code comments**
@@ -96,6 +102,6 @@ func VersionedArtifactLister() ArtifactLister {
 	})
 }
 
-// One the whole above code seems good. The code is not verbose as well by avoiding some lines of code. I felt above code
+// One the whole above code seems good. The code is not verbose and is not too terse as well. I felt above code
 // as practical. However, is there any other approach that is good as well as pragmatic. Let us check below code snippets.
 ```
