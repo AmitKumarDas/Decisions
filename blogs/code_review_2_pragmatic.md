@@ -30,7 +30,7 @@ difficult to explain?
 There are so many factors that a developer needs to keep in mind, while implementing a logic. There are chances this 
 developer goes too far keeping best practices in mind. At the end of the day, this logic will get `10/10` from various 
 linting and other tools. This sounds great. However, the thing that I have come to realize rather late, is the ability to 
-write code that is easy to understand by the reviewers and maintainers is the only stuff that matters.
+write code that is easy to understand by the reviewers and maintainers is _**the most important**_ that should matter.
 
 I shall delve into code that tries to uncover if the same is more practical and easy to understand versus if it is more 
 smart versus if it is more generic.
