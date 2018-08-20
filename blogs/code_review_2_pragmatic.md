@@ -5,20 +5,18 @@ avoiding any first conclusion bias(-es) I might form when I look at the code for
 by putting on a user's hat and review the code from its readability point of view.
 
 I shall divide this blog into two parts:
-- Part 1 talks about my recents thoughts about programming in general
-- Part 2 talks about one of my latest source code and its code review
-
-NOTE: - Both the parts are not exactly related though.
+- Part 1 talks about my recents thoughts about writing `practical code` vs. `smart code` vs. `generic code`
+- Part 2 talks about one of my latest source code and its code review which validates the discussions of Part 1
 
 ## Part 1
-### Smart code vs. Good code
-There are so many factors that a developer needs to keep in mind, while implementing a logic. There are chances this 
-developer goes too far keeping best practices in mind. At the end of the day, this logic will get `10/10` from various 
-linting and other tools. This sounds great. However, the thing that I have come to realize rather late, is the ability to 
-write code that is easy to understand by the reviewers and maintainers is the only stuff that matters.
+### Smart code vs. Generic code vs. Practical code
+We need not elaborate deeply on what is generic code. I guess most of us understand this. This typically means having a lot
+of interfaces, higher order functions and so on to implement a given requirement. This will enable us to achieve 
+extensibility. The only side effect will be more lines of code. Now this is all fine when the requirement demands such a 
+need.
 
 So what is smart code then? Smart code will get 10 on 10 from the review hubs. Smart code is perhaps the best way to have 
-the logic implemented for some piece of requirement. 
+the logic implemented for some piece of requirement that is un-thinkable by most of the fellow developers. 
 
 However, I have a different take with respect to code that is smart. I feel a code is given a smart tag, when a fellow 
 maintainer or reviewer looks at the code and does not feel at home. This other fella somehow feels it must be good code, 
@@ -28,10 +26,14 @@ this code reviewer to approve the code with a Looks Good To Me `LGTM`. Needless 
 approving this code which works fine but misses something which is difficult to describe. What is this something that is so
 difficult to explain?
 
-### Being user friendly
-While above was a discussion on how a code can show off it's smartness, I shall delve into code that is more practical and
-easy to understand. I shall do it by pasting some source code as well as my review comments that hinges on ease of 
-understanding than being smart.
+### Being practical is user friendly
+There are so many factors that a developer needs to keep in mind, while implementing a logic. There are chances this 
+developer goes too far keeping best practices in mind. At the end of the day, this logic will get `10/10` from various 
+linting and other tools. This sounds great. However, the thing that I have come to realize rather late, is the ability to 
+write code that is easy to understand by the reviewers and maintainers is the only stuff that matters.
+
+I shall delve into code that tries to uncover if the same is more practical and easy to understand versus if it is more 
+smart versus if it is more generic.
 
 ## Part 2 
 ### Here are the code reviews
