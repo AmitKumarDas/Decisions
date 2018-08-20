@@ -19,3 +19,77 @@ linting issues and has very good code coverage. This other chap now approves the
 ### Being pragmatic
 While above was a discussion on how a code can talk about it's smartness, I shall delve into code that is more practical and
 easy to understand. I shall paste some source code as well as my review comments that hinge on pragmatism.
+
+### Here goes the code!
+**Check for _Notes:_ in the code comments**
+
+```go
+package v1alpha1
+
+import (
+  "fmt"
+)
+
+// Artifact has the artifact that will be installed or uninstalled
+type Artifact struct {
+	// Doc represents the original artifact itself
+	Doc string
+}
+
+// ArtifactList is the list of artifacts that will be installed or uninstalled
+type ArtifactList struct {
+	Items []*Artifact
+}
+
+// ArtifactListOptions is used to list artifacts based on these options
+//
+// Notes:
+// - This was introduced to provide a generic list option argument. Good
+// - Having an argument in the interface method enables decoupling the creation & invocation parts
+// - e.g. creation of an instance does not need this as an argument
+// - contd. invoking the method on the instance will require this as an argument
+// - Many a times, logic does not have the argument handy during creating an instance
+// - So all seems good
+type ArtifactListOptions struct {
+  Version string
+}
+
+// ArtifactLister abstracts listing of Artifacts
+type ArtifactLister interface {
+	List(options ArtifactListOptions) (ArtifactList, error)
+}
+
+// ArtifactListerFunc is a functional implementation of ArtifactLister
+//
+// Notes:
+// - This helps in avoiding creating a dedicated structure. Go vs. Java. Go wins here.
+// - Less code is good
+// - Be careful of terse code that may seem smart but is a painful w.r.t maintainance
+type ArtifactListerFunc func(options ArtifactListOptions) (ArtifactList, error)
+
+// List is an implementation of ArtifactLister
+func (fn ArtifactListerFunc) List(options ArtifactListOptions) (ArtifactList, error) {
+	return fn(options)
+}
+
+// VersionedArtifactLister returns a new instance of ArtifactLister that is
+// capable of returning artifacts based on the provided version
+//
+// Notes:
+// - Just a function suffices. No need of a dedicated structure as noted earlier
+// - One can similarly create functions that cater to specific requirements without the need for structs
+// - One is able to pass the options late during invocation time. Good
+func VersionedArtifactLister() ArtifactLister {
+	return ArtifactListerFunc(func(options ArtifactListOptions) (ArtifactList, error) {
+		switch options.Version {
+		case "0.7.0":
+			return RegisteredArtifactsFor070(), nil
+		default:
+			return ArtifactList{}, fmt.Errorf("invalid version '%s': failed to list artifacts by version", version)
+		}
+	})
+}
+
+// One the whole above code seems good. The code is not verbose as well by avoiding some lines of code. I felt above code
+// as practical. However, is there any other approach that is good as well as pragmatic. Let us check below code snippets.
+```
