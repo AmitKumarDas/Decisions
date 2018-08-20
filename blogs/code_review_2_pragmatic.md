@@ -44,12 +44,16 @@ type ArtifactList struct {
 // ArtifactListOptions is used to list artifacts based on these options
 //
 // Notes:
-// - This was introduced to provide a generic list option argument. Good
+// - This was introduced to provide a generic list option argument. 
+// - contd... In other words, there might be more options in future.
+// - contd... Using this struct helps avoiding adding paramters to the function signature.
+// - contd... This adheres to open-closed principle
+//
 // - Having an argument in the interface method enables decoupling the creation & invocation parts
 // - e.g. creation of an instance does not need this as an argument
-// - contd. invoking the method on the instance will require this as an argument
-// - Many a times, logic does not have the argument handy during creating an instance
-// - So all seems good
+// - contd... this argument will be provided in a lazily during invocation of a method on this instance
+// - Many a times, logic does not have the argument handy during creation of an instance
+// - So this way of exposing interface methods seems great
 type ArtifactListOptions struct {
   Version string
 }
@@ -65,6 +69,8 @@ type ArtifactLister interface {
 // - This helps in avoiding creating a dedicated structure. Go vs. Java. Go wins here.
 // - Less code is good
 // - Be careful of terse code that may seem smart but is a painful w.r.t maintainance
+// - This particular functional implementation might be a learning curve to fellow developers.
+// - contd... be mindful of above
 type ArtifactListerFunc func(options ArtifactListOptions) (ArtifactList, error)
 
 // List is an implementation of ArtifactLister
