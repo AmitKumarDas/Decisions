@@ -140,7 +140,7 @@ func (fn VersionArtifactListerFunc) List(version string) (ArtifactList, error) {
 // Notes:
 // - Very few changes here
 // - options is gone & version has taken its place
-func VersionedArtifactLister() ArtifactLister {
+func VersionedArtifactLister() VersionArtifactLister {
 	return ArtifactListerFunc(func(version string) (VersionArtifactLister, error) {
 		switch version {
 		case "0.7.0":
