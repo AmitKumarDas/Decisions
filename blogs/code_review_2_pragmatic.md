@@ -110,52 +110,36 @@ func VersionedArtifactLister() ArtifactLister {
 	})
 }
 
+// Take 2
+//
 // One the whole above code seems good. The code is not verbose and is not too terse as well. 
 // I felt above code as practical. 
-// However, is there any other approach that is good as well as pragmatic. 
+// However, is there any other approach that is good as well as pragmatic?
+//
 // Let us check below code snippets.
 
-// VersionArtifactLister abstracts listing of Artifacts based on version
+// VersionArtifactLister abstracts fetching a list of artifacts based on 
+// provided version
 //
 // Notes:
-// - The interface is modified to focus on version based listing
-// - The argument of interface method makes use of version which seems to be very natural
-// - This also enables decoupling of creation from invocation as mentioned earlier
+// - The interface is no more
+// - The functional implementation of interface is gone as well
+// - A higher order function is just what is needed
+// - The argument of this functionn type makes use of version which seems to be very natural
+// - We still achieve decoupling of defining a function from its invocation as happened earlier
 //
 // - The main debate of practical code comes up here
-// - If the requirements will never make use of any other filtering abilities than version
-// - contd... this code seems to be more practical than the one above
-// - However, this is about being more practical versus less practical
-type VersionArtifactLister interface {
-	List(version string) (ArtifactList, error)
-}
+// - If the requirements will never make use of any other filtering abilities other than `version`
+// - contd... then this code seems to be more practical than the one above
+type VersionArtifactLister func(version string) (ArtifactList, error)
 
-// VersionArtifactListerFunc is a functional implementation of 
-// VersionArtifactLister
-//
-// Notes:
-// - A functional type avoids creating a struct that implements above interface
-type VersionArtifactListerFunc func(version string) (ArtifactList, error)
-
-// List is an implementation of VersionArtifactLister
-func (fn VersionArtifactListerFunc) List(version string) (ArtifactList, error) {
-	return fn(version)
-}
-
-// VersionedArtifactLister returns a new instance of VersionArtifactLister that 
-// is capable of returning artifacts based on the provided version
-//
-// Notes:
-// - Very few changes here
-// - options is gone & version has taken its place
-func VersionedArtifactLister() VersionArtifactLister {
-	return ArtifactListerFunc(func(version string) (VersionArtifactLister, error) {
-		switch version {
-		case "0.7.0":
-			return RegisteredArtifactsFor070(), nil
-		default:
-			return ArtifactList{}, fmt.Errorf("invalid version '%s': failed to list artifacts by version", version)
-		}
-	})
+// ListArtifactsByVersion returns artifacts based on the provided version
+func ListArtifactsByVersion(version string) (ArtifactList, error) {
+  switch version {
+  case "0.7.0":
+	  return RegisteredArtifactsFor070(), nil
+  default:
+	  return ArtifactList{}, fmt.Errorf("invalid version '%s': failed to list artifacts by version", version)
+  }
 }
 ```
