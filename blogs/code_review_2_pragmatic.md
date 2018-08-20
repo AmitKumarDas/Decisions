@@ -27,7 +27,7 @@ easy to understand. I shall do it by pasting some source code as well as my revi
 understanding than being smart.
 
 ### Here goes the code!
-**Check for `_Notes:_` in the code comments**
+**Check for `Notes:` section in the code level comments**
 
 ```go
 package v1alpha1
