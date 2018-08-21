@@ -114,11 +114,12 @@ func VersionedArtifactLister() ArtifactLister {
 
 // Take 2
 //
-// One the whole above code seems good. The code is not verbose and is not too terse as well. 
-// I felt above code as practical. 
-// However, is there any other approach that is good as well as pragmatic?
+// One the whole above code seems good. 
+// Above code is not too verbose and is not too terse as well. 
 //
-// Let us check below code snippets.
+// However, is there any other approach that can be more pragmatic?
+//
+// Let us check below code snippets:
 
 // VersionArtifactLister abstracts fetching a list of artifacts based on 
 // provided version
@@ -142,6 +143,34 @@ func ListArtifactsByVersion(version string) (ArtifactList, error) {
 	  return RegisteredArtifactsFor070(), nil
   default:
 	  return ArtifactList{}, fmt.Errorf("invalid version '%s': failed to list artifacts by version", version)
+  }
+}
+
+// Take 3
+//
+// In this take, we shall see that being functional solves most of our needs i.e.practical & readable code
+// Let us check below code snippets.
+
+type ArtifactListOptions struct {
+	Version string
+}
+
+// ArtifactLister abstracts fetching a list of artifacts
+//
+// Notes:
+// - Sticking to higher order function
+// - Name of this function is changed to make it more apt
+// - The argument of this function is different here
+// - We still achieve decoupling of defining a function from its invocation as happened earlier
+type ArtifactLister func(options ArtifactListOptions) (ArtifactList, error)
+
+// ListArtifactsByVersion returns artifacts based on the provided version
+func ListArtifactsByVersion(options ArtifactListOptions) (ArtifactList, error) {
+  switch options.Version {
+  case "0.7.0":
+	  return RegisteredArtifactsFor070(), nil
+  default:
+	  return ArtifactList{}, fmt.Errorf("invalid version '%s': failed to list artifacts by version", options.Version)
   }
 }
 ```
