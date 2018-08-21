@@ -130,6 +130,8 @@ func VersionedArtifactLister() ArtifactLister {
 // - A higher order function is just what is needed
 // - The argument of this functionn type makes use of version which seems to be very natural
 // - We still achieve decoupling of defining a function from its invocation as happened earlier
+// - contd... decoupling is achieved by passing function first
+// - contd... & later by invoking this function when its argument(s) are available
 //
 // - The main debate of practical code comes up here
 // - If the requirements will never make use of any other filtering abilities other than `version`
@@ -137,6 +139,9 @@ func VersionedArtifactLister() ArtifactLister {
 type VersionArtifactLister func(version string) (ArtifactList, error)
 
 // ListArtifactsByVersion returns artifacts based on the provided version
+//
+// Notes:
+// - This is an implicit implementation of VersionArtifactLister function type
 func ListArtifactsByVersion(version string) (ArtifactList, error) {
   switch version {
   case "0.7.0":
@@ -162,9 +167,14 @@ type ArtifactListOptions struct {
 // - Name of this function is changed to make it more apt
 // - The argument of this function is different here
 // - We still achieve decoupling of defining a function from its invocation as happened earlier
+// - contd... decoupling is achieved by passing function first
+// - contd... & later by invoking this function when its argument(s) are available
 type ArtifactLister func(options ArtifactListOptions) (ArtifactList, error)
 
 // ListArtifactsByVersion returns artifacts based on the provided version
+//
+// Notes:
+// - This is an implicit implementation of ArtifactLister function type
 func ListArtifactsByVersion(options ArtifactListOptions) (ArtifactList, error) {
   switch options.Version {
   case "0.7.0":
