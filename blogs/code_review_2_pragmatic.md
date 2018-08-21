@@ -67,9 +67,9 @@ type ArtifactList struct {
 //
 // - Having an argument in the interface method enables decoupling the creation & invocation parts
 // - e.g. creation of an instance does not need this as an argument
-// - contd... this argument will be provided in a lazily during invocation of a method on this instance
+// - contd... this argument will be provided lazily during invocation of the interface method
 // - Many a times, logic does not have the argument handy during creation of an instance
-// - So this way of exposing interface methods seems great
+// - So this way of exposing via interface & interface method seems great
 type ArtifactListOptions struct {
   Version string
 }
