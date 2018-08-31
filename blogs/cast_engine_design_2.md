@@ -47,6 +47,15 @@ should go in to make the engine better.
 - Template Functions
 - Pipes
 
+### Things to Add
+- Generic HTTP API
+
+```yaml
+post:
+  - {{- $url = http://{{.Volume.ControllerIP}}:5104/volume/delete/{{.Volume.owner}} -}}
+  - {{- $url | hpost | struct | saveAs .TaskResult.jivadel.resp -}}
+```
+
 ### New Design
 - Values as feeds from user, runtime, engine, etc
   - Can be .Volume, .Config or both or more based on what is fed to CAS engine
