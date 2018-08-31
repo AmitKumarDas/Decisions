@@ -64,7 +64,9 @@ yamls:
 runs:
   - if: 
     run: |
-      - {{- .Docs.abc-123 | -}}
+      - {{- .Docs.abc-123 | New | noop -}}
+      - {{- $isFalse := fn eq "false" -}}
+      - {{- $isLblPresent := .Stores.abc-123 | $isFalse ".spec.metadata.labels" -}}
       - {{- $myNewRTObjList := $myRTObjList | Map | Filter p | Any p -}}
       - {{- $myRTObjList | Map | Filter p | Any p | Store id123 -}}
       - {{- $aMap := .Stores.id123 | Items -}}
