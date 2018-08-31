@@ -39,8 +39,8 @@ should go in to make the engine better.
 ```yaml
 runs:
   - yaml: |
-    - kind: cool
-    - apiVersion: v1
+      kind: cool
+      apiVersion: v1
     if: 
     run: |
     - {{- .Docs.abc-123 | -}}
