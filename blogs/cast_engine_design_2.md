@@ -15,13 +15,14 @@ should go in to make the engine better.
 - Avoid get from specific paths and setting at specific paths
   - User/Dev/Operator does not care about this
 - Errors are hard to debug
-  - Infos as a list of successful messages
-  - Warns as a list of warning messages
-  - Skips as a list of skipped messages
-  - Errors as a list of typed errors
+  - Improvements:
+    - Infos as a list of successful runtasks
+    - Warns as a list of warning runtasks
+    - Skips as a list of skipped runtasks
+    - Errors as a list of errored runtasks
 - Lots of RunTasks are needed
 - Executing RunTasks conditionally
-- Streaming template functions
+- Streaming based template functions
   - Map invocation against a list
   - Filter invocation against a list
   - Use of Predicate
