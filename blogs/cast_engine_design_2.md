@@ -26,6 +26,10 @@ should go in to make the engine better.
   - Filter invocation against a list
   - Use of Predicate
 - Template Functions without the use of method calls
+- All validations should be triggered before invoking all/any runtasks
+  - data related validations
+  - template related validations
+  - old vs. new templating style
 
 ### Things that went good !!!
 - Template Functions
