@@ -31,6 +31,16 @@ should go in to make the engine better.
   - data related validations
   - template related validations
   - old vs. new templating style
+- Use of Predicates -- same as selectors
+  - isPresent,
+  - isNotEmpty ".spec.disks",
+  - isLbl, isLblAll, isLblAny,
+  - isAnn, isAnnAll, isAnnAny,
+  - isNode,
+  - isTaint,
+  - isNamespaced,
+- Might need to wrap existing template functions that work for unstruct instances
+  - new template function names will need to be thought of
 
 ### Things that went good !!!
 - Template Functions
@@ -38,22 +48,28 @@ should go in to make the engine better.
 
 ### New Design
 - Values as feeds from user, runtime, engine, etc
+  - Can be .Volume, .Config or both or more based on what is fed to CAS engine
 - Stores as storage during execution of one or more runtasks
 - Docs stores the yamls as unstruct instances indexed with name of unstruct
   - i.e. `[]*unstruct`
+- Values, Stores & Docs are stored in a map[string]interface{} & is provided to template
+- Keep the template function generic to start with
 ```yaml
-runs:
+yamls:
   - yaml: |
       kind: cool
       apiVersion: v1
-    if: 
+      metadata:
+        name: abc-123
+runs:
+  - if: 
     run: |
-    - {{- .Docs.abc-123 | -}}
-    - {{- $myNewRTObjList := $myRTObjList | Map | Filter p | Any p -}}
-    - {{- $myRTObjList | Map | Filter p | Any p | Store id123 -}}
-    - {{- $aMap := .Stores.id123 | Items -}}
-    - {{- $myRTObjList | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
-    - {{- $myRTObj | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
+      - {{- .Docs.abc-123 | -}}
+      - {{- $myNewRTObjList := $myRTObjList | Map | Filter p | Any p -}}
+      - {{- $myRTObjList | Map | Filter p | Any p | Store id123 -}}
+      - {{- $aMap := .Stores.id123 | Items -}}
+      - {{- $myRTObjList | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
+      - {{- $myRTObj | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
     onErr: 
 onErr:
 ```
