@@ -41,6 +41,7 @@ should go in to make the engine better.
   - isNamespaced,
 - Might need to wrap existing template functions that work for unstruct instances
   - new template function names will need to be thought of
+- Ability to curry the existing template functions & give good names to these curried functions
 
 ### Things that went good !!!
 - Template Functions
