@@ -26,14 +26,29 @@ should go in to make the engine better.
   - Filter invocation against a list
   - Use of Predicate
 - Template Functions without the use of method calls
-  - {{- $myNewRTObjList := $myRTObjList | Map | Filter p | Any p -}}
-  - {{- $myRTObjList | Map | Filter p | Any p | Store id123 -}}
-  - {{- $aMap := .Stores.id123 | Items -}}
-  - {{- $myRTObjList | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
-  - {{- $myRTObj | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
-- Values as feeds from user, runtime, engine, etc
-- Stores as storage during execution
 
 ### Things that went good !!!
 - Template Functions
 - Pipes
+
+### New Design
+- Values as feeds from user, runtime, engine, etc
+- Stores as storage during execution of one or more runtasks
+- Docs stores the yamls as unstruct instances indexed with name of unstruct
+  - i.e. `[]*unstruct`
+```yaml
+runs:
+  - yaml: |
+    - kind: cool
+    - apiVersion: v1
+    if: 
+    run: |
+    - {{- .Docs.abc-123 | -}}
+    - {{- $myNewRTObjList := $myRTObjList | Map | Filter p | Any p -}}
+    - {{- $myRTObjList | Map | Filter p | Any p | Store id123 -}}
+    - {{- $aMap := .Stores.id123 | Items -}}
+    - {{- $myRTObjList | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
+    - {{- $myRTObj | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
+    onErr: 
+onErr:
+```
