@@ -87,38 +87,74 @@ onErr:
 ```
 
 ### New Design - Day 2 Thinking
-- YAML snippet:
-```yaml
-spec:
-  yamls:
-  runs:
-  onErr:
-```
-- Ability to run a runtask programatically
-- Ability to run a castemplate programatically
-- AbortIf abort automatically based on errors or injected errors
-- RunIf aborts an individual task based on condition supplied
-- Retry retries the individual task based on particular error type
+- Ability to execute a runtask programatically
+  - Decouples from dependency on yaml
+  - Decouples from k8s api server, custom resource, etcd
+  - More abstracted runtask runner engine
+  - Ability to UnitTest on kubernetes cluster
+- Ability to execute a castemplate programatically
+  - Same as above advantages
+- Better handling of flow of runtask steps
+  - Aborts the runtask automatically based on errors or injected errors
+  - Run conditionally a runtask step based on condition supplied
+  - Retry a runtask step based on particular error type
 - **Self manageable functions without need of engine**
-- Template Values:
-  - .cast.stepid.req
-  - .cast.stepid.resp
-  - .cast.stepid.errors
-  - .cast.errors
-  - .cast.infos
-  - .cast.warns
-  - .cast.rollbacks
-  - .cast.fallbacks
-- Runtask runs:
+- Accessing cast related _Template Values_:
+  - .cast.reqs.
+  - .cast.resps.
+  - .cast.errors.
+  - .cast.infos.
+  - .cast.warns.
+  - .cast.rollbacks.
+  - .cast.rollbackresps.
+  - .cast.fallbacks.
+  - .store.xyz.
+- Sample Runtask yaml:
 ```yaml
 metadata:
   name: cstor-volume-create
 spec:
   yamls:
   runs:
-  - {{- cast "step1" | kload .cast.yamls[0] | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | end -}}
-  - {{- cast "step2" | kget "pod" .Config.name | ns .Volume.runNS | select ".spec.ip" ".spec.node" ".spec.status" | end -}}
-  - {{- cast "step3" | klist "pods" | ns "abc" "def" "def" | select ".spec.name" | where ".spec.status" "eq" "running" | where ".spec.label" "haskey" "abc" | where ".spec.label" "hasval" "def" | and | end -}}
-  - {{- cast "step4" | klist "deploy" | ns "abc" | select ".spec.name" | where ".spec.labels" "has" "key=val" | where ".spec.labels" "has" "key1=val1" | or | end -}}
+  - {{- cast "step1" | kload .cast.yamls[0] | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | run -}}
+  - {{- cast "step2" | kget "pod" .Config.name | ns .Volume.runNS | select ".spec.ip" ".spec.node" ".spec.status" | storeat ".poddetails" | run -}}
+  - {{- cast "step3" | klist "pods" | ns "abc" "def" "def" | select ".spec.name" | where ".spec.status" "eq" "running" | where ".spec.label" "haskey" "abc" | where ".spec.label" "hasval" "def" | and | run -}}
+  - {{- cast "step4" | klist "deploy" | ns "abc" | select ".spec.name" | where ".spec.labels" "has" "key=val" | where ".spec.labels" "has" "key1=val1" | or | run -}}
+  - {{- cast "step5" | hdelete | url $url | select all | run -}}
   onErr:
+```
+- Sample go code:
+```go
+type CastAction string
+
+const (
+  KLoad   CastAction = "kload"
+  HDelete CastAction = "hdelete"
+  KGet    CastAction = "kget"
+)
+
+type cast struct {
+  StepID    string
+  Action    CastAction
+  Namespace string
+  Unstruct  *unstructured.Unstructured
+  Select    []string
+  Where     []string
+  Errors    []error
+  Warns     []string
+}
+
+// kcast is kubernetes based cast structure
+type kcast *cast
+// hcast is http based cast structure
+type hcast *cast
+// gcast is grpc based cast structure
+type gcast *cast
+// castvalues are used during templating
+type castvalues map[string]interface{}
+```
+- Sample go code for engine:
+```go
+type CasTemplateRunner struct {}
+type RunTaskRunner struct {}
 ```
