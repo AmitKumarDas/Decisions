@@ -5,7 +5,7 @@ taking a dip into compilation and so on. There as other rosy aspects with the us
 has a lot of pain points. In this design which will form the basis of next CAST engine, I will list down my thoughts of what
 should go in to make the engine better.
 
-### Things to improve !!!
+### Things to improve
 - Avoid as much as possible the need to write specific CAST engines
   - Volume, Clone, Pool, Upgrade and so on needs to be written to influence generic CAST engine
 - Ability to Unit Test a RunTask
@@ -43,20 +43,20 @@ should go in to make the engine better.
   - new template function names will need to be thought of
 - Ability to curry the existing template functions & give good names to these curried functions
 
-### Things that went good !!!
+### Things that went good
 - Template Functions
 - Pipes
 
 ### Things to Add
 - Generic HTTP API
-
+- Below is a sample yaml snippet:
 ```yaml
 post:
   - {{- $url = http://{{.Volume.ControllerIP}}:5104/volume/delete/{{.Volume.owner}} -}}
   - {{- $url | hpost | struct | saveAs .TaskResult.jivadel.resp -}}
 ```
 
-### New Design
+### New Design - Day 1 Thinking
 - Values as feeds from user, runtime, engine, etc
   - Can be .Volume, .Config or both or more based on what is fed to CAS engine
 - Stores as storage during execution of one or more runtasks
@@ -84,4 +84,41 @@ runs:
       - {{- $myRTObj | Select ".spec.abc" ".spec.def" ".spec.xyz" -}}
     onErr: 
 onErr:
+```
+
+### New Design - Day 2 Thinking
+- YAML snippet:
+```yaml
+spec:
+  yamls:
+  runs:
+  onErr:
+```
+- Ability to run a runtask programatically
+- Ability to run a castemplate programatically
+- AbortIf abort automatically based on errors or injected errors
+- RunIf aborts an individual task based on condition supplied
+- Retry retries the individual task based on particular error type
+- **Self manageable functions without need of engine**
+- Template Values:
+  - .cast.stepid.req
+  - .cast.stepid.resp
+  - .cast.stepid.errors
+  - .cast.errors
+  - .cast.infos
+  - .cast.warns
+  - .cast.rollbacks
+  - .cast.fallbacks
+- Runtask runs:
+```yaml
+metadata:
+  name: cstor-volume-create
+spec:
+  yamls:
+  runs:
+  - {{- cast "step1" | kload .cast.yamls[0] | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | end -}}
+  - {{- cast "step2" | kget "pod" .Config.name | ns .Volume.runNS | select ".spec.ip" ".spec.node" ".spec.status" | end -}}
+  - {{- cast "step3" | klist "pods" | ns "abc" "def" "def" | select ".spec.name" | where ".spec.status" "eq" "running" | where ".spec.label" "haskey" "abc" | where ".spec.label" "hasval" "def" | and | end -}}
+  - {{- cast "step4" | klist "deploy" | ns "abc" | select ".spec.name" | where ".spec.labels" "has" "key=val" | where ".spec.labels" "has" "key1=val1" | or | end -}}
+  onErr:
 ```
