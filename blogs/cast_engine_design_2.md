@@ -106,7 +106,8 @@ metadata:
 spec:
   yamls:
   runs:
-  - {{- cast "step1" | kload .cast.yamls[0] | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | run -}}
+  - {{- cast "step1" | payload .cast.yamls[0] | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | run -}}
+  - {{- cast "step1" | objload ".cast.resps[name==poddetails]" | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | run -}}
   - {{- cast "step2" | kget "pod" .Config.name | ns .Volume.runNS | select ".spec.ip" ".spec.node" ".spec.status" | runas ".poddetails" -}}
   - {{- cast "step3" | klist "pods" | ns "abc" "def" "def" | select ".spec.name" | where ".spec.status" "eq" "running" | where ".spec.label" "haskey" "abc" | where ".spec.label" "hasval" "def" | and | runas "podlistdetails" -}}
   - {{- cast "step4" | klist "deploy" | ns "abc" | select ".spec.name" | where ".spec.labels" "has" "key=val" | where ".spec.labels" "has" "key1=val1" | or | run -}}
@@ -118,8 +119,8 @@ spec:
 # rollbacks, rollbackresps, fallbacks, errors, infos, warns are debugging purposes
 values:
   - .cast.reqs.
-  - .cast.resps.[].poddetails.
-  - .cast.resps.[].podlistdetails.
+  - .cast.resps.[name==poddetails].
+  - .cast.resps.[name==podlistdetails].
   - .cast.rollbacks.
   - .cast.rollbackresps.
   - .cast.fallbacks.
@@ -141,9 +142,11 @@ type cast struct {
   StepID    string
   Action    CastAction
   Namespace string
-  Unstruct  *unstructured.Unstructured
+  Payload   *unstructured.Unstructured
+  Objects   []*unstructured.Unstructured
   Select    []string
-  Where     []string
+  Where     []CastCondition
+  WhereOp   CastOperator
   Errors    []error
   Warns     []string
 }
