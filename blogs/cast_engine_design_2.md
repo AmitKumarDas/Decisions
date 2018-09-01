@@ -99,16 +99,6 @@ onErr:
   - Run conditionally a runtask step based on condition supplied
   - Retry a runtask step based on particular error type
 - **Self manageable functions without need of engine**
-- Accessing cast related _Template Values_:
-  - .cast.reqs.
-  - .cast.resps.
-  - .cast.errors.
-  - .cast.infos.
-  - .cast.warns.
-  - .cast.rollbacks.
-  - .cast.rollbackresps.
-  - .cast.fallbacks.
-  - .store.xyz.
 - Sample Runtask yaml:
 ```yaml
 metadata:
@@ -117,11 +107,22 @@ spec:
   yamls:
   runs:
   - {{- cast "step1" | kload .cast.yamls[0] | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | run -}}
-  - {{- cast "step2" | kget "pod" .Config.name | ns .Volume.runNS | select ".spec.ip" ".spec.node" ".spec.status" | storeat ".poddetails" | run -}}
-  - {{- cast "step3" | klist "pods" | ns "abc" "def" "def" | select ".spec.name" | where ".spec.status" "eq" "running" | where ".spec.label" "haskey" "abc" | where ".spec.label" "hasval" "def" | and | run -}}
+  - {{- cast "step2" | kget "pod" .Config.name | ns .Volume.runNS | select ".spec.ip" ".spec.node" ".spec.status" | runas ".poddetails" -}}
+  - {{- cast "step3" | klist "pods" | ns "abc" "def" "def" | select ".spec.name" | where ".spec.status" "eq" "running" | where ".spec.label" "haskey" "abc" | where ".spec.label" "hasval" "def" | and | runas "podlistdetails" -}}
   - {{- cast "step4" | klist "deploy" | ns "abc" | select ".spec.name" | where ".spec.labels" "has" "key=val" | where ".spec.labels" "has" "key1=val1" | or | run -}}
   - {{- cast "step5" | hdelete | url $url | select all | run -}}
   onErr:
+```
+- Accessing cast related _Template Values_:
+```yaml
+# rollbacks, rollbackresps, fallbacks, errors, infos, warns are debugging purposes
+values:
+  - .cast.reqs.
+  - .cast.resps.[].poddetails.
+  - .cast.resps.[].podlistdetails.
+  - .cast.rollbacks.
+  - .cast.rollbackresps.
+  - .cast.fallbacks.
 ```
 - Sample go code:
 ```go
@@ -133,6 +134,9 @@ const (
   KGet    CastAction = "kget"
 )
 
+// cast represents a runtask step request
+//
+// A request can be cast to anything
 type cast struct {
   StepID    string
   Action    CastAction
@@ -143,6 +147,11 @@ type cast struct {
   Errors    []error
   Warns     []string
 }
+
+// castresp is the successful response of executing a cast request
+type castresp  *unstructured.Unstructured
+type casterror *castresp
+type castwarn  *castresp
 
 // kcast is kubernetes based cast structure
 type kcast *cast
