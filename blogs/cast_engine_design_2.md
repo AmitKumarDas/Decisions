@@ -1,27 +1,25 @@
 ### CASTemplate Engine Design - Chapter 2
-Exposing CASTemplate along with RunTasks enables exposing logic in a declarative fashion. It helped the team in numerous ways.
-One of the typical use of these templates was the ability to embed logic into RunTasks and solve the problem statement without
-taking a dip into compilation and so on. There as other rosy aspects with the use of template. However, other side of the coin
-has a lot of pain points. In this design which will form the basis of next CAST engine, I will list down my thoughts of what
-should go in to make the engine better.
+Exposing CASTemplate along with RunTasks enables exposing logic in a declarative fashion. It helped the team in numerous ways. One of the typical use of these templates was the ability to embed logic into RunTasks and solve the problem statement
+externally withoyt getting into the project's in-tree repo. 
+
+However, there are still numerous pain points that need to be addressed in cast. In this design, which will form the basis of 
+next CAST engine, I will list down my thoughts of what should go in to make **cast** better.
 
 ### Things to improve
-- Avoid as much as possible the need to write specific CAST engines
-  - Volume, Clone, Pool, Upgrade and so on needs to be written to influence generic CAST engine
+```yaml
+- Avoid the need to write specific CAST engines
 - Ability to Unit Test a RunTask
-  - This helps in verifying the validity of the RunTask with various data options
-- Avoid as much as possible the need to write conditional logic
-- Avoid as much as possible the need to write meta info in RunTasks
-- Avoid get from specific paths and setting at specific paths
-  - User/Dev/Operator does not care about this
+- Reduce the need for programming in templates
+- Avoid verbosity in RunTasks
+- Make the template intuitive & less learning curve
 - Errors are hard to debug
   - Improvements:
     - Infos as a list of successful runtasks
     - Warns as a list of warning runtasks
     - Skips as a list of skipped runtasks
     - Errors as a list of errored runtasks
-- Lots of RunTasks are needed
-- Executing RunTasks conditionally
+- Avoid the need for multiple RunTasks
+- Ability to execute RunTasks conditionally
 - Streaming based template functions
   - Map invocation against a list
   - Filter invocation against a list
@@ -31,17 +29,7 @@ should go in to make the engine better.
   - data related validations
   - template related validations
   - old vs. new templating style
-- Use of Predicates -- same as selectors
-  - isPresent,
-  - isNotEmpty ".spec.disks",
-  - isLbl, isLblAll, isLblAny,
-  - isAnn, isAnnAll, isAnnAny,
-  - isNode,
-  - isTaint,
-  - isNamespaced,
-- Might need to wrap existing template functions that work for unstruct instances
-  - new template function names will need to be thought of
-- Ability to curry the existing template functions & give good names to these curried functions
+```
 
 ### Things that went good
 - Template Functions
@@ -106,18 +94,19 @@ metadata:
 spec:
   yamls:
   runs:
-  - {{- cast "step1" | payload .cast.yamls[0] | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | run -}}
-  - {{- cast "step1" | objload ".cast.resps[name==poddetails]" | kcreate | select ".spec.ip" ".spec.uid" ".spec.name" | run -}}
-  - {{- cast "step2" | kget "pod" .Config.name | ns .Volume.runNS | select ".spec.ip" ".spec.node" ".spec.status" | runas ".poddetails" -}}
-  - {{- cast "step3" | klist "pods" | ns "abc" "def" "def" | select ".spec.name" | where ".spec.status" "eq" "running" | where ".spec.label" "haskey" "abc" | where ".spec.label" "hasval" "def" | and | runas "podlistdetails" -}}
-  - {{- cast "step4" | klist "deploy" | ns "abc" | select ".spec.name" | where ".spec.labels" "has" "key=val" | where ".spec.labels" "has" "key1=val1" | or | run -}}
+  - {{- cast "step1" | ymlmap "name eq my-pod" | reqdata | kcreate | run -}}
+  - {{- cast "step2" | kget "pod" .Config.name | ns .Volume.runNS | select ".spec.ip" ".spec.stat" | runas ".poddetails" -}}
+  - {{- cast "step3" | respmap "name eq poddetails" | respdata | select ".spec.ip" ".spec.uid" ".spec.name" | run -}}
+  - {{- cast "step4" | klist "pods" | ns "abc" "def" "def" | select ".spec.name" | whereall ".spec.status eq running" ".spec.label haskey abc" | runas "podlistdetails" -}}
   - {{- cast "step5" | hdelete | url $url | select all | run -}}
   onErr:
+  - {{- cast "rbstep1" | kdelete "pod" .Config.name | ns .Volume.runNS | run -}}
 ```
 - Accessing cast related _Template Values_:
 ```yaml
 # rollbacks, rollbackresps, fallbacks, errors, infos, warns are debugging purposes
 values:
+  - .cast.yamls.
   - .cast.reqs.
   - .cast.resps.[name==poddetails].
   - .cast.resps.[name==podlistdetails].
@@ -142,8 +131,8 @@ type cast struct {
   StepID    string
   Action    CastAction
   Namespace string
-  Payload   *unstructured.Unstructured
-  Objects   []*unstructured.Unstructured
+  Reqdata   *unstructured.Unstructured
+  Resdata   []*unstructured.Unstructured
   Select    []string
   Where     []CastCondition
   WhereOp   CastOperator
@@ -153,8 +142,6 @@ type cast struct {
 
 // castresp is the successful response of executing a cast request
 type castresp  *unstructured.Unstructured
-type casterror *castresp
-type castwarn  *castresp
 
 // kcast is kubernetes based cast structure
 type kcast *cast
@@ -169,4 +156,34 @@ type castvalues map[string]interface{}
 ```go
 type CasTemplateRunner struct {}
 type RunTaskRunner struct {}
+```
+- Sample go code for message:
+```go
+// pkg/msg/v1alpha1/msg.go
+type msg struct {
+  type msgType
+  desc string
+  err  error
+}
+func (m msg) String() {}
+
+type msgs []*msg
+
+type (m msgs) Log(l func(...interface{})){
+  for _, msg := range m {
+    l(msg.String())
+  }
+}
+
+type (m msgs) LogAny(l func(...interface{}), pl []msgPredicate)
+type (m msgs) LogAll(l func(...interface{}), pl []msgPredicate)
+
+func (m msgs) AddInfo() {}
+func (m msgs) AddWarn() {}
+func (m msgs) AddSkip() {}
+func (m msgs) AddError() {}
+func (m msgs) Filter(p msgPredicate) (f msgs){}
+func (m msgs) Infos() (f msgs){
+  return m.Filter(infoPredicate)
+}
 ```
