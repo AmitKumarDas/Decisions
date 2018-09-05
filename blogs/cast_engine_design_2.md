@@ -187,3 +187,31 @@ func (m msgs) Infos() (f msgs){
   return m.Filter(infoPredicate)
 }
 ```
+
+### New Design - Day 3 Thinking
+```
+rt 123 | get volume jiva | where name == abc
+rt 123 | get jiva volume | where name == abc
+rt 123 | select name namespace | from jiva volume | where namespace == default | where label == app=jiva
+rt 123 | delete jiva volume | where name == default | where ip == $ip (edited)
+rt 123 | delete jiva volume | whereany 'name == abc' 'namespace == default'
+```
+
+```
+rt 123 | select all | delete jiva volume | where 'name' 'eq' $name | where 'namespace' 'eq' $namespace | run
+rt 123 | select 'all' | delete jiva volume | where 'name' 'eq' $name | where 'namespace' 'eq' $namespace | runif $count 'eq' 0
+rt 123 | select 'all' | delete jiva volume | where 'name' 'eq' $name | runif eq $count 0
+```
+
+```
+rt 123 | select 'all' | delete jiva volume | where 'name' '=' $name | runif eq $count 0
+rt 123 | select 'all' | from jiva volumes  | where 'name' '=' $name | runif eq $count 0
+rt 123 | select 'all' | from jiva volumes | where 'namespace' 'in' $names | runif eq $ciunt 0
+```
+
+```
+rt 123 | select 'serviceip' | create k8s service | where 'spec' '=' $yaml | runif eq $exists false
+rt 123 | select 'serviceip' | get k8s service | where 'namespace' '=' 'default' | runif eq $err false
+rt 123 | select 'serviceip' | from k8s service | where 'name' '=' 'okie' | runif eq $err false
+```
+
