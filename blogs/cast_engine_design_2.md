@@ -55,6 +55,8 @@ This rough work lists down all sorts of templating possibilities. However, only 
 refined further based on feedbacks, experiences & my brain's biasedness.
 
 #### Select Clause
+- [ ] select all | create kubernetes service | spec $yaml | totemplate .Values .Config | run
+- [ ] select all | text template .Values $doc | tounstruct | run | saveas "123" .Values
 
 #### Where Clause
 
@@ -67,8 +69,7 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 - [x] $doc | text template | data . Values | run
 - [ ] create kubernetes service | specs $doc | txttemplate . Values | run
 - [ ] create k8s svc | spec $doc | txttemplate .Volume .Config  | run
-- [x] select name, ip | create k8s svc | spec $doc | txttemplate .Volume .Config | run
-- [ ] create kubernetes service | data $data | txttemplate . Values .Config | run
+- [x] select name, ip | create k8s service | spec $doc | totemplate .Volume .Config | run
 
 #### Spec
 ```yaml
