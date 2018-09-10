@@ -51,7 +51,7 @@ High Level Design:
 
 
 ### Rough Work
-```
+```yaml
 $doc | exec template . Values | run
 $doc | exec text template | data . Values | run
 create kubernetes service | specs $doc | txttemplate . Values | run
