@@ -56,20 +56,20 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 
 #### Select Clause
 - [ ] `select all | create kubernetes service | spec $yaml | totemplate .Values .Config | run`
-- [ ] select all | text template .Values $doc | tounstruct | run | saveas "123" .Values
+- [ ] `select all | text template .Values $doc | tounstruct | run | saveas "123" .Values`
 
 #### Where Clause
 
 #### Join multiple queries
-- [ ] select name, ip | get k8s svc | where label eq abc | join list k8s pod | where 'label' 'eq' 'all'
+- [ ] `select name, ip | get k8s svc | where label eq abc | join list k8s pod | where 'label' 'eq' 'all'`
 
 #### Text Template as a template function
-- [ ] $doc | exec template . Values | run
-- [ ] $doc | exec text template | data . Values | run
-- [x] $doc | text template | data . Values | run
-- [ ] create kubernetes service | specs $doc | txttemplate . Values | run
-- [ ] create k8s svc | spec $doc | txttemplate .Volume .Config  | run
-- [x] select name, ip | create k8s service | spec $doc | totemplate .Volume .Config | run
+- [ ] `$doc | exec template . Values | run`
+- [ ] `$doc | exec text template | data . Values | run`
+- [x] `$doc | text template | data . Values | run`
+- [ ] `create kubernetes service | specs $doc | txttemplate . Values | run`
+- [ ] `create k8s svc | spec $doc | txttemplate .Volume .Config  | run`
+- [x] `select name, ip | create k8s service | spec $doc | totemplate .Volume .Config | run`
 
 #### Spec
 ```yaml
