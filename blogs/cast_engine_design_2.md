@@ -48,3 +48,13 @@ High Level Design:
   - `CASTemplateOptions` is the options
   - `Kubernetes` is the provider of CAS Templates
   - `CASTemplateRunner` is the runner
+
+
+### Rough Work
+```
+$doc | exec template . Values | run
+$doc | exec text template | data . Values | run
+create kubernetes service | specs $doc | txttemplate . Values | run
+create k8s svc | spec $doc | txttemplate .Volume .Config  | run
+select name, ip | create k8s svc | spec $doc | txttemplate .Volume .Config | run
+```
