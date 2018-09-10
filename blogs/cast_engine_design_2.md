@@ -63,6 +63,12 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 #### Join multiple queries
 - [ ] `select name, ip | get k8s svc | where label eq abc | join list k8s pod | where 'label' 'eq' 'all'`
 
+#### Error Handling
+
+#### Predicates
+- [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" "value" isnamespace | run`
+- [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" "value" | run`
+
 #### Text Template as a template function
 - [ ] `$doc | exec template . Values | run`
 - [ ] `$doc | exec text template | data . Values | run`
