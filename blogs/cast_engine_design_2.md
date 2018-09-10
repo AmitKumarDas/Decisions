@@ -51,9 +51,31 @@ High Level Design:
 
 
 ### Rough Work
+This rough work lists down all sorts of templating possibilities. However, only few have been selected by me. This will get
+refined further based on feedbacks, experiences & my brain's biasedness.
+
+#### Select Clause
+
+#### Where Clause
+
+#### Join multiple queries
+- [ ] select name, ip | get k8s svc | where label eq abc | join list k8s pod | where 'label' 'eq' 'all'
+
+#### Text Template as a template function
 - [ ] $doc | exec template . Values | run
 - [ ] $doc | exec text template | data . Values | run
 - [x] $doc | text template | data . Values | run
 - [ ] create kubernetes service | specs $doc | txttemplate . Values | run
 - [ ] create k8s svc | spec $doc | txttemplate .Volume .Config  | run
-- [ ] select name, ip | create k8s svc | spec $doc | txttemplate .Volume .Config | run
+- [x] select name, ip | create k8s svc | spec $doc | txttemplate .Volume .Config | run
+- [ ] create kubernetes service | data $data | txttemplate . Values .Config | run
+
+#### Spec
+```yaml
+- select:
+    name namespace 
+  get:
+    kubernetes service 
+  where:
+    name eq John
+```
