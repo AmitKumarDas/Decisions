@@ -42,13 +42,12 @@ but will be pseudo-logic i.e. some english like notations. These specs should be
 engine will decide the provider and runner based on these specs.
 
 High Level Design:
-- Volume Provisioning:
-  - `CASVolume` is the spec
-  - `CASTemplateEngine` is the engine
-  - `CASTemplateOptions` is the options
-  - `Kubernetes` is the provider of CAS Templates
-  - `CASTemplateRunner` is the runner
-
+- UseCase: Volume Provisioning
+  - spec - pkg/apis/openebs.io/v1alpha1/casvolume.go may have `type CASVolume struct`
+  - engine - pkg/engine/v1alpha1/cas_template.go may have `type CASTemplateEngine struct`
+  - engine - pkg/engine/v1alpha1/run_task.go may have `type RunTaskEngine struct`
+  - runner - pkg/task/v1alpha1/txt_template.go may have `type TxtTemplateRunner struct`
+  - runner - pkg/task/v1alpha1/run_command.go may have `type RunCommandRunner struct`
 
 ### Rough Work
 This rough work lists down all sorts of templating possibilities. However, only few have been selected by me. This will get
