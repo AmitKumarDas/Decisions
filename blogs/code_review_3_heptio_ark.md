@@ -42,9 +42,10 @@ ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/backup_storage_lo
   - Provider Location Access Mode
 ```
 
-#### Constants
+#### Constants vs. Labels & Annotations
 ```yaml
 ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/constants.go
+ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/labels_annotations.go
 
 - This has the project level constants e.g.
   - namespace where ark components will get installed
@@ -64,3 +65,19 @@ ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/delete_backup_req
   - If reconcile logic or operator implements the custom resource then:
     - the request gets handled eventually i.e. asynchronous
 ```
+
+#### Download Request Specifications
+```yaml
+ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/download_request.go
+
+- This is spec of download request
+- It understand various type of download requests e.g:
+  - BackupContents
+  - BackupLogs
+  - RestoreLogs
+  - RestoreResults
+```
+
+#### Pod Volume Backup Specs
+
+#### 
