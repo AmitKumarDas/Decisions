@@ -130,6 +130,8 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 
 #### Set
 - [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" $ns | run`
+- [ ] `create jiva snapshot | set "spec" $yaml | txttemplate .Values | run`
+- [ ] `create jiva snapshot | set "name" $name | set "capacity" "2G" | run`
 
 #### Set Conditionally
 - [ ] `create k8s service | spec $yaml | totemplate .Values | setif isnamespace "namespace" "value" | run`
