@@ -118,4 +118,12 @@ ref: https://github.com/heptio/ark/blob/master/pkg/cloudprovider/aws
 ref: https://github.com/heptio/ark/tree/master/pkg/cloudprovider/gcp
 
 - It exposes/supports block store based backup & restore operations via Compute engine API
+- It exposes/supports object store based backup & restore operations via storage API
+```
+
+#### Azure
+```yaml
+ref: https://github.com/heptio/ark/blob/master/pkg/cloudprovider/azure/
+
+- It supports block as well as object store based backup & restore operations
 ```
