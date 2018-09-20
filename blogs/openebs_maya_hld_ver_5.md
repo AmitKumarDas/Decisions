@@ -37,11 +37,15 @@ externally without getting into the project's in-tree repo.
 ```
 
 ### Next Steps
-The design should be accomodating to accept specs from users and convert these specs to logic. The specs will not be logic
-but will be pseudo-logic i.e. some english like notations. These specs should be provided to feature specific engine. The 
-engine will decide the provider and runner based on these specs.
+Maya design will expose two kinds of config. They are explained below:
+- spec config - human understood and are inline with the feature
+- raw config - program understood that implements a feature
+
+A raw config looks like a pseudo-code. A spec based config is typically implemented (or transformed & then run) as a raw
+config.
 
 Package Design:
+```
   - spec - pkg/apis/openebs.io/v1alpha1/
   - engine - pkg/engine/v1alpha1/
   - runner - pkg/task/v1alpha1/ vs. pkg/runner/v1alpha1
@@ -54,6 +58,7 @@ Package Design:
   - snapshot - pkg/snapshot/v1alpha1/
   - clone - pkg/clone/v1alpha1/
   - pool - pkg/pool/v1alpha1/
+```
 
 Low Level Design:
 - engine
@@ -145,7 +150,7 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 - [ ] `create k8s svc | spec $doc | txttemplate .Volume .Config  | run`
 - [x] `select name, ip | create k8s service | spec $doc | totemplate .Volume .Config | run`
 
-#### Spec
+#### Raw Config
 ```yaml
 - select:
     name namespace 
