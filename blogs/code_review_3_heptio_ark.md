@@ -88,6 +88,15 @@ ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/restore.go
 - It can restore PV from snapshot (via cloudprovider)
 ```
 
+#### Schedule Specifications
+```yaml
+ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/schedule.go
+
+- This builds on top of BackupSpec
+- It is composed of BackupSpec and Cron specification
+- Follows the same model as others
+```
+
 #### Others
 ```yaml
 - Pod Volume Backup Specs
