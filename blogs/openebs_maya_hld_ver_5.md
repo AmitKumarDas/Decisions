@@ -156,8 +156,9 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 ```
 
 #### Error & Error StackTrace
-- Make use of github.com/pkg/errors everywhere i.e.:
+- Make use of github.com/pkg/errors everywhere i.e. for:
   - creation of new error i.e. `errors.New`
-  - wrapping error from 3rd party package i.e. `errors.Errorf`
-  - or WithStack of error from 3rd party package i.e. `errors.WithStack`
-- **Do NOT** make use of `fmt.Error` or `fmt.Errorf` or golang standard `errors` package
+  - wrapping error with additional info i.e. `errors.Errorf`
+  - wrapping error from 3rd party package with additional info i.e. `errors.Errorf`
+  - returning error from 3rd party package with stack trace i.e. `errors.WithStack`
+- **Do NOT** make use of `fmt` package i.e. `fmt.Error`, `fmt.Errorf` or golang standard `errors` package
