@@ -103,3 +103,19 @@ ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/schedule.go
 - Pod Volume Restore Specs
 - Restic Repository Specs
 ```
+
+### Cloud Providers
+#### AWS
+```yaml
+ref: https://github.com/heptio/ark/blob/master/pkg/cloudprovider/aws
+
+- It exposes/supports block store based backup & restore operations via EC2 API
+- It exposes/supports object store based backup & restore operations via s3 API
+```
+
+#### GCP
+```yaml
+ref: https://github.com/heptio/ark/tree/master/pkg/cloudprovider/gcp
+
+- It exposes/supports block store based backup & restore operations via Compute engine API
+```
