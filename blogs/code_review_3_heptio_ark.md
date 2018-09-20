@@ -41,3 +41,26 @@ ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/backup_storage_lo
   - Provider Location Availability
   - Provider Location Access Mode
 ```
+
+#### Constants
+```yaml
+ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/constants.go
+
+- This has the project level constants e.g.
+  - namespace where ark components will get installed
+  - label key(s) e.g. 'ark.heptio.com/restore-name'
+```
+
+#### Backup Request Specifications
+```yaml
+ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/delete_backup_request.go
+
+- This has the spec related to backup request argument
+- It has a List of BackUpRequest as well that can be used for bulk deletion of backups
+- There is also a BackupRequestStatus which indicates the response of backup request
+- This seems to be a kubernetes custom resource
+  - If this is used as a custom resource then an audit of all requests can be done
+  - kubectl can be used to get a history of requests as well as individual status
+  - If reconcile logic or operator implements the custom resource then:
+    - the request gets handled eventually i.e. asynchronous
+```
