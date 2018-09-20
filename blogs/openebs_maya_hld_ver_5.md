@@ -32,7 +32,8 @@ externally without writing code.
 ```
 
 ### Next Steps
-Maya design will expose two kinds of config. They are explained below:
+Maya design will expose two new kinds of config in addition to template based config. 
+They are explained below:
 - spec config - human understood and are inline with the feature
 - raw config - program understood that implements a feature
 
@@ -101,10 +102,11 @@ type ResourceNameBySC struct {}
 type ResourceNameByENV struct {}
 ```
 
-### Rough Work
-#### Templating
-This rough work lists down all sorts of templating possibilities. However, only few have been selected by me. This will get
-refined further based on feedbacks, experiences & my brain's biasedness.
+### Template Config - Futuristic Version i.e. similar to **MySQL Query Language**
+This rough work lists down all sorts of templating possibilities for a `template config`. 
+
+_NOTE: This will get refined further based on feedbacks, experiences & my brain's biasedness._
+_NOTE: The core structures/code will be reused to implement **Human Config** & **Raw Config**._
 
 #### Select Clause
 - [ ] `select all | create kubernetes service | spec $yaml | totemplate .Values .Config | run`
@@ -127,9 +129,9 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 #### Join multiple queries
 - [ ] `select name, ip | get k8s svc | where label eq abc | join list k8s pod | where "label" "all"`
 
-#### Error Handling
+#### Error Handling Clause
 
-#### Set
+#### Set Clause
 - [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" $ns | run`
 - [ ] `create jiva snapshot | set "spec" $yaml | txttemplate .Values | run`
 - [ ] `create jiva snapshot | set "name" $name | set "capacity" "2G" | run`
@@ -147,7 +149,7 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 - [x] `select name, ip | create k8s service | spec $doc | totemplate .Volume .Config | run`
 
 
-#### Templated Config
+#### Sample Template Config
 ```yaml
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -164,7 +166,7 @@ spec:
     {{- $err | empty | not | verifyErr $err | saveIf "deljivadata.verifyErr" .TaskResult | noop -}}
 ```
 
-#### Raw Config
+### Raw Config
 ```yaml
 - select:
     name namespace 
@@ -174,14 +176,6 @@ spec:
     name eq John
 ```
 
-#### Human Config
+### Human Config
 ```yaml
 ```
-
-#### Error & Error StackTrace
-- Make use of github.com/pkg/errors everywhere i.e. for:
-  - creation of new error i.e. `errors.New`
-  - wrapping error with additional info i.e. `errors.Errorf`
-  - wrapping error from 3rd party package with additional info i.e. `errors.Errorf`
-  - returning error from 3rd party package with stack trace i.e. `errors.WithStack`
-- **Do NOT** make use of `fmt` package i.e. `fmt.Error`, `fmt.Errorf` or golang standard `errors` package
