@@ -1,12 +1,7 @@
-### CASTemplate Engine Design - Chapter 2
-Exposing CASTemplate along with RunTasks enables exposing logic in a declarative fashion. It helped the team in numerous ways. One of the typical use of these templates was the ability to embed logic into RunTasks and solve the problem statement
-externally without getting into the project's in-tree repo. 
-
-### Things that went good
-```yaml
-- Template Functions
-- Pipes
-```
+### OpenEBS Maya - Version 5
+Exposing CASTemplate along with RunTasks enables exposing **logic in a declarative manner**. It helped the team in numerous
+ways. One of the typical use of these templates was the ability to embed logic into RunTasks and solve the problem statement
+externally without writing code.
 
 ### Is Templating & Template Functions Good?
 ```yaml
