@@ -34,10 +34,10 @@ externally without writing code.
 ### Next Steps
 Maya design will expose two new kinds of config in addition to template based config. 
 They are explained below:
-- spec config - human understood and are inline with the feature
+- human config - human understood and are inline with the feature
 - raw config - program understood that implements a feature
 
-A raw config looks like a pseudo-code. A spec based config is typically implemented (or transformed & then run) as a raw
+A raw config looks like a pseudo-code. A human based config is typically implemented (or transformed & then run) as a raw
 config.
 
 Package Design:
