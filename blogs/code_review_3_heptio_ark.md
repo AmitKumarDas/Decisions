@@ -78,6 +78,8 @@ ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/download_request.
   - RestoreResults
 ```
 
-#### Pod Volume Backup Specs
-
-#### 
+#### Others
+```yaml
+- Pod Volume Backup Specs
+- Pod Volume Restore Specs
+```
