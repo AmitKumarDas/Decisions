@@ -41,13 +41,65 @@ The design should be accomodating to accept specs from users and convert these s
 but will be pseudo-logic i.e. some english like notations. These specs should be provided to feature specific engine. The 
 engine will decide the provider and runner based on these specs.
 
-High Level Design:
-- UseCase: Volume Provisioning
-  - spec - pkg/apis/openebs.io/v1alpha1/casvolume.go may have `type CASVolume struct`
-  - engine - pkg/engine/v1alpha1/cas_template.go may have `type CASTemplateEngine struct`
-  - engine - pkg/engine/v1alpha1/run_task.go may have `type RunTaskEngine struct`
-  - runner - pkg/task/v1alpha1/txt_template.go may have `type TxtTemplateRunner struct`
-  - runner - pkg/task/v1alpha1/run_command.go may have `type RunCommandRunner struct`
+Package Design:
+  - spec - pkg/apis/openebs.io/v1alpha1/
+  - engine - pkg/engine/v1alpha1/
+  - runner - pkg/task/v1alpha1/ vs. pkg/runner/v1alpha1
+  - resource - pkg/resource/v1alpha1/
+  - client - pkg/client/k8s/v1alpha1/
+  - http client - pkg/client/http/v1alpha1/
+  - template - pkg/template/v1apha1/
+  - install - pkg/install/v1alpha1/
+  - volume - pkg/volume/v1alpha1/
+  - snapshot - pkg/snapshot/v1alpha1/
+  - clone - pkg/clone/v1alpha1/
+  - pool - pkg/pool/v1alpha1/
+
+Low Level Design:
+- engine
+```go
+type Engine interface {}
+
+type CASTemplate struct {
+  data        interface{}
+  provider    CASTemplateProvider
+  rtEngine    RunTaskEngine
+}
+
+type RunTask struct {
+  config    map[string]interface{}
+  data      interface{}
+  provider  RunTaskProvider
+  runner    CommandRunner
+}
+```
+- runner
+```go
+type CommandRunner interface {}
+
+type RunCommand struct {}
+type TxtTemplateRunner struct {}
+type RunCommandRunner struct {}
+```
+- resource
+```go
+type ResourceProvider interface {}
+type ResourceGetter interface {}
+type ResourceUpdater interface{}
+
+type K8sResource struct {}
+type CASTemplate struct {}
+type RunTask struct {}
+type ConfigMap struct{}
+```
+- engine helpers
+```go
+type ResourceNameFetcher interface {}
+
+type ResourceName struct {}
+type ResourceNameBySC struct {}
+type ResourceNameByENV struct {}
+```
 
 ### Rough Work
 This rough work lists down all sorts of templating possibilities. However, only few have been selected by me. This will get
