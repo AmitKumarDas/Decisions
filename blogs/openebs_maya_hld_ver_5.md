@@ -101,7 +101,8 @@ type ResourceNameBySC struct {}
 type ResourceNameByENV struct {}
 ```
 
-### Templating -- Rough Work
+### Rough Work
+#### Templating
 This rough work lists down all sorts of templating possibilities. However, only few have been selected by me. This will get
 refined further based on feedbacks, experiences & my brain's biasedness.
 
@@ -144,6 +145,24 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 - [ ] `create kubernetes service | specs $doc | txttemplate . Values | run`
 - [ ] `create k8s svc | spec $doc | txttemplate .Volume .Config  | run`
 - [x] `select name, ip | create k8s service | spec $doc | totemplate .Volume .Config | run`
+
+
+#### RunTask dated 20 Sep 2018
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: jiva-volume-delete-deletedata-default-0.7.0
+spec:
+  meta: |
+    id: deljivadata
+    kind: Command
+  post: |
+    {{- $base := print "http://" .TaskResult.deletelistsvc.ips ":9501" -}}
+    {{- delete jiva volume | url $base | name .Volume.owner | run | saveas "deljivadata" .TaskResult -}}
+    {{- $err := toString .TaskResult.deljivadata.error -}}
+    {{- $err | empty | not | verifyErr $err | saveIf "deljivadata.verifyErr" .TaskResult | noop -}}
+```
 
 #### Raw Config
 ```yaml
