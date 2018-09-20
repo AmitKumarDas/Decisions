@@ -127,3 +127,12 @@ ref: https://github.com/heptio/ark/blob/master/pkg/cloudprovider/azure/
 
 - It supports block as well as object store based backup & restore operations
 ```
+
+#### Auth Providers
+```yaml
+ref: https://github.com/heptio/ark/blob/master/pkg/client/auth_providers.go
+
+- It imports all the auth providers for aws, gcp, azure
+- It imports by importing the client-go's auth providers i.e:
+  - k8s.io/client-go/plugin/pkg/client/auth/
+```
