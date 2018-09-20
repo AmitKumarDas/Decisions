@@ -78,8 +78,19 @@ ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/download_request.
   - RestoreResults
 ```
 
+#### Restore Specifications
+```yaml
+ref: https://github.com/heptio/ark/blob/master/pkg/apis/ark/v1/restore.go
+
+- It understands restore from backup name
+- It can restore from a particular backup's schedule name
+- It has various options / rules to include exclude resources for restore
+- It can restore PV from snapshot (via cloudprovider)
+```
+
 #### Others
 ```yaml
 - Pod Volume Backup Specs
 - Pod Volume Restore Specs
+- Restic Repository Specs
 ```
