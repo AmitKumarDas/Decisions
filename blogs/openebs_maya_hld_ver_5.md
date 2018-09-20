@@ -101,7 +101,7 @@ type ResourceNameBySC struct {}
 type ResourceNameByENV struct {}
 ```
 
-### Rough Work
+### Templating -- Rough Work
 This rough work lists down all sorts of templating possibilities. However, only few have been selected by me. This will get
 refined further based on feedbacks, experiences & my brain's biasedness.
 
@@ -110,15 +110,30 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 - [ ] `select all | text template .Values $doc | tounstruct | run | saveas "123" .Values`
 
 #### Where Clause
+- [ ] `select "name" "ip" | get k8s service | where "name" $name | run`
+- [ ] `select "name" "ip" | get k8s service | where "name" "ne" $name | run`
+- [ ] `select "name" "ip" | delete k8s service | where "name" $name | run`
+- [ ] `select "name" "ip" | list k8s service | where "name" "ne" $name | run`
+
+#### Whereop Clause
+- [ ] `select "name" "ip" | list k8s service | where "name" $name | where "label" $app | whereop "any" | run`
+- [ ] `select "name" "ip" | list k8s service | where "name" $name | where "label" $app | whereop "all" | run`
+- [ ] `select "name" "ip" | list k8s service | where "name" $name | where "label" $app | whereop "atleasttwo" | run`
+
+#### When Clause
+- [ ] `select "name" "ip" | get k8s service | where "name" "ne" $name | when eq $willrun "true" | run`
 
 #### Join multiple queries
-- [ ] `select name, ip | get k8s svc | where label eq abc | join list k8s pod | where 'label' 'eq' 'all'`
+- [ ] `select name, ip | get k8s svc | where label eq abc | join list k8s pod | where "label" "all"`
 
 #### Error Handling
 
-#### Predicates
-- [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" "value" isnamespace | run`
-- [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" "value" | run`
+#### Set
+- [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" $ns | run`
+
+#### Set Conditionally
+- [ ] `create k8s service | spec $yaml | totemplate .Values | setif isnamespace "namespace" "value" | run`
+
 
 #### Text Template as a template function
 - [ ] `$doc | exec template . Values | run`
