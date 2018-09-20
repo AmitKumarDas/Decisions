@@ -160,4 +160,4 @@ refined further based on feedbacks, experiences & my brain's biasedness.
   - creation of new error i.e. `errors.New`
   - wrapping error from 3rd party package i.e. `errors.Errorf`
   - or WithStack of error from 3rd party package i.e. `errors.WithStack`
-- Do not make use of `fmt.Error` or `fmt.Errorf` or golang's errors package
+- **Do NOT** make use of `fmt.Error` or `fmt.Errorf` or golang standard `errors` package
