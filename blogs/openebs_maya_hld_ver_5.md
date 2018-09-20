@@ -147,7 +147,7 @@ refined further based on feedbacks, experiences & my brain's biasedness.
 - [x] `select name, ip | create k8s service | spec $doc | totemplate .Volume .Config | run`
 
 
-#### RunTask dated 20 Sep 2018
+#### Templated Config
 ```yaml
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -172,6 +172,10 @@ spec:
     kubernetes service 
   where:
     name eq John
+```
+
+#### Human Config
+```yaml
 ```
 
 #### Error & Error StackTrace
