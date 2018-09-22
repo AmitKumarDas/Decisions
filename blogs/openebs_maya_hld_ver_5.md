@@ -135,6 +135,17 @@ _NOTE: The core structures/code will be reused to implement **Human Config** & *
 - [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" $ns | run`
 - [ ] `create jiva snapshot | set "spec" $yaml | txttemplate .Values | run`
 - [ ] `create jiva snapshot | set "name" $name | set "capacity" "2G" | run`
+- [ ] `create k8s pod | set spec $spec | run`
+- [ ] `creates k8s pod | set image $image | run`
+- [ ] `create k8s jiva replica | set image $image | run`
+- [ ] `delete jiva data | run`
+- [ ] `create jiva target | set image $image | run`
+- [ ] `create jiva target | set "container.path" $container | run`
+- [ ] `create jiva target | set "spec" $spec | run`
+- [ ] `create jiva target | set "doc" $doc | run`
+- [ ] `create jiva target | set "yaml" $yaml | run`
+- [ ] `create k8s deploy | set "yaml" $yaml | txttemplate .Values .Config | run`
+- [ ] `create k8s deploy | set "yaml" $yaml | set "image" $image | txttemplate .Values .Config | run`
 
 #### Set Conditionally
 - [ ] `create k8s service | spec $yaml | totemplate .Values | setif isnamespace "namespace" "value" | run`
