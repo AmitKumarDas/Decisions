@@ -40,7 +40,7 @@ They are explained below:
 A raw config looks like a pseudo-code. A human based config is typically implemented (or transformed & then run) as a raw
 config.
 
-Package Design:
+#### Package Design:
 ```
   - spec - pkg/apis/openebs.io/v1alpha1/
   - engine - pkg/engine/v1alpha1/
@@ -56,18 +56,16 @@ Package Design:
   - pool - pkg/pool/v1alpha1/
 ```
 
-Low Level Design:
+#### Low Level Design:
 - engine
 ```go
-type Engine interface {}
-
-type CASTemplate struct {
+type Interface interface {}
+type casTemplateEngine struct {
   data        interface{}
   provider    CASTemplateProvider
   rtEngine    RunTaskEngine
 }
-
-type RunTask struct {
+type runTaskEngine struct {
   config    map[string]interface{}
   data      interface{}
   provider  RunTaskProvider
@@ -77,29 +75,31 @@ type RunTask struct {
 - runner
 ```go
 type CommandRunner interface {}
-
 type RunCommand struct {}
-type TxtTemplateRunner struct {}
-type RunCommandRunner struct {}
+type RunCommands []RunCommand
+type templateRunner struct {}
+type runner struct {}
+type repeater struct {}
 ```
 - resource
 ```go
-type ResourceProvider interface {}
-type ResourceGetter interface {}
-type ResourceUpdater interface{}
+type Interface interface {}
+type Provider interface {}
+type Getter interface {}
+type Updater interface{}
+type Applier interface{}
 
 type K8sResource struct {}
 type CASTemplate struct {}
 type RunTask struct {}
 type ConfigMap struct{}
-```
-- engine helpers
-```go
-type ResourceNameFetcher interface {}
 
-type ResourceName struct {}
-type ResourceNameBySC struct {}
-type ResourceNameByENV struct {}
+type Namer interface {
+  Name() (string, error)
+}
+type name struct {}
+type nameBySC struct {}
+type nameByENV struct {}
 ```
 
 ### Template Config - Futuristic Version i.e. similar to **MySQL Query Language**
