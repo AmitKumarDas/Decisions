@@ -130,6 +130,9 @@ _NOTE: The core structures/code will be reused to implement **Human Config** & *
 - [ ] `select name, ip | get k8s svc | where label eq abc | join list k8s pod | where "label" "all"`
 
 #### Error Handling Clause
+- Should assert & expect like things be exposed ?
+  - https://github.com/kubernetes-csi/csi-test/blob/master/pkg/sanity/controller.go
+
 
 #### Set Clause
 - [ ] `create k8s service | spec $yaml | totemplate .Values | set "namespace" $ns | run`
