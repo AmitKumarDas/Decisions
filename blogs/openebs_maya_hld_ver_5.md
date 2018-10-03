@@ -129,6 +129,15 @@ _NOTE: The core structures/code will be reused to implement **Human Config** & *
 #### Join multiple queries
 - [ ] `select name, ip | get k8s svc | where label eq abc | join list k8s pod | where "label" "all"`
 
+#### select, from, groupby
+- [ ] `select "name" "namespace" | from .TaskResult.101 | runas 201`
+- [ ] `select "name" "namespace" | from .TaskResult.101 .TaskResult.102 | groupby "name" | runas 202`
+
+```go
+type row map[string]interface{}
+type table []row
+```
+
 #### Error Handling Clause
 - Should assert & expect like things be exposed ?
   - https://github.com/kubernetes-csi/csi-test/blob/master/pkg/sanity/controller.go
