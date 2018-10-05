@@ -132,6 +132,7 @@ _NOTE: The core structures/code will be reused to implement **Human Config** & *
 #### select, from, groupby
 - [ ] `select "name" "namespace" | from .TaskResult.101 | runas 201`
 - [ ] `select "name" "namespace" | from .TaskResult.101 .TaskResult.102 | groupby "name" | runas 202`
+- verify if https://github.com/Masterminds/sprig/blob/master/dict.go will solve the purpose !!!
 
 ```go
 type row map[string]interface{}
