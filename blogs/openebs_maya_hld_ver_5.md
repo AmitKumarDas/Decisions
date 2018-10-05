@@ -172,6 +172,19 @@ type table []row
 - [ ] `create k8s svc | spec $doc | txttemplate .Volume .Config  | run`
 - [x] `select name, ip | create k8s service | spec $doc | totemplate .Volume .Config | run`
 
+#### Accept docs
+```
+# unmarshall from a json or a yaml doc in string format to []byte to interface{}
+unmarshall .Value.docs.abc01 | runas "abc01" $runner
+unmarshall .Value.docs.abc02 | runas "abc02" $runner
+
+# first run the template with all available values & return as a string
+$doc := txtTemplate .Value.docs.abc01 . | runas "tpl" $runner
+# now unmarshall it to []byte to interface{}
+unmarshall .TaskResult.tpl.result | runas "deploy" $runner
+
+create k8s deploy | withoption "body" .TaskResult.deploy.result | runas "createK8sDeploy" $runner
+```
 
 #### Sample Template Config
 ```yaml
