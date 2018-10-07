@@ -254,3 +254,5 @@ work:
   - The patch operation & path specific details will be hidden/internal to your custom library
   - Just the doc hidden in RunTask or defaults to common stuff in .go file
   - The merge == pure json as config of CASTemplate
+- Making `select` more powerful:
+  - https://github.com/jmespath/go-jmespath/tree/master/compliance
