@@ -75,8 +75,16 @@ type runTaskEngine struct {
 - runner
 ```go
 type CommandRunner interface {}
-type RunCommand struct {}
+type Command struct {}
+func NewCommand() *Command {}
+func WithOptions(o CommandOptions) cmd.Interface {}
+type CommandOptions struct {
+  Select    Selector
+  Store     Storage
+  WillRun   RunCondition
+}
 type RunCommands []RunCommand
+type StoreCommand struct {}
 type templateRunner struct {}
 type runner struct {}
 type repeater struct {}
