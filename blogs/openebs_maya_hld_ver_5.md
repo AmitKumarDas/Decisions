@@ -245,3 +245,7 @@ work:
   - https://github.com/jmespath/go-jmespath
 - extracting values from json as json
   - https://github.com/jmespath/go-jmespath
+- merge json:
+  - https://github.com/evanphx/json-patch/blob/master/merge_test.go
+- patch json i.e. operation based merge ?
+  - https://github.com/evanphx/json-patch/blob/master/patch_test.go
