@@ -241,3 +241,7 @@ work:
   - https://github.com/tidwall/sjson
 - Patch/Update json via:
   - https://github.com/tidwall/sjson
+- input & output of parsing a json via json path is json
+  - https://github.com/jmespath/go-jmespath
+- extracting values from json as json
+  - https://github.com/jmespath/go-jmespath
