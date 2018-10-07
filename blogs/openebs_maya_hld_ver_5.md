@@ -213,6 +213,25 @@ spec:
     name eq John
 ```
 
+### Raw Config references in WILD
+- ref - https://github.com/grofers/go-codon/wiki/Task-Phases
+```yaml
+get_all_comments:
+  with-items: <%jmes main.posts %>
+  loop:
+    task: get_comments
+    input:
+      postId: <%jmes item.id %>
+    publish:
+      combined: <%jmes {"post_details":item,"comments":task.comments} %>
+```
+
 ### Human Config
 ```yaml
+spec:
+  tasks:
+  - abc
+  - def
+abcSpec:
+defSpec:
 ```
