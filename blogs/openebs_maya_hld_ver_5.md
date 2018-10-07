@@ -235,3 +235,7 @@ work:
   abc:
   def:
 ```
+
+### Wild Ideas From The Wild
+- Replace go text templating via:
+  - https://github.com/tidwall/sjson
