@@ -249,3 +249,8 @@ work:
   - https://github.com/evanphx/json-patch/blob/master/merge_test.go
 - patch json i.e. operation based merge ?
   - https://github.com/evanphx/json-patch/blob/master/patch_test.go
+- Use this to replace go text templating
+  - https://github.com/evanphx/json-patch/blob/master/patch_test.go
+  - The patch operation & path specific details will be hidden/internal to your custom library
+  - Just the doc hidden in RunTask or defaults to common stuff in .go file
+  - The merge == pure json as config of CASTemplate
