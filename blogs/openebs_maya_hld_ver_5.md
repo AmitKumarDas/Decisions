@@ -228,10 +228,10 @@ get_all_comments:
 
 ### Human Config
 ```yaml
-spec:
-  tasks:
+work:
+  flow:
   - abc
   - def
-abcSpec:
-defSpec:
+  abc:
+  def:
 ```
