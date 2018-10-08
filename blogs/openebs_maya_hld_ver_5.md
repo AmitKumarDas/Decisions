@@ -234,7 +234,7 @@ get_all_comments:
       combined: <%jmes {"post_details":item,"comments":task.comments} %>
 ```
 
-### Human Config
+### Human Config Samples
 ```yaml
 work:
   flow:
@@ -242,6 +242,27 @@ work:
   - def
   abc:
   def:
+```
+
+```yaml
+kind: Install
+spec:
+  # ordered options that influences the installation workflow
+  options:
+  - labels
+  - namespace
+  - artifacts
+  # labels related options/configs
+  labels:
+    add: app=cool
+    update: openebs.io/version=1.7
+  # artifacts related options/configs
+  artifacts:
+    include: my_artifact
+    exclude: his_artifact
+  # namespace related options/configs
+  namespace:
+    useOpenEBS: true
 ```
 
 ### Wild Ideas From The Wild
