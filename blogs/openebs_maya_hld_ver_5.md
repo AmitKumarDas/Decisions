@@ -231,11 +231,11 @@ spec:
     values: <map[string]interface{}>
   runs:
   - id: prep
-    func: .Values.name | default "none" | asvar "named"
+    func: .Values.name | default "none" | saveas "var" "named"
   - id: mySvc
-    run: select "clusterIP" | create kube service | withoption "name" .var.named
+    run: select "clusterIP" | create kube service | options "name" .var.named
   - id: myDeploy
-    run: select ".namespace.name" | create kube deploy | withoption "name" "my-deploy"
+    run: select ".namespace.name" | create kube deploy | options "name" "my-deploy"
   status:
     run: select "all" | get runtask result
 ```
@@ -247,9 +247,9 @@ spec:
 Kind: RunTask
 spec:
   runs:
-  - func: .Values.name | default "none" | asvar "named"
-  - run: select "clusterIP" | create kube service | withoption "name" .var.named
-  - run: select ".namespace.name" | create kube deploy | withoption "name" "my-deploy"
+  - func: .Values.name | default "none" | saveas "var" "named"
+  - run: select "clusterIP" | create kube service | options "name" .var.named
+  - run: select ".namespace.name" | create kube deploy | options "name" "my-deploy"
   status:
     run: select "all" | get runtask result
 ```
