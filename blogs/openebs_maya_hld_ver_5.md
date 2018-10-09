@@ -212,6 +212,7 @@ spec:
 ```
 
 ### Raw Config Samples
+- variant 1
 ```yaml
 - select:
     name namespace 
@@ -220,19 +221,7 @@ spec:
   where:
     name eq John
 ```
-- Raw Config references in WILD
-- ref - https://github.com/grofers/go-codon/wiki/Task-Phases
-```yaml
-get_all_comments:
-  with-items: <%jmes main.posts %>
-  loop:
-    task: get_comments
-    input:
-      postId: <%jmes item.id %>
-    publish:
-      combined: <%jmes {"post_details":item,"comments":task.comments} %>
-```
-- go text templated yet yaml
+- variant 2 - flavour 1 - go text templated yet yaml
 ```yaml
 Kind: RunTask
 spec:
@@ -242,28 +231,30 @@ spec:
     values: <map[string]interface{}>
   runs:
   - id: prep
-    cmd: $name := .Values.name | default "none"
+    func: .Values.name | default "none" | asvar "named"
   - id: mySvc
-    cmd: select "clusterIP" | create kube service | withoption "name" "my-svc"
+    run: select "clusterIP" | create kube service | withoption "name" .var.named
   - id: myDeploy
-    cmd: select ".namespace.name" | create kube deploy | withoption "name" "my-deploy"
+    run: select ".namespace.name" | create kube deploy | withoption "name" "my-deploy"
   status:
-    cmd: select "all" | get runtask result
+    run: select "all" | get runtask result
 ```
-- go text templated yet yaml - variant 2
+- variant 2 - flavour 2 - go text templated yet yaml
   - entire options is optional
   - options is populated by the controller
+  - run id can be auto generated
 ```yaml
 Kind: RunTask
 spec:
   runs:
-  - .Values.name | default "none" | saveas "named"
-  - select "clusterIP" | create kube service | withoption "name" "my-svc" | runas "mySvc"
-  - select ".namespace.name" | create kube deploy | withoption "name" "my-deploy" | runas "myDeploy"
+  - func: .Values.name | default "none" | asvar "named"
+  - run: select "clusterIP" | create kube service | withoption "name" .var.named
+  - run: select ".namespace.name" | create kube deploy | withoption "name" "my-deploy"
   status:
-    select "all" | get runtask result
+    run: select "all" | get runtask result
 ```
 ### Human Config Samples
+- a sample blueprint
 ```yaml
 work:
   flow:
@@ -272,7 +263,7 @@ work:
   abc:
   def:
 ```
-
+- a install spec
 ```yaml
 kind: Install
 spec:
@@ -294,7 +285,7 @@ spec:
     useOpenEBS: true
 ```
 
-### Wild Ideas From The Wild
+### Wild Ideas
 - Replace go text templating via:
   - https://github.com/tidwall/sjson
 - Patch/Update json via:
