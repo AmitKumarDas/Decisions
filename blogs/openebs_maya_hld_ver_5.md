@@ -211,7 +211,7 @@ spec:
     {{- $err | empty | not | verifyErr $err | saveIf "deljivadata.verifyErr" .TaskResult | noop -}}
 ```
 
-### Raw Config
+### Raw Config Samples
 ```yaml
 - select:
     name namespace 
@@ -220,8 +220,7 @@ spec:
   where:
     name eq John
 ```
-
-### Raw Config references in WILD
+- Raw Config references in WILD
 - ref - https://github.com/grofers/go-codon/wiki/Task-Phases
 ```yaml
 get_all_comments:
@@ -233,7 +232,37 @@ get_all_comments:
     publish:
       combined: <%jmes {"post_details":item,"comments":task.comments} %>
 ```
-
+- go text templated yet yaml
+```yaml
+Kind: RunTask
+spec:
+  options:
+    runner: storeRunner
+    runIf:  ifNoErr
+    values: <map[string]interface{}>
+  runs:
+  - id: prep
+    cmd: $name := .Values.name | default "none"
+  - id: mySvc
+    cmd: select "clusterIP" | create kube service | withoption "name" "my-svc"
+  - id: myDeploy
+    cmd: select ".namespace.name" | create kube deploy | withoption "name" "my-deploy"
+  status:
+    cmd: select "all" | get runtask result
+```
+- go text templated yet yaml - variant 2
+  - entire options is optional
+  - options is populated by the controller
+```yaml
+Kind: RunTask
+spec:
+  runs:
+  - .Values.name | default "none" | saveas "named"
+  - select "clusterIP" | create kube service | withoption "name" "my-svc" | runas "mySvc"
+  - select ".namespace.name" | create kube deploy | withoption "name" "my-deploy" | runas "myDeploy"
+  status:
+    select "all" | get runtask result
+```
 ### Human Config Samples
 ```yaml
 work:
