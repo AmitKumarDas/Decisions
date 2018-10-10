@@ -10,10 +10,10 @@ by all its readers? Can we be assured of a good maintainance of this software?
 
 ### Loops & Conditions Rule The Roost
 Take any programming logic from any real world software and more often than not, you will find yourselves navigating through 
-its loops and if else branches. Does OOPs have anything to talk about loops & branches? How about trying to model these loops
-and conditions into objects. Yes, I am referring to collections here. However, I am not talking about arrays or maps. I am 
-talking about making a collection of these objects as first class citizens similar to the object itself. Let us look at a 
-piece of code to understand further.
+its loops and if else branches. _Does OOPs have anything to talk about loops & branches?_ _How about modeling these loops
+and conditions into objects?_ Yes, I am referring to collections here. However, I am not talking about arrays or maps. _**I
+am indicating to make a collection of these objects as first class citizens similar to the object itself.**_ Let us look at 
+a piece of code to understand further.
 
 ```go
 type storage struct {}
