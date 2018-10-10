@@ -1,12 +1,13 @@
-### What objects to consider ?
-Most of us (developers) have been introduced to the concept of programming. Most of us again would have likely heard about 
-Object Oriented Programming (OOPs). The essence of OOPs is about constructing objects by analyzing through the 
-requirements in terms of real world objects.
+### What objects should one consider while programming in OOPs ?
+Most of us (_developers_) have been introduced to the concept of programming via books or our own experience. It is more than
+likely some of us would have heard about Object Oriented Programming (OOPs). The essence of OOPs is all about constructing
+objects by analyzing software requirements in terms of real world objects.
 
-### Is it all about _thinking in nouns_ ?
-We have often heard of nouns becoming programming objects & the behaviours of these objects turn into methods or functions. 
-If we conform to these OOPs essentials, does it ease our programming logic? Does this mean the logic will be understood 
-by all its readers? Can we be assured of a good maintainance of this software?
+### Is OOPs same as _thinking in nouns_ to construct objects ?
+We have often heard of nouns becoming programmable objects & the behaviours of these objects turn into methods or functions. 
+Theory aside, if we conform to these OOPs essentials, does it ease our programming logic? Does this mean the logic will be
+understood by all its readers (read reviewers, fellow maintainers)? Can we be assured of a good maintainance of this 
+software?
 
 ### Loops & Conditions Rule The Roost
 Take any programming logic from any real world software and more often than not, you will find yourselves navigating through 
