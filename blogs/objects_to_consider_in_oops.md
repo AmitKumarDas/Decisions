@@ -78,7 +78,7 @@ requirements that will be easy to code and maintain and even unit test.
 ### Conclusion
 It is all about thinking in terms of objects. Some may view above as functional approach as well. However, the core idea of
 thinking in terms of specific structures, functions or objects in addition to language provided keywords like `for loop`, 
-`switch case` conditions, etc can help in getting some amazing stuff done using simple approaches.
+`switch case` conditions, etc can help in getting some amazing stuff done using simple approaches. 
 
 ### More Stuff
 - How about implementing sort.Interface to sort the storage collections !!!
@@ -97,3 +97,7 @@ func (l storageList) Swap(i, j int) {
 ```
 - How about requirements driving us to implement various operators on top of collections & conditions? e.g.
   - or, eq, ne, gt, lt, and so on
+
+### Fun Side
+- I tend to call above as first-class domain based objects. A jargon that will obviously be mis-interpreted. Hence this
+article.
