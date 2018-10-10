@@ -1,5 +1,5 @@
 ### What objects to consider ?
-Most of us (developers) have been introduced to the concept of proramming. Most of us again would have likely heard about 
+Most of us (developers) have been introduced to the concept of programming. Most of us again would have likely heard about 
 Object Oriented Programming (OOPs). The essence of OOPs is about constructing objects by analyzing through the 
 requirements in terms of real world objects.
 
