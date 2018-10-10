@@ -70,3 +70,30 @@ func (l storageList) Onlines() (u storageList) {
   return l.Filter(isOnline)
 }
 ```
+
+Above tries to model a simple storage related requirement by considering collection based objects & conditional objects.
+With similar foundational pieces in place, we can venture to stitch together (read permutations & combinations) of complex
+requirements that will be easy to code and maintain and even unit test.
+
+### Conclusion
+It is all about thinking in terms of objects. Some may view above as functional approach as well. However, the core idea of
+thinking in terms of specific structures, functions or objects in addition to language provided keywords like `for loop`, 
+`switch case` conditions, etc can help in getting some amazing stuff done using simple approaches.
+
+### More Stuff
+- How about implementing sort.Interface to sort the storage collections !!!
+```go
+func (l storageList) Len() int {
+	return len(l)
+}
+
+func (l storageList) Less(i, j int) bool {
+	return l[i].LessThan(l[j]) // implement LessThan method
+}
+
+func (l storageList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
+}
+```
+- How about requirements driving us to implement various operators on top of collections & conditions? e.g.
+  - or, eq, ne, gt, lt, and so on
