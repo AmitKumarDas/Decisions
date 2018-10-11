@@ -81,7 +81,7 @@ It is all about thinking in terms of objects. Some may view above as functional 
 thinking in terms of specific structures, functions or objects in addition to language provided keywords like `for loop`, 
 `switch case` conditions, etc can help in getting some amazing stuff done using simple approaches. 
 
-### More Stuff
+### We are all familiar with `sort` Interface
 - How about implementing sort.Interface to sort the storage collections !!!
 ```go
 func (l storageList) Len() int {
@@ -96,8 +96,12 @@ func (l storageList) Swap(i, j int) {
 	l[i], l[j] = l[j], l[i]
 }
 ```
-- How about requirements driving us to implement various operators on top of collections & conditions? e.g.
-  - or, eq, ne, gt, lt, and so on
+- NOTE: Most of the projects seem to use a custom list to implement `sort` interface. 
+- NOTE: It could be great if these projects look beyond supporting sort & start using it to build domain logic as well.
+
+### Ever thought of building custom operators as well ?
+How about requirements driving us to implement various operators on top of collections & conditions? e.g. `or`, `eq`, `ne`,
+`gt`, `lt`, and so on.
 
 ### Fun Side
 - I tend to call above as first-class domain based objects. A jargon that will obviously be mis-interpreted. Hence this
