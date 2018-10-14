@@ -9,14 +9,14 @@ usecases but would like to discuss about my mental models on declarative program
 
 ### How does this help?
 This is obviously the first question that boomerangs. In my opinion it does no harm to re-think a particular idea or process 
-in the fields / disciplines where it was not meant to be in the first place. For example, why should core programmers (the ones
-who know writing programming language syntax) be the only ones meant to use reconciliation? What about enabling users, 
-non-technical personas to use this technique. Now one of the solutions, that come to my mind is to expose reconcilation into
-simple declarative english like syntaxes. This helps the broader community of the project.
+in the fields / disciplines where it was not meant to be in the first place. For example, why should core programmers (_the
+ones who understand writing programming language syntax_) be the only ones meant to use reconciliation? What about enabling
+users, non-technical personas to utilize this technique. Now one of the solutions, that come to my mind is to expose
+reconcilation into simple declarative, english like statements. This helps broaden the use and hence iterate the feedback loop of the project that acts as a tailwind into the project's improvement.
 
 ### Declarative Reconcile - High Level Design
-We can start by designing a specification which is more english like versus code syntax like. Let us give this specification a
-name. Let me call it _**ReconcileTask**_.
+We can start by designing a specification which is more english like versus code syntax like. Let us give this specification
+a name. Let me call it _**ReconcileTask**_.
 
 #### How does it look like - Take 1
 ```yaml
@@ -31,6 +31,7 @@ spec:
     with: 
     - "clusterip": clusterIP
 ```
+
 #### How does it look like - Take 2
 ```yaml
 kind: ReconcileTask
@@ -38,6 +39,7 @@ spec:
   - select clusterIP from a kube service having name my-svc
   - select name after creating a kube deploy with clusterip $clusterIP
 ```
+
 #### How does it look like - Take 3
 ```yaml
 kind: ReconcileTask
