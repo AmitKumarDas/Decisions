@@ -1,3 +1,11 @@
+## Learn You Some DSL !!!
+### Chapters
+- Where It All Began
+- Shameless Cloner
+- Illusion of Control
+- OODA Loop
+
+## Rough
 The first time I chanced to understand a go template file was when I was reviewing a helm chart pull request (PR). This PR was
 sent by an operator. On the other side of the PR (read code review) was done by me (i.e. a programmer). I was pleasantly
 surprised by the thought process put in by this operator to send this PR. I wondered, how a person with an operator role, was
