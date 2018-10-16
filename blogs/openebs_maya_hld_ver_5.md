@@ -238,7 +238,7 @@ spec:
   - select: $name $ns
     get: kube-deploy
     with:
-    - name: $deploy
+    - name: {{values.deploy}}
 status:
   select: all
   get: runtask-result
