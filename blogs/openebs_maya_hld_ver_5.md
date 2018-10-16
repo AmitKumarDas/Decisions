@@ -212,16 +212,38 @@ spec:
 ```
 
 ### Raw Config Samples
-- variant 1
+- **flavour 1 - pure yaml -- with functions sprinkled around**
+  - entire options is optional
+  - options is populated by the controller
+  - run id can be auto generated
 ```yaml
-- select:
-    name namespace 
-  get:
-    kubernetes service 
-  where:
-    name eq John
+kind: RunTask
+options:
+  values:
+  - svc: my-service
+  - deploy: my-deploy
+spec:
+  runs:
+  - let: name, ns
+    value: .metadata.name, .metadata.namespace
+  - let: svc, deploy
+    value: {{values.svc}} | default "mysvc", {{values.deploy}}
+  - let: funky
+    func: $mysvc | suffix "-svc" | prefix "my-"
+  - select: $name $ns
+    get: kube-service
+    where: labels.name.eq.John
+    with: 
+    - name: $svc
+  - select: $name $ns
+    get: kube-deploy
+    with:
+    - name: $deploy
+status:
+  select: all
+  get: runtask-result
 ```
-- variant 2 - flavour 1 - go text templated yet yaml
+- **flavour 2 - functions && pipes**
 ```yaml
 Kind: RunTask
 spec:
@@ -231,15 +253,15 @@ spec:
     values: <map[string]interface{}>
   runs:
   - id: prep
-    func: .Values.name | default "none" | saveas "var" "named"
+    let: .Values.name | default "none" | alias "var" "named"
   - id: mySvc
-    run: select "clusterIP" | create kube service | options "name" .var.named
+    run: select "clusterIP" | create kube service | with "name" .var.named
   - id: myDeploy
-    run: select ".namespace.name" | create kube deploy | options "name" "my-deploy"
+    run: select ".namespace.name" | create kube deploy | with "name" "my-deploy"
   status:
     run: select "all" | get runtask result
 ```
-- variant 2 - flavour 2 - go text templated yet yaml
+- **flavour 3 - functions & pipes**
   - entire options is optional
   - options is populated by the controller
   - run id can be auto generated
@@ -247,9 +269,10 @@ spec:
 Kind: RunTask
 spec:
   runs:
-  - func: .Values.name | default "none" | saveas "var" "named"
-  - run: select "clusterIP" | create kube service | options "name" .var.named
-  - run: select ".namespace.name" | create kube deploy | options "name" "my-deploy"
+  - let: .Values.name | default "none" | alias "names" "named"
+  - let: .Values.deploy.name | default "none" | alias "mydep"
+  - run: select "clusterIP" | create kube service | with "name" .names.named
+  - run: select ".namespace.name" | create kube deploy | with "name" .var.mydep
   status:
     run: select "all" | get runtask result
 ```
