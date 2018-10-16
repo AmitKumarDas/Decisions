@@ -328,3 +328,6 @@ spec:
   - The merge == pure json as config of CASTemplate
 - Making `select` more powerful:
   - https://github.com/jmespath/go-jmespath/tree/master/compliance
+
+### Useful References:
+- Naming References - https://concourse-ci.org/reference.html
