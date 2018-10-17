@@ -10,7 +10,7 @@ ways to orchestrate using Kubernetes.
 ### My hands on
 As part of implementing software pieces, I use a variety of programming languages, libraries, tools as & when applicable. I 
 am fascinated by functional languages and the novelty they provide by segregating the concerns from the domain logic. In 
-short, I fulfill the role of a full stack / polygot programmer / thinker.
+short, I fulfill the role of a software programmer / thinker.
 
 ### When I wear my devops hat
 As one of my generalist roles in my current place of work, I have been building tools required for the world of _Devops_ and 
