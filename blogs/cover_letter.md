@@ -18,7 +18,7 @@ _Automation Everywhere_. Below are my hands-on that try to **convey my position*
 - 1/ either create or 
 - 2/ exploit an existing tool
 
-These are specific to creation of tool.
+Here are some links related to a automation tool that I was building back in the year 2016:
 - [A groovy based DSL](https://github.com/cloudbytestorage/automation-core/blob/master/README.md)
 - [Lessons Learnt](https://github.com/cloudbytestorage/automation-core/blob/master/touchstone/DesignThoughts/My%20Final%20Thoughts.md)
 
