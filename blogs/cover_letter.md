@@ -14,28 +14,27 @@ been associated with following programming languages:
 - GO (**_current_**)
 - Java, Groovy, Python, JavaScript, VB.Net, C# (_past lives_)
 
-### When I wear my devops hat
+### My contributions
 As an architect in my current place of work, I have been coding reconcile operators, workflow tooling required for the world
-of _Devops_ and _Automation Everywhere_. Below are my hands-on that try to **convey my position** w.r.t automation 
-everywhere, which is:
-- 1/ either create or 
-- 2/ exploit an existing tool
+of _fileystems_. 
 
-Here are some links related to a automation tool that I was building back in the year 2016:
+Below are my hands-on that try to **convey my position** w.r.t automation, which is (1) either create or (2) exploit an 
+existing tool.
+
+Here are some links related to an automation tool that I built back in the year 2016:
 - [A groovy based DSL](https://github.com/cloudbytestorage/automation-core/blob/master/README.md)
 - [Lessons Learnt](https://github.com/cloudbytestorage/automation-core/blob/master/touchstone/DesignThoughts/My%20Final%20Thoughts.md)
 
-### These are some of the posts that speaks about me
+I would suggest to go through the commit history of below projects, which reflect **my programming style**:
+- [Contributions to OpenEBS](https://github.com/openebs/maya)
+- [Litmus](https://github.com/openebs/litmus)
+- [Building Automation DSL](https://github.com/AmitKumarDas/automation-core)
+- Contributions to OpenStack - Unfortunately, cloudbyte cinder plugin driver has been removed ;)
+
+### These are some of the posts where I have put my thoughts:
 - [Learnings being with a startup](https://amitkumardas.github.io/2016/08/20/lessons-learned-at-CloudByte.html)
 - [Being idiomatic](https://amitkumardas.github.io/2016/08/19/being-idiomatic-and-do-i-bother.html)
 - [On Being Functional](https://www.linkedin.com/pulse/being-functional-amit-kumar-das/?trk=hp-feed-article-title-publish)
-
-### My code contributions:
-I would suggest to go through the commit history which will reflect my programming behavior.
-
-- Contributions to OpenStack - Cinder Plugin Driver has been removed ;)
-- [Contributions to OpenEBS](https://github.com/openebs/maya)
-- [Building Automation DSL](https://github.com/AmitKumarDas/automation-core)
 - [Articles, blogs, learnings, etc... - 1](https://amitkumardas.github.io/)
 - [Articles, blogs, learnings, etc... - 2](https://github.com/AmitKumarDas/Decisions/tree/master/blogs)
 - [Articles, blogs, learnings, etc... - 3](https://blog.openebs.io/@amit.das)
@@ -44,6 +43,7 @@ I would suggest to go through the commit history which will reflect my programmi
 - Title - Using kubectl to Run your End-to-End Tests - Amit Kumar Das & Uday Kiran, MayaData
   - [Link](https://www.youtube.com/watch?v=YU9J4KH8X14)
 
+### Past Life
 I was part of below solutions in my earlier avatars:
 - Infrastructure as a Service (IAAS), specializing in storage integrations
 - Cloud Security Product Development/Implementation
@@ -52,4 +52,5 @@ I was part of below solutions in my earlier avatars:
 - AMI (Automated Metering Infrastructure), Smart Grid/Metering
 - OMS GIS integration
 
+### Others
 [My LinkedIn profile](https://www.linkedin.com/in/amit-kumar-das-224b351b/)
