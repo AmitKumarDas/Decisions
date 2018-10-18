@@ -25,7 +25,7 @@ Here are some links related to an automation tool that I built back in the year 
 - [A groovy based DSL](https://github.com/cloudbytestorage/automation-core/blob/master/README.md)
 - [Lessons Learnt](https://github.com/cloudbytestorage/automation-core/blob/master/touchstone/DesignThoughts/My%20Final%20Thoughts.md)
 
-I would suggest to go through the commit history of below projects, which reflect **my programming style**:
+I would suggest readers to go through commit history of below projects, that reflect **my programming style**:
 - [Contributions to OpenEBS](https://github.com/openebs/maya)
 - [Litmus](https://github.com/openebs/litmus)
 - [Building Automation DSL](https://github.com/AmitKumarDas/automation-core)
