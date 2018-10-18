@@ -1,20 +1,23 @@
 I have elaborated my current profile which correlates my area of interest & provides a fair glimpse of my personality.
-I specialize in designing & building developer as well as software solutions, improving them, or simply refactoring them to
-isolated but cohesive features communicating in harmony. However, I firmly believe above skills does not have a profound 
-impact until those are read, understood, apprecitated & criticized by a larger community. Hence my belief in _Open Source 
-Programming_. I conclude by accepting the fact that any solution can stand the test of time if & only if it is simple.
+I specialize in designing, building & testing tools as well as software solutions, improving them, or simply refactoring 
+them to isolated but cohesive features communicating in harmony. However, I firmly believe above skills does not have a 
+profound impact until those are read, understood, apprecitated & criticized by a larger community. Hence my belief in _Open
+Source Programming_. I conclude by accepting the fact that any solution can stand the test of time if & only if it is simple.
 
-Currently designing solutions around the management pieces of file systems [OpenEBS](https://openebs.io/) & finding suitable 
-ways to orchestrate using Kubernetes.
+Currently designing operators and e2e tooling around the management pieces of file systems [OpenEBS](https://openebs.io/).
 
 ### My hands on
 As part of implementing software pieces, I use a variety of programming languages, libraries, tools as & when applicable. I 
-am fascinated by functional languages and the novelty they provide by segregating the concerns from the domain logic. In 
-short, I fulfill the role of a software programmer / thinker.
+am fascinated by functional languages and the novelty they provide by segregating the concerns from the domain logic. I have 
+been associated with following programming languages:
+
+- GO (**_current_**)
+- Java, Groovy, Python, JavaScript, VB.Net, C# (_past lives_)
 
 ### When I wear my devops hat
-As one of my generalist roles in my current place of work, I have been building tools required for the world of _Devops_ and 
-_Automation Everywhere_. Below are my hands-on that try to **convey my position** w.r.t automation everywhere, which is:
+As an architect in my current place of work, I have been coding reconcile operators, workflow tooling required for the world
+of _Devops_ and _Automation Everywhere_. Below are my hands-on that try to **convey my position** w.r.t automation 
+everywhere, which is:
 - 1/ either create or 
 - 2/ exploit an existing tool
 
