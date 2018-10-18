@@ -31,13 +31,13 @@ I would suggest readers to go through commit history of below projects, that ref
 - [Building Automation DSL](https://github.com/AmitKumarDas/automation-core)
 - Contributions to OpenStack - Unfortunately, cloudbyte cinder plugin driver has been removed ;)
 
-### These are some of the posts where I have put my thoughts:
-- [Learnings being with a startup](https://amitkumardas.github.io/2016/08/20/lessons-learned-at-CloudByte.html)
-- [Being idiomatic](https://amitkumardas.github.io/2016/08/19/being-idiomatic-and-do-i-bother.html)
-- [On Being Functional](https://www.linkedin.com/pulse/being-functional-amit-kumar-das/?trk=hp-feed-article-title-publish)
+### These are some of the posts that reflect my thoughts:
 - [Articles, blogs, learnings, etc... - 1](https://amitkumardas.github.io/)
 - [Articles, blogs, learnings, etc... - 2](https://github.com/AmitKumarDas/Decisions/tree/master/blogs)
 - [Articles, blogs, learnings, etc... - 3](https://blog.openebs.io/@amit.das)
+- [Learnings being with a startup](https://amitkumardas.github.io/2016/08/20/lessons-learned-at-CloudByte.html)
+- [Being idiomatic](https://amitkumardas.github.io/2016/08/19/being-idiomatic-and-do-i-bother.html)
+- [On Being Functional](https://www.linkedin.com/pulse/being-functional-amit-kumar-das/?trk=hp-feed-article-title-publish)
 
 ### Conference Talks
 - Title - Using kubectl to Run your End-to-End Tests - Amit Kumar Das & Uday Kiran, MayaData
