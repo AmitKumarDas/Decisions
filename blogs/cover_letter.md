@@ -4,7 +4,7 @@ have a profound impact until those are used, understood, apprecitated & criticiz
 _OpenSource Programming_. I conclude by accepting the fact that any solution can stand the test of time if & only if it is 
 simple.
 
-Currently designing operators and e2e tooling around block file systems [OpenEBS](https://openebs.io/) using Kubernetes.
+Currently designing operators and e2e tooling around block file systems i.e. [OpenEBS](https://openebs.io/) using Kubernetes.
 
 ### My hands on
 As part of implementing software pieces, I use a variety of programming languages, libraries, tools as & when applicable. I 
