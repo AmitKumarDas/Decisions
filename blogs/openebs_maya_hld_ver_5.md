@@ -331,3 +331,4 @@ spec:
 
 ### Useful References:
 - Naming References - https://concourse-ci.org/reference.html
+- Diagram References - https://medium.com/bluecore-engineering/were-all-using-airflow-wrong-and-how-to-fix-it-a56f14cb0753
