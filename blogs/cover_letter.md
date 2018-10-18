@@ -38,6 +38,7 @@ I would suggest to go through the commit history which will reflect my programmi
 - [Building Automation DSL](https://github.com/AmitKumarDas/automation-core)
 - [Articles, blogs, learnings, etc... - 1](https://amitkumardas.github.io/)
 - [Articles, blogs, learnings, etc... - 2](https://github.com/AmitKumarDas/Decisions/tree/master/blogs)
+- [Articles, blogs, learnings, etc... - 3](https://blog.openebs.io/@amit.das)
 
 ### Conference Talks
 - Title - Using kubectl to Run your End-to-End Tests - Amit Kumar Das & Uday Kiran, MayaData
