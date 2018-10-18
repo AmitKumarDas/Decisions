@@ -1,10 +1,10 @@
 I have elaborated my current profile which correlates my area of interest & provides a fair glimpse of my personality.
-I specialize in designing, building & testing tools as well as software solutions, improving them, or simply refactoring 
-them to isolated but cohesive features communicating in harmony. However, I firmly believe above skills does not have a 
-profound impact until those are read, understood, apprecitated & criticized by a larger community. Hence my belief in _Open
-Source Programming_. I conclude by accepting the fact that any solution can stand the test of time if & only if it is simple.
+I specialize in designing, building solutions as well as developer tools. However, I firmly believe above skills does not
+have a profound impact until those are used, understood, apprecitated & criticized by a larger community. Hence my belief in
+_OpenSource Programming_. I conclude by accepting the fact that any solution can stand the test of time if & only if it is 
+simple.
 
-Currently designing operators and e2e tooling around the management pieces of file systems [OpenEBS](https://openebs.io/).
+Currently designing operators and e2e tooling around block file systems [OpenEBS](https://openebs.io/) using Kubernetes.
 
 ### My hands on
 As part of implementing software pieces, I use a variety of programming languages, libraries, tools as & when applicable. I 
