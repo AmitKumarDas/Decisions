@@ -3,7 +3,7 @@ Most of us (_developers_) have been introduced to the concept of programming via
 likely some of us would have heard about Object Oriented Programming (OOPs). The essence of OOPs is all about constructing
 objects by analyzing software requirements in terms of real world objects.
 
-### Is OOPs same as _thinking in nouns_ to construct objects ?
+### Need to move beyond _thinking in nouns to construct custom types_ ?
 We have often heard of nouns becoming programmable objects & the behaviours of these objects turn into methods or functions. 
 Theory aside, if we conform to these OOPs essentials, does it ease our programming logic? Does this mean this logic will be
 understood by all its readers (read reviewers, fellow maintainers)? Can we be assured of a good maintainance of this 
