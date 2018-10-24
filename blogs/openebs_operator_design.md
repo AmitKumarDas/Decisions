@@ -34,7 +34,7 @@ spec:
     if: labelSelector version eq 0.6.0, pathSelector metadata.labels.abc ne default
 
   supports:
-  - feature: CreateJivaVolume, NVMEIsAvailable
+  - feature: CreateJivaVolume, NVMEIsAvailable, HostHasISCSIInstalled
 
 status:
   state: failed
