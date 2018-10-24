@@ -53,10 +53,21 @@ custom defined types i.e. collection types.)_ Let us resort to some code samples
 type Predicate(s storage) bool
 
 // isOnline evaluates if storage is online or not
+//
+// NOTE:
+// Function adheres to Predicate functional type
+//
+// NOTE:
+// One can find domain specific logic only
 func isOnline(s storage) bool {...}
 
 // Filter returns a list of storages that satisfy the provided
 // condition
+//
+// !!! IMPORTANT !!!
+// This is the gist of this article. Loop meets the condition here.
+// Domain logic is not seen here. What we done here is - decouple the
+// business logic from programming constructus i.e. loops & conditions.
 func (l storageList) Filter(p Predicate) (u storageList) {
   for _, s := range l {
     if p(s) {
@@ -67,6 +78,9 @@ func (l storageList) Filter(p Predicate) (u storageList) {
 }
 
 // Onlines returns a list of storages that are online
+//
+// NOTE:
+// Programming is fun now.
 func (l storageList) Onlines() (u storageList) {
   return l.Filter(isOnline)
 }
@@ -104,5 +118,4 @@ How about requirements driving us to implement various operators on top of colle
 `gt`, `lt`, and so on.
 
 ### Fun Side
-- I tend to call above as first-class domain based objects. A jargon that will obviously be mis-interpreted. Hence this
-article.
+- I tend to call above as _first-class domain types_. A jargon that will obviously be mis-interpreted. Hence this article.
