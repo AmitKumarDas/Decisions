@@ -30,7 +30,7 @@ spec:
   - support: CreateCstorVolume
     check: latency lt 1msec
     with: replicas 3
-    interval: 1day or 1 hr // check support every 1 day on success or every 1 hr on failure
+    interval: 1day or 1 hr # check support every 1 day on success or every 1 hr on failure
 
 status:
   state: failed
