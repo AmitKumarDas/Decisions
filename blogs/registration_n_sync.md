@@ -13,6 +13,12 @@ import (
 	"time"
 )
 
+// This has to be package level global variable as we do not want any
+// other instances of this object. In other words, as long as this 
+// object is not created more than once, the action is triggered once
+// in the lifetime of this application.
+//
+// DOUBT - Why is this not declared as a pointer?
 var registerMetrics sync.Once
 
 // LatencyMetric observes client latency partitioned by verb and url.
