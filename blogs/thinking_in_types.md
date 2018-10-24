@@ -67,7 +67,7 @@ func isOnline(s storage) bool {...}
 //
 // This is the gist of this article. Loop meets the condition here.
 // Domain logic is not seen here. What we have done here is - decouple the
-// business logic from programming constructus i.e. loops & conditions.
+// business logic from programming constructs i.e. loops & conditions.
 func (l storageList) Filter(p Predicate) (u storageList) {
   for _, s := range l {
     if p(s) {
