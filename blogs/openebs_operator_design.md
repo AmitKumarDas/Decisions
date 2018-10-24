@@ -1,20 +1,3 @@
-### Install, Update, Upgrade, Probe / Checks, Self Healing via reconciliation
-Is this and more openebs operator?
-
-### Usecase #1 If any desired resource is deleted operator should re-install
-
-- How will it know if a particular resource is present or absent ?
-- Should every resource be tracked via name & version ? 
-- Should every resource be tracked via counts ? 
-- Should a resource be tracked based on tags ? 
-- Should a resource be tracked based on any of above ?
-
-### Usecase #2 If any resource is excluded operator should delete if resource is already installed ?
-
-To Be Filled
-
-### More Usecases 
-
 ### Specification
 ```yaml
 # desired state
