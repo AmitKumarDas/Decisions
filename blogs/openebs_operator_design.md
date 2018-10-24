@@ -1,4 +1,4 @@
-### Install, Update, Upgrade, Probe, Checks, Healing via reconciliation
+### Install, Update, Upgrade, Probe / Checks, Self Healing via reconciliation
 Is this and more openebs operator?
 
 ### Usecase #1 If any desired resource is deleted operator should re-install
