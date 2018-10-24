@@ -1,20 +1,20 @@
-### What objects should one consider while programming in OOPs ?
+### Introduction
 Most of us (_developers_) have been introduced to the concept of programming via books or our own experience. It is more than
 likely some of us would have heard about Object Oriented Programming (OOPs). The essence of OOPs is all about constructing
 objects by analyzing software requirements in terms of real world objects.
 
 ### Is OOPs same as _thinking in nouns_ to construct objects ?
 We have often heard of nouns becoming programmable objects & the behaviours of these objects turn into methods or functions. 
-Theory aside, if we conform to these OOPs essentials, does it ease our programming logic? Does this mean the logic will be
+Theory aside, if we conform to these OOPs essentials, does it ease our programming logic? Does this mean this logic will be
 understood by all its readers (read reviewers, fellow maintainers)? Can we be assured of a good maintainance of this 
 software?
 
 ### Loops & Conditions Rule The Roost
 Take any programming logic from any real world software and more often than not, you will find yourselves navigating through 
 its loops and if else branches. _Does OOPs have anything to talk about loops & branches?_ _How about modeling these loops
-and conditions into objects?_ Yes, I am referring to collections here. However, I am not talking about arrays or maps. _**I
-am indicating to make a collection of these objects as first class citizens similar to the object itself.**_ Let us look at 
-a piece of code to understand further.
+and conditions into defined types?_ Yes, I am referring to collections here. However, I am not talking about arrays or maps.
+_**I am indicating to make a collection of these objects as first class citizens similar to the object itself.**_ Let us look
+at a piece of code to understand further.
 
 ```go
 type storage struct {}
@@ -29,24 +29,24 @@ type storageMap struct {
 ```
 
 ### Does above make any difference?
-The difference in above thought process is what this article is all about. The very approach towards this thinking makes a 
-lot of difference. It makes your software simple yet effective. In my opinion this is the foundation to build software 
-that can be better maintained, is easy to unit test, and is easy to extend without injecting bugs.
+The difference in above thought process is what this article is all about. The very approach of modelling collections as 
+custom types makes a lot of difference. It makes your software simple yet effective. In my opinion this is the foundation to
+build software that can be better maintained, is easy to unit test, and is easy to extend without injecting bugs.
 
 _How can we be so sure of above's advantages?_
-We talked about considering the collections of objects as first class objects themselves. Let us park this thought for a 
-moment and try to think about conditions. 
+We talked about considering the collections of objects as typed objects. To understand the full benefits, let us park collections for a moment and try to think about conditions. 
 
-In general, when we hit a conditional requirement, we developers start to write if else clauses. This is one of the shortest
-keywords in any programming language that creates wonder. I bet a condition based keyword will have more occurences than that
-of loops. Getting back to our mode of thinking in objects, can these conditions be treated as objects? 
+In general, when we hit a conditional requirement, we developers start to write _if else_ clauses. This is one of the
+shortest keywords in any programming language that creates wonder. I bet a condition based keyword will have more occurences
+than that of loops. Getting back to our mode of thinking in objects, can these conditions be treated as first class citizens?
+In other words should we define custom type to represent a condition?
 
-For the impatient, the solution lies in composing these collection objects along with conditional objects to arrive at 
-writing logic that is simple to maintain.
+In my opinion, solution lies in composing these collection types along with conditional types to arrive at writing logic that
+is very effective and yet is simple to maintain.
 
-### Creating your own conditionals i.e. object to represent a condition
-This is again about thinking conditions as first class citizens. As I have said earlier, the trick lies in decoupling
-conditions from above loop based custom objects. Let us resort to some code samples to understand.
+### Creating your own conditionals i.e. custom type to represent a condition
+Why? This ensures decoupling conditions from loop based logic. _(Remember that we have also tried to move the loops into 
+custom defined types i.e. collection types.)_ Let us resort to some code samples to understand better.
 
 ```go
 // Predicate abstracts evaluating storage based condition
@@ -77,9 +77,9 @@ With similar foundational pieces in place, we can venture to stitch together (re
 requirements that will be easy to code and maintain and even unit test.
 
 ### Conclusion
-It is all about thinking in terms of objects. Some may view above as functional approach as well. However, the core idea of
+It is all about **thinking in types**. Some may view above as functional approach as well. However, the core idea of
 thinking in terms of specific structures, functions or objects in addition to language provided keywords like `for loop`, 
-`switch case` conditions, etc can help in getting some amazing stuff done using simple approaches. 
+`switch case` conditions, etc can help us in getting some amazing stuff done with a maintainable codebase. 
 
 ### We are all familiar with `sort` Interface
 - How about implementing sort.Interface to sort the storage collections !!!
