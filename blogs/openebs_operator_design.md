@@ -32,13 +32,14 @@ spec:
     - ndm
   # cstor is the specification related to cstor storage engine
   cstor:
-    onSparse: true
+    persistence:
+      sparse: enabled
   # jiva is the specification related jiva storage engine
   jiva:
     ha:
       # A value of 'None' will invalidate the ha support specified at maya level
-      # A value e.g. 'ReplicaFailure' will add to the existing ha support options mentioned at maya level
-      # 
+      # A value e.g. 'ReplicaFailure' will add to the ha options mentioned at maya level
+      # A value of '!NetworkFailure' will remove check of this particular ha support for jiva storage
       support:
       - None
   # localPV is the specification related to local PV storage engine
