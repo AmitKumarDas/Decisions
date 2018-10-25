@@ -27,6 +27,7 @@ spec:
     cas:
     - cstor
     - jiva
+    - localPV
     # what disk management solutions should be enabled
     disk:
     - ndm
