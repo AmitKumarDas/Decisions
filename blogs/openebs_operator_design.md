@@ -1,4 +1,35 @@
 
+### WIP Draft
+```yaml
+spec:
+  # maya is the specification of control plane
+  maya:
+    # what version of maya should be enabled/made available
+    version: 0.7.0
+    ha:
+      # what kind of High Availability support(s)
+      support:
+      - NodeFailure
+      - NetworkFailure
+    # what storage engine(s) should be enabled
+    # query: should this be casEngine? casType?
+    cas:
+    - cstor
+    - jiva
+    # what disk management solutions should be enabled
+    disk:
+    - ndm
+  # cstor is the specification of cstor storage engine
+  cstor:
+    onSparse: true
+  # jiva is the specification related jiva storage engine
+  jiva:
+  # localPV is the specification related to local PV storage engine
+  localPV:
+  # ndm is the specification related to ndm disk management solution
+  ndm:
+```
+
 ### Rough Drafts
 #### Draft 1 -- dated 24/Oct/2018
 
