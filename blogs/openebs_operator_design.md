@@ -19,6 +19,7 @@ spec:
     ha:
       # what kind of High Availability support(s)
       # All is a valid value
+      # None is a valid value
       support:
       - NodeFailure
       - NetworkFailure
