@@ -5,8 +5,10 @@ kind: OpenEBS
 metadata:
   name: default
 # specification of OpenEBS Operator
-# query: specifications related to following managed via reconciliation
+# specifications related to following managed via reconciliation
 # - Install, Update, Upgrade, Probe / Monitor, Self Healing
+# query: Should above be the job of openebs operator?
+# think: Does it help the real human i.e. operator?
 spec:
   # maya is the specification of control plane
   maya:
