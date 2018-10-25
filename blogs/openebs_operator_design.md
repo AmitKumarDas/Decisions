@@ -1,6 +1,10 @@
-### Specification
-- All the things that are shown here will not be supported in the beginning
-- However, it is important to get the naming & design spec right by considering wide number of use cases
+
+### Rough Drafts
+#### Draft 1 -- dated 24/Oct/2018
+
+- Comment - This is not a specification i.e. statement
+- Comment - This is more like a program/logic
+- Comment - This is not what enduser will really want as a specification
 
 ```yaml
 # desired state
@@ -70,7 +74,7 @@ status:
     count:
 ```
 
-### Appendix
+##### Appendix
 - currentCASTemplate - ensure CAS Templates for current version of openebs are available in the cluster
 - currentRunTask - ensure Run Tasks for current version of openebs are available in the cluster
 - currentOpenEBSProvisioner - ensure openebs provisioner for current version of openebs is available in the cluster
