@@ -1,6 +1,11 @@
 
-### WIP Draft
+### WIP Draft -- OpenEBS Operator Specification
 ```yaml
+kind: OpenEBS
+metadata:
+  name: default
+# specification of OpenEBS Operator
+# query: specifications related to Install, Update, Upgrade, Probe / Monitor, Self Healing via reconciliation
 spec:
   # maya is the specification of control plane
   maya:
@@ -33,9 +38,9 @@ spec:
 ### Rough Drafts
 #### Draft 1 -- dated 24/Oct/2018
 
-- Comment - This is not a specification i.e. statement
-- Comment - This is more like a program/logic
-- Comment - This is not what enduser will really want as a specification
+- Review Comment - This is not a specification i.e. statement
+- Review Comment - This is more like a program/logic
+- Review Comment - This is not what enduser will really want as a specification
 
 ```yaml
 # desired state
