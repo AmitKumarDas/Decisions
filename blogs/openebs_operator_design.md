@@ -5,7 +5,8 @@ kind: OpenEBS
 metadata:
   name: default
 # specification of OpenEBS Operator
-# query: specifications related to Install, Update, Upgrade, Probe / Monitor, Self Healing via reconciliation
+# query: specifications related to following managed via reconciliation
+# - Install, Update, Upgrade, Probe / Monitor, Self Healing
 spec:
   # maya is the specification of control plane
   maya:
