@@ -19,7 +19,7 @@ spec:
     # what disk management solutions should be enabled
     disk:
     - ndm
-  # cstor is the specification of cstor storage engine
+  # cstor is the specification related to cstor storage engine
   cstor:
     onSparse: true
   # jiva is the specification related jiva storage engine
