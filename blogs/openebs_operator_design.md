@@ -38,6 +38,7 @@ spec:
     ha:
       # A value of 'None' will invalidate the ha support specified at maya level
       # A value e.g. 'ReplicaFailure' will add to the existing ha support options mentioned at maya level
+      # 
       support:
       - None
   # localPV is the specification related to local PV storage engine
