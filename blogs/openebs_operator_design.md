@@ -14,8 +14,11 @@ spec:
   maya:
     # what version of maya should be enabled/made available
     version: 0.7.0
+    # desired to have ha support
+    # absence of this property will imply no desire and hence no checks on the system
     ha:
       # what kind of High Availability support(s)
+      # All is a valid value
       support:
       - NodeFailure
       - NetworkFailure
@@ -32,6 +35,11 @@ spec:
     onSparse: true
   # jiva is the specification related jiva storage engine
   jiva:
+    ha:
+      # A value of 'None' will invalidate the ha support specified at maya level
+      # A value e.g. 'ReplicaFailure' will add to the existing ha support options mentioned at maya level
+      support:
+      - None
   # localPV is the specification related to local PV storage engine
   localPV:
   # ndm is the specification related to ndm disk management solution
