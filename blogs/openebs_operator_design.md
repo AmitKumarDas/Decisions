@@ -9,7 +9,7 @@ spec:
   component:
 
   # simple desired state specification
-  - include: currentCASTemplate; currentRunTask; currentOpenEBSProvisioner
+  - include: currentCASTemplate; currentRunTask; currentOpenEBSProvisioner; currentMAPIServerEnv
   - exclude: labelSelector app eq jiva version lt current
 
   # finely granular desired state specification
@@ -69,3 +69,9 @@ status:
     endtime:
     count:
 ```
+
+### Appendix
+- currentCASTemplate - ensure CAS Templates for current version of openebs are available in the cluster
+- currentRunTask - ensure Run Tasks for current version of openebs are available in the cluster
+- currentOpenEBSProvisioner - ensure openebs provisioner for current version of openebs is available in the cluster
+- currentMAPIServerEnv - ensure maya api server pod has environment variables for current version of openebs
