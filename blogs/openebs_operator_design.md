@@ -1,5 +1,7 @@
 
 ### WIP Draft -- OpenEBS Operator Specification
+- This is the typical default operator specification that gets generated and applied before the operator logic kicks in
+
 ```yaml
 kind: OpenEBS
 metadata:
@@ -37,11 +39,17 @@ spec:
     disk:
       # Defaults to ndm
       # None is a valid value here
-      support: ndm
+      support: 
+      - ndm
   # cstor is the specification related to cstor storage engine
   cstor:
     sparse:
       enabled: true
+      # DOUBT: Can there be different flavors of sparse files ?
+      # DOUBT: Should sparse be directly under spec ?
+      # DOUBT: Should sparse be present at all ?
+      support:
+      - xyz
     snapshot:
       template:
         create: default
@@ -52,6 +60,7 @@ spec:
         create: default
         delete: default
         list: default
+        read: default
   # jiva is the specification related jiva storage engine
   jiva:
     ha:
@@ -65,6 +74,7 @@ spec:
         create: default
         delete: default
         list: default
+        read: default
   # localPV is the specification related to local PV storage engine
   localPV:
   # ndm is the specification related to ndm disk management solution
