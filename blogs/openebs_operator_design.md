@@ -9,8 +9,8 @@ metadata:
 # specification of OpenEBS Operator
 # specifications related to following managed via reconciliation
 # - Install, Update, Upgrade, Probe / Monitor, Self Healing
-# query: Should above be the job of openebs operator?
-# think: Does it help the real human i.e. operator?
+# DOUBT: Should above be the job of openebs operator?
+# THINK: Does it help the real human i.e. operator?
 spec:
   # maya is the specification of control plane
   # maya controls the nested properties shown here
