@@ -26,27 +26,45 @@ spec:
       - NodeFailure
       - NetworkFailure
     # what storage engine(s) should be enabled
-    # query: should this be casEngine? casType?
     storage:
+      # defaults to all supported storage engines
+      # storages supported as of now are: cstor, jiva & localPV
       support:
       - cstor
       - jiva
       - localPV
     # what disk management solutions should be enabled
     disk:
-    - ndm
+      # Defaults to ndm
+      # None is a valid value here
+      support: ndm
   # cstor is the specification related to cstor storage engine
   cstor:
     sparse:
       enabled: true
+    snapshot:
+      template:
+        create: default
+        delete: default
+        list: default
+    volume:
+      template:
+        create: default
+        delete: default
+        list: default
   # jiva is the specification related jiva storage engine
   jiva:
     ha:
-      # A value of 'None' will invalidate the ha support specified at maya level
-      # A value e.g. 'ReplicaFailure' will add to the ha options mentioned at maya level
-      # A value of '!NetworkFailure' will remove check of this particular ha support for jiva storage
+      # A value of None will invalidate the ha support specified at maya level
+      # A value of ReplicaFailure will add to the ha options mentioned at maya level
+      # A value of !NetworkFailure will remove check of this particular ha support for jiva storage
       support:
       - None
+    volume:
+      template:
+        create: default
+        delete: default
+        list: default
   # localPV is the specification related to local PV storage engine
   localPV:
   # ndm is the specification related to ndm disk management solution
