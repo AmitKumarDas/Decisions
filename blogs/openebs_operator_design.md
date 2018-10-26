@@ -11,6 +11,7 @@ metadata:
 # think: Does it help the real human i.e. operator?
 spec:
   # maya is the specification of control plane
+  # maya controls the nested properties shown here
   maya:
     # what version of maya should be enabled/made available
     version: 0.7.0
