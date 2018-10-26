@@ -34,7 +34,10 @@ $ rustup update
 ```
 - linker
 > Additionally, you’ll need a linker of some kind. It’s likely one is already installed, but when you try to compile a Rust program and get errors indicating that a linker could not execute, that means a linker isn’t installed on your system and you’ll need to install one manually. C compilers usually come with the correct linker. Check your platform’s documentation for how to install a C compiler.
-
+- macro
+```rust
+println!("This is macro with !");
+```
 
 
 ## Simple
