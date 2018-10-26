@@ -40,6 +40,16 @@ println!("This is macro with !");
 ```
 - Ahead-Of-Time compiled language
 > Rust is an ahead-of-time compiled language, meaning you can compile a program and give the executable to someone else, and they can run it even without having Rust installed.
+- dependency management ?
+> cargo .. same as dep in go
+- Does code compiles ?
+```
+cargo check
+```
+- Want to build?
+```
+cargo build
+```
 
 
 ## Simple
