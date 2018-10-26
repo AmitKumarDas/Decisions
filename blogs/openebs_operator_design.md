@@ -25,17 +25,18 @@ spec:
       - NetworkFailure
     # what storage engine(s) should be enabled
     # query: should this be casEngine? casType?
-    cas:
-    - cstor
-    - jiva
-    - localPV
+    storage:
+      support:
+      - cstor
+      - jiva
+      - localPV
     # what disk management solutions should be enabled
     disk:
     - ndm
   # cstor is the specification related to cstor storage engine
   cstor:
-    persistence:
-      sparse: enabled
+    sparse:
+      enabled: true
   # jiva is the specification related jiva storage engine
   jiva:
     ha:
