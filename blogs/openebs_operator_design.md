@@ -15,7 +15,7 @@ spec:
   # what version of openebs should be enabled/made available
   # version controls install, upgrade & rollback as well
   version: 0.7.0
-  # volumeProvisioner is the specification of openebs api server
+  # volumeProvisioner is the specification of volume provisioner
   volumeProvisioner:
     # cluster provides a list of volume provisioners that interact with openebs
     # to provision volume
