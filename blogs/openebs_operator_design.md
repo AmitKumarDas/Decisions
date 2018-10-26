@@ -12,35 +12,40 @@ metadata:
 # DOUBT: Should above be the job of openebs operator?
 # THINK: Does it help the real human i.e. operator?
 spec:
-  # maya is the specification of control plane
-  # maya controls the nested properties shown here
-  maya:
-    # what version of maya should be enabled/made available
-    # version controls install, upgrade & rollback as well
-    version: 0.7.0
+  # what version of openebs should be enabled/made available
+  # version controls install, upgrade & rollback as well
+  version: 0.7.0
+  # volumeProvisioner is the specification of openebs api server
+  volumeProvisioner:
+    # cluster provides a list of volume provisioners that interact with openebs
+    # to provision volume
+    cluster: 
+    - type: remote
+      name: remote-123
+      id: 123
+    - type: remote
+      name: remote-231
+      id: 231
+    - type: inCluster
+      name: inCluster-001
+      nodeSelector:
+      ha:
+        support:
+        - NodeFailure
+        - NetworkFailure
+  # apiServer is the specification of openebs api server
+  apiServer:
+    # nodeSelector translates to kubernetes pod's nodeSelector property
+    nodeSelector:
     # desired to have ha support
     # absence of this property will imply no desire and hence no checks on the system
     ha:
-      # what kind of High Availability support(s)
+      # What kind of High Availability support(s) are expected
       # All is a valid value
       # None is a valid value
       support:
       - NodeFailure
       - NetworkFailure
-    # what storage engine(s) should be enabled
-    storage:
-      # defaults to all supported storage engines
-      # storages supported as of now are: cstor, jiva & localPV
-      support:
-      - cstor
-      - jiva
-      - localPV
-    # what disk management solutions should be enabled
-    disk:
-      # Defaults to ndm
-      # None is a valid value here
-      support: 
-      - ndm
   # cstor is the specification related to cstor storage engine
   cstor:
     sparse:
@@ -63,12 +68,6 @@ spec:
         read: default
   # jiva is the specification related jiva storage engine
   jiva:
-    ha:
-      # A value of None will invalidate the ha support specified at maya level
-      # A value of ReplicaFailure will add to the ha options mentioned at maya level
-      # A value of !NetworkFailure will remove check of this particular ha support for jiva storage
-      support:
-      - None
     volume:
       template:
         create: default
