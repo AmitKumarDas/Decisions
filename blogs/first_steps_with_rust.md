@@ -50,7 +50,14 @@ cargo check
 ```
 cargo build
 ```
-
+- Want to build & run?
+```
+cargo run
+```
+- Want to release?
+```
+cargo build --release
+```
 
 ## Simple
 - package
