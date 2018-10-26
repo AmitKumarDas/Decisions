@@ -14,6 +14,7 @@ spec:
   # maya controls the nested properties shown here
   maya:
     # what version of maya should be enabled/made available
+    # version controls install, upgrade & rollback as well
     version: 0.7.0
     # desired to have ha support
     # absence of this property will imply no desire and hence no checks on the system
