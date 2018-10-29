@@ -56,11 +56,15 @@ spec:
       support:
       - xyz
     snapshot:
+      # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t snapshot
+      # default value implies operator will decide / set the name of the template
       template:
         create: default
         delete: default
         list: default
     volume:
+      # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t volume
+      # default value implies operator will decide / set the name of the template
       template:
         create: default
         delete: default
