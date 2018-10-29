@@ -12,11 +12,15 @@ metadata:
 # DOUBT: Should above be the job of openebs operator?
 # THINK: Does it help the real human i.e. operator?
 spec:
+  # A value of false will uninstall all openebs components
+  enabled: true
   # what version of openebs should be enabled/made available
   # version controls install, upgrade & rollback as well
   version: 0.7.0
   # volumeProvisioner is the specification of volume provisioner
   volumeProvisioner:
+    # A value of false will un-install all instances of volume provisioner
+    enabled: true
     # cluster provides a list of volume provisioners that interact with openebs
     # to provision volume
     cluster: 
@@ -26,8 +30,8 @@ spec:
     - type: remote
       name: remote-231
       id: 231
-    - type: inCluster
-      name: inCluster-001
+    - type: local
+      name: local-001
       nodeSelector:
       ha:
         support:
@@ -35,6 +39,8 @@ spec:
         - NetworkFailure
   # apiServer is the specification of openebs api server
   apiServer:
+    # A value of false will un-install all instances of api server
+    enabled: true
     # nodeSelector translates to kubernetes pod's nodeSelector property
     nodeSelector:
     # desired to have ha support
@@ -48,6 +54,8 @@ spec:
       - NetworkFailure
   # cstor is the specification related to cstor storage engine
   cstor:
+    # A value of false will un-install all cstor options, templates, tunables
+    enabled: true
     sparse:
       enabled: true
       # DOUBT: Can there be different flavors of sparse files ?
@@ -56,6 +64,8 @@ spec:
       support:
       - xyz
     snapshot:
+      # A value of false will un-install all cstor snapshot related options, templates, tunables
+      enabled: true
       # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t snapshot
       # default value implies operator will decide / set the name of the template
       template:
@@ -63,6 +73,8 @@ spec:
         delete: default
         list: default
     volume:
+      # A value of false will un-install all cstor volume related options, templates, tunables
+      enabled: true
       # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t volume
       # default value implies operator will decide / set the name of the template
       template:
@@ -72,7 +84,11 @@ spec:
         read: default
   # jiva is the specification related jiva storage engine
   jiva:
+    # A value of false will un-install all jiva related options, templates, tunables
+    enabled: true
     volume:
+      # A value of false will un-install all jiva volume related options, templates, tunables
+      enabled: true
       template:
         create: default
         delete: default
