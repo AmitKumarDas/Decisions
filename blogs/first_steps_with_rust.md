@@ -58,6 +58,66 @@ cargo run
 ```
 cargo build --release
 ```
+- Create new project
+```
+cargo new my-project
+```
+
+### Mental Model - Day 1
+- variable name starts with `let name`
+- if mutable tell it explicitly `let mut name`
+- pass mutable explicitly `func(&mut name)`
+- func names use underscore `my_func_name()`
+- Result is an enum Type with Ok & Error
+- **!Tip** **!Note**
+```bash
+- Rust has a number of types named Result in its standard library
+  - a generic Result 
+  - as well as specific versions for submodules, such as io::Result
+```
+- Custom Message & Panic with `.expect("something bad happened")`
+- **!DOUBT** - Does Rust require a separate BDD library when it has its own `expect` & `Result` enum?
+- **!Amit Says** - Rust tries hard to make code look like a series of function calls with `.` separator
+- **!Amit Says** - In Go we have `%s` `%t` `%v` `%#v` & so on. In Rust use `{}`
+- `::` is used to refers to functions or traits directly without instantiation. Remember static calls in Java ?
+- `:` is used for type casting
+- **!Amit Says** - One line says its all. Assignment and Error Handling in One Line
+```
+let guess: u32 = guess.trim().parse().expect("Please type a number!");
+```
+- `;` is back
+- Rust at its best to push everything into a single line. Below is a switch case like code block:
+```
+match guess.cmp(&secret_number) {
+  Ordering::Less => println!("Too small!"),
+  Ordering::Greater => println!("Too big!"),
+  Ordering::Equal => println!("You win!"),
+}
+```
+- Block of code within `{}` separated by comma `,`
+- **DOUBT** - Don't we need a semi-colon `;` within a block `{}`?
+- Semi-Colons `;` Commas ',' Nested Blocks `{}` inside a Block `{}`
+```
+match guess.cmp(&secret_number) {
+  Ordering::Less => println!("Too small!"),
+  Ordering::Greater => println!("Too big!"),
+  Ordering::Equal => {
+    println!("You win!");
+    break;
+  }
+}
+```
+- Map like operator via `=>`
+- **!Amit says** - Everything under the sun has been used in Rust
+- A sample error handling within a loop
+```
+let guess: u32 = match guess.trim().parse() {
+  Ok(num) => num,
+  Err(_) => continue,
+};
+```
+- **!Amit says** - Rust tries its best to flatten which will otherwise be nested code blocks in other languages
+- In Go underscore `_` is used to ignore a return value. In Rust `_` is used to catch anything i.e. represent anything.
 
 ## Simple
 - package
