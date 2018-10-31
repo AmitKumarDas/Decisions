@@ -146,7 +146,24 @@ let spaces = spaces.len();
 - 
 - What is the default in floating point?
 > The default type is f64 because on modern CPUs it’s roughly the same speed as f32 but is capable of more precision.
-
+- Tuples & destructing them as well. I guess `destructuring` is common in functional languages.
+```rust
+   let tup = (500, 6.4, 1);
+   let (x, y, z) = tup;
+   println!("The value of y is: {}", y);
+```
+- Destructing is made possible via pattern matching. This is all internal. A developer need not worry about patterns.
+- One can make use of dot i.e. period `.` followed by the index postion to access an element of tuple
+- Tuple vs. Array - Array demands each element be of same data type
+- Arrays in Rust are fixed length
+- Arrays in Rust have the data collected in stack than heap
+- You may be wanting a Vector that can grow & shrink in size
+```rust
+let a = [1, 2, 3, 4, 5];
+```
+```rust
+let a: [i32; 5] = [1, 2, 3, 4, 5];
+```
 
 ## Simple
 - package
