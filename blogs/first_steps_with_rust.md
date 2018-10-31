@@ -118,6 +118,28 @@ let guess: u32 = match guess.trim().parse() {
 ```
 - **!Amit says** - Rust tries its best to flatten which will otherwise be nested code blocks in other languages
 - In Go underscore `_` is used to ignore a return value. In Rust `_` is used to catch anything i.e. represent anything.
+- mutable versus. immutable
+> In cases where you’re using large data structures, mutating an instance in place may be faster than copying and returning newly allocated instances. With smaller data structures, creating new instances and writing in a more functional programming style may be easier to think through, so lower performance might be a worthwhile penalty for gaining that clarity.
+- constants: Look how readability is considered.
+```rust
+const MAX_POINTS: u32 = 100_000;
+```
+- Use of underscore `_` for readability. They name it as `visual separator`.
+- Shadowing. When is it useful?
+```rust
+let spaces = "   ";
+let spaces = spaces.len();
+```
+- Shadowing. No need to think of different variable names. Great !!!
+- Data types in rust can be: 1/ Scalar or 2/ Compound
+- Scalar - Integer, floating point, numbers, characters, booleans
+- u32 - is a integer scalar data type - is unsigned - will take 32 bits of space
+- Similarly u8, u16, u32, u64, u128, usize && i8, i16, i32, i64, i128, isize
+- usize & isize will result into either 32 bit or 64 bit based on the architecture program is running
+- Are you unsure of integer type?
+> So how do you know which type of integer to use? If you’re unsure, Rust’s defaults are generally good choices, and integer types default to i32: this type is generally the fastest, even on 64-bit systems. The primary situation in which you’d use isize or usize is when indexing some sort of collection.
+- 
+
 
 ## Simple
 - package
