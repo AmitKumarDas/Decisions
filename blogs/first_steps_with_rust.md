@@ -97,7 +97,7 @@ match guess.cmp(&secret_number) {
 - Block of code within `{}` separated by comma `,`
 - **DOUBT** - Don't we need a semi-colon `;` within a block `{}`?
 - Semi-Colons `;` Commas ',' Nested Blocks `{}` inside a Block `{}`
-```
+```rust
 match guess.cmp(&secret_number) {
   Ordering::Less => println!("Too small!"),
   Ordering::Greater => println!("Too big!"),
@@ -110,7 +110,7 @@ match guess.cmp(&secret_number) {
 - Map like operator via `=>`
 - **!Amit says** - Everything under the sun has been used in Rust
 - A sample error handling within a loop
-```
+```rust
 let guess: u32 = match guess.trim().parse() {
   Ok(num) => num,
   Err(_) => continue,
