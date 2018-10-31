@@ -144,6 +144,8 @@ let spaces = spaces.len();
 - Are you unsure of integer type?
 > So how do you know which type of integer to use? If you’re unsure, Rust’s defaults are generally good choices, and integer types default to i32: this type is generally the fastest, even on 64-bit systems. The primary situation in which you’d use isize or usize is when indexing some sort of collection.
 - 
+- What is the default in floating point?
+> The default type is f64 because on modern CPUs it’s roughly the same speed as f32 but is capable of more precision.
 
 
 ## Simple
