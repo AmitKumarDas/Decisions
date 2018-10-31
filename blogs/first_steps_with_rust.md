@@ -123,6 +123,8 @@ let guess: u32 = match guess.trim().parse() {
 ```
 - **!Amit says** - Rust tries its best to flatten which will otherwise be nested code blocks in other languages
 - In Go underscore `_` is used to ignore a return value. In Rust `_` is used to catch anything i.e. represent anything.
+
+### Mental Model - Day 2
 - mutable versus. immutable
 > In cases where you’re using large data structures, mutating an instance in place may be faster than copying and returning newly allocated instances. With smaller data structures, creating new instances and writing in a more functional programming style may be easier to think through, so lower performance might be a worthwhile penalty for gaining that clarity.
 - constants: Look how readability is considered.
@@ -164,6 +166,9 @@ let a = [1, 2, 3, 4, 5];
 ```rust
 let a: [i32; 5] = [1, 2, 3, 4, 5];
 ```
+
+### Mental Model - Day 3
+
 
 ## Simple
 - package
