@@ -1,3 +1,8 @@
+### Why RUST?
+I am a developer at my core. I like to build mental models by learning, observing, implementing programs using different
+languages. Currently, RUST claims to be the best with respect to perforamce and memory usage. It is also one of the modern
+day programming languages.
+
 ## Rough
 - install rust via rustup
 ```bash
