@@ -71,12 +71,12 @@ spec:
   ndm:
 ```
 
-### KubeTest Operator - A reconciler to test kubernetes resource(s) -- WIP
+### KubeMonitor Operator - A reconciler to test, monitor kubernetes resource(s) -- WIP
 - Will be used to test OpenEBS Operator
 - Can be used to inject failures optionally
 - Can be used to test if all openebs PV have dependent resources
 ```yaml
-kind: KubeTest
+kind: KubeMonitor
 spec:
   resource:
   - kind: PersistentVolume
@@ -96,28 +96,28 @@ status:
 ```
 
 ```yaml
-kind: KubeTest
+kind: KubeMonitor
 spec:
   type: serial
   resource:
   - kind: Pod
     labelSelector: app=jiva
-    condition:
+    fault:
       state: Deleted
     expect: Online
   - kind: Deployment
     labelSelector: app=maya
-    condition:
+    fault:
       state: Deleted
     expect: Online
   - kind: Deployment
     labelSelector: app=provisioner
-    condition:
+    fault:
       state: Deleted
     expect: Online
   - kind: Deployment
     labelSelector: app=provisioner
-    condition:
+    fault:
       image: openebs/bad-image:0.0.1
     expect: Online
 status:
