@@ -34,41 +34,35 @@ spec:
     enabled: true
     # nodeSelector translates to kubernetes pod's nodeSelector property
     nodeSelector:
-  # cstor is the specification related to cstor storage engine
-  cstor:
-    # A value of false will un-install all cstor options, templates, tunables
-    enabled: true
-    snapshot:
-      # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t snapshot
-      # default value implies operator will decide / set the name of the template
-      casTemplate:
-        create: default
-        delete: default
-        list: default
-    volume:
-      # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t volume
-      # default value implies operator will decide / set the name of the template
-      casTemplate:
-        create: default
-        delete: default
-        list: default
-        read: default
-  # jiva is the specification related jiva storage engine
-  jiva:
-    # A value of false will un-install all jiva related options, templates, tunables
-    enabled: true
-    volume:
-      # A value of false will un-install all jiva volume related options, templates, tunables
+    # cstor is the specification related to cstor storage engine
+    cstor:
+      snapshot:
+        # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t snapshot
+        # default value implies operator will decide / set the name of the template
+        casTemplate:
+          create: default
+          delete: default
+          list: default
+      volume:
+        # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t volume
+        # default value implies operator will decide / set the name of the template
+        casTemplate:
+          create: default
+          delete: default
+          list: default
+          read: default
+    # jiva is the specification related jiva storage engine
+    jiva:
+      # A value of false will un-install all jiva related options, templates, tunables
       enabled: true
-      casTemplate:
-        create: default
-        delete: default
-        list: default
-        read: default
-  # localPV is the specification related to local PV storage engine
-  localPV:
-  # ndm is the specification related to ndm disk management solution
-  ndm:
+      volume:
+        # A value of false will un-install all jiva volume related options, templates, tunables
+        enabled: true
+        casTemplate:
+          create: default
+          delete: default
+          list: default
+          read: default
 ```
 
 ### KubeMonitor Operator - A reconciler to test, monitor kubernetes resource(s) -- WIP
