@@ -56,28 +56,17 @@ spec:
   cstor:
     # A value of false will un-install all cstor options, templates, tunables
     enabled: true
-    sparse:
-      enabled: true
-      # DOUBT: Can there be different flavors of sparse files ?
-      # DOUBT: Should sparse be directly under spec ?
-      # DOUBT: Should sparse be present at all ?
-      support:
-      - xyz
     snapshot:
-      # A value of false will un-install all cstor snapshot related options, templates, tunables
-      enabled: true
       # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t snapshot
       # default value implies operator will decide / set the name of the template
-      template:
+      casTemplate:
         create: default
         delete: default
         list: default
     volume:
-      # A value of false will un-install all cstor volume related options, templates, tunables
-      enabled: true
       # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t volume
       # default value implies operator will decide / set the name of the template
-      template:
+      casTemplate:
         create: default
         delete: default
         list: default
@@ -89,7 +78,7 @@ spec:
     volume:
       # A value of false will un-install all jiva volume related options, templates, tunables
       enabled: true
-      template:
+      casTemplate:
         create: default
         delete: default
         list: default
@@ -98,6 +87,46 @@ spec:
   localPV:
   # ndm is the specification related to ndm disk management solution
   ndm:
+```
+
+### Thinking in Code
+- pkg/reconcile/v1alpha1/reconcile.go
+```go
+type Reconciler interface {
+  Reconcile() *Response
+}
+type Status string
+const (
+  Success Status = "success"
+  Error   Status = "error"
+)
+type Result string
+const (
+  Updated Result = "updated"
+  Created Result = "created"
+  Noop    Result = "noop"
+  Deleted Result = "deleted"
+  Patched Result = "patched"
+)
+type Response struct {
+  Alias     string
+  Namespace string
+  Name      string
+  Kind      string
+  Status    Status
+  Result    Result
+  Message   string
+  LastUpdatedAt time
+}
+```
+- pkg/pod/v1alpha1/pod.go
+```go
+type pod struct {}
+func (p *pod) Reconcile() reconcile.Response {}
+type builder struct {}
+func Builder() *builder {}
+func (b *Builder) WithImage(image string) *Builder {}
+func (b *Builder) Build() *pod {}
 ```
 
 ### Old Drafts
