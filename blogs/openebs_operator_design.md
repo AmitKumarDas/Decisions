@@ -28,25 +28,12 @@ spec:
     # local volume provisioner
     local:
       nodeSelector:
-      ha:
-        support:
-        - NodeFailure
-        - NetworkFailure
   # apiServer is the specification of openebs api server
   apiServer:
     # A value of false will un-install all instances of api server
     enabled: true
     # nodeSelector translates to kubernetes pod's nodeSelector property
     nodeSelector:
-    # desired to have ha support
-    # absence of this property will imply no desire and hence no checks on the system
-    ha:
-      # What kind of High Availability support(s) are expected
-      # All is a valid value
-      # None is a valid value
-      support:
-      - NodeFailure
-      - NetworkFailure
   # cstor is the specification related to cstor storage engine
   cstor:
     # A value of false will un-install all cstor options, templates, tunables
