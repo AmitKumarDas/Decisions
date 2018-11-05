@@ -12,26 +12,21 @@ metadata:
 # DOUBT: Should above be the job of openebs operator?
 # THINK: Does it help the real human i.e. operator?
 spec:
-  # A value of false will uninstall all openebs components
-  enabled: true
   # what version of openebs should be enabled/made available
   # version controls install, upgrade & rollback as well
   version: 0.7.0
   # volumeProvisioner is the specification of volume provisioner
   volumeProvisioner:
-    # A value of false will un-install all instances of volume provisioner
+    # A value of false will un-install volume provisioner
     enabled: true
-    # cluster provides a list of volume provisioners that interact with openebs
-    # to provision volume
-    cluster: 
-    - type: remote
-      name: remote-123
+    # remote volume provisioner(s) if any
+    remote: 
+    - name: remote-123
       id: 123
-    - type: remote
-      name: remote-231
+    - name: remote-231
       id: 231
-    - type: local
-      name: local-001
+    # local volume provisioner
+    local:
       nodeSelector:
       ha:
         support:
@@ -89,24 +84,74 @@ spec:
   ndm:
 ```
 
-### Thinking in Code
+### KubeTest Operator - A reconciler to test kubernetes resource(s) -- WIP
+- Will be used to test OpenEBS Operator
+- Can be used to inject failures optionally
+```yaml
+kind: KubeTest
+spec:
+  type: serial
+  resource:
+  - kind: Pod
+    namespace: default
+    labelSelector: app=jiva
+    expect: Online
+  - kind: Pod
+    labelSelector: app=jiva
+    condition:
+      state: Deleted
+    expect: Online
+  - kind: Deployment
+    labelSelector: app=maya
+    condition:
+      state: Deleted
+    expect: Online
+  - kind: Deployment
+    labelSelector: app=ndm
+    expect: NotFound
+  - kind: Deployment
+    labelSelector: app=provisioner
+    condition:
+      state: Deleted
+    expect: Online
+  - kind: Deployment
+    labelSelector: app=provisioner
+    condition:
+      image: openebs/bad-image:0.0.1
+    expect: Online
+status:
+```
+
+### Thinking in Code -- WIP
 - pkg/reconcile/v1alpha1/reconcile.go
 ```go
+type StatusSelector struct {}
 type Reconciler interface {
+  // Reconcile abstracts the reconciliation process
   Reconcile() *Response
+  // Expect abstracts expectation if any, post the reconcile process
+  Expect(s ExpectedStatus) *Response
 }
 type Status string
 const (
-  Success Status = "success"
-  Error   Status = "error"
+  InProgress Status = "InProgress"
+  Success    Status = "Success"
+  Error      Status = "Error"
+)
+type ExpectedStatus string
+const (
+  Online   ExpectedStatus = "Online"
+  NotFound ExpectedStatus = "NotFound"
 )
 type Result string
 const (
-  Updated Result = "updated"
-  Created Result = "created"
-  Noop    Result = "noop"
-  Deleted Result = "deleted"
-  Patched Result = "patched"
+  Updated  Result = "Updated"
+  Created  Result = "Created"
+  Noop     Result = "Noop"
+  Deleted  Result = "Deleted"
+  Patched  Result = "Patched"
+  NoError  Result = "NoError"
+  Verified Result = "Verified"
 )
 type Response struct {
   Alias     string
@@ -127,6 +172,12 @@ type builder struct {}
 func Builder() *builder {}
 func (b *Builder) WithImage(image string) *Builder {}
 func (b *Builder) Build() *pod {}
+```
+- pkg/deployment/v1alpha1/deployment.go
+```go
+type deployment struct {}
+func GetMayaAPIServerSpecs(imageTag string) *appsv1.deployment {}
+func GetOpenEBSProvisionerSpecs(imageTag string) *appsv1.deployment {}
 ```
 
 ### Old Drafts
