@@ -28,36 +28,25 @@ spec:
     # local volume provisioner
     local:
       nodeSelector:
-  # apiServer is the specification of openebs api server
+  # apiServer is the specification of maya api server
   apiServer:
-    # A value of false will un-install all instances of api server
+    # A value of false will un-install api server
     enabled: true
-    # nodeSelector translates to kubernetes pod's nodeSelector property
     nodeSelector:
-    # cstor is the specification related to cstor storage engine
     cstor:
       snapshot:
-        # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t snapshot
-        # default value implies operator will decide / set the name of the template
         casTemplate:
           create: default
           delete: default
           list: default
       volume:
-        # operator can provide the name of custom templates to invoke CRUD operation(s) w.r.t volume
-        # default value implies operator will decide / set the name of the template
         casTemplate:
           create: default
           delete: default
           list: default
           read: default
-    # jiva is the specification related jiva storage engine
     jiva:
-      # A value of false will un-install all jiva related options, templates, tunables
-      enabled: true
       volume:
-        # A value of false will un-install all jiva volume related options, templates, tunables
-        enabled: true
         casTemplate:
           create: default
           delete: default
