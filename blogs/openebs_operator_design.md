@@ -54,10 +54,12 @@ spec:
           read: default
 ```
 
-### KubeMonitor Operator - A reconciler to test, monitor kubernetes resource(s) -- WIP
+### KubeMonitor Operator - A generic reconciler to monitor kubernetes resource(s) -- WIP
 - Will be used to test OpenEBS Operator
 - Can be used to inject failures optionally
-- Can be used to test if all openebs PV have dependent resources
+- Some of the usecases are:
+- Can be used to test if all openebs PVs have dependent resources
+  - In other words, can be used to detect stale resources
 ```yaml
 kind: KubeMonitor
 spec:
@@ -81,6 +83,7 @@ status:
 ```yaml
 kind: KubeMonitor
 spec:
+  # can monitor in a serial manner or in parallel
   type: serial
   resource:
   - kind: Pod
