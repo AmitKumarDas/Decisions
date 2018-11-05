@@ -1,5 +1,5 @@
 
-### WIP Draft -- OpenEBS Operator Specification
+### OpenEBS Operator Specification -- WIP
 - This is the typical default operator specification that gets generated and applied before the operator logic kicks in
 
 ```yaml
@@ -100,7 +100,7 @@ spec:
   ndm:
 ```
 
-### Rough Drafts
+### Old Drafts
 #### Draft 1 -- dated 24/Oct/2018
 
 - Review Comment - This is not a specification i.e. statement
