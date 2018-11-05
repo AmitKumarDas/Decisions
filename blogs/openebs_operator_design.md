@@ -170,15 +170,30 @@ type Response struct {
 - pkg/pod/v1alpha1/pod.go
 ```go
 type pod struct {}
+type podList struct {}
 func (p *pod) Reconcile() reconcile.Response {}
+func (p *podList) Reconcile() reconcile.Response {}
+
 type builder struct {}
 func Builder() *builder {}
-func (b *Builder) WithImage(image string) *Builder {}
-func (b *Builder) Build() *pod {}
+func (b *builder) WithImage(image string) *builder {}
+func (b *builder) Build() *pod {}
+
+type listBuilder struct {}
+func ListBuilder() *listBuilder {}
+func (b *listBuilder) WithCount(n int) *listBuilder {}
+func (b *listBuilder) Build() *podList {}
 ```
 - pkg/deployment/v1alpha1/deployment.go
 ```go
 type deployment struct {}
+func (p *deployment) Reconcile() reconcile.Response {}
+
+type builder struct {}
+func Builder() *builder {}
+func (b *builder) WithReplicas(n int) *builder {}
+func (b *builder) Build() *deployment {}
+
 func GetMayaAPIServerSpecs(imageTag string) *appsv1.deployment {}
 func GetOpenEBSProvisionerSpecs(imageTag string) *appsv1.deployment {}
 ```
