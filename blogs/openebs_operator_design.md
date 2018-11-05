@@ -87,15 +87,32 @@ spec:
 ### KubeTest Operator - A reconciler to test kubernetes resource(s) -- WIP
 - Will be used to test OpenEBS Operator
 - Can be used to inject failures optionally
+- Can be used to test if all openebs PV have dependent resources
+```yaml
+kind: KubeTest
+spec:
+  resource:
+  - kind: PersistentVolume
+    namespace: default
+    labelSelector: provisioner=openebs
+    expect: Bound
+    owns:
+    - kind: Deployment
+      namespace: default
+      labelSelector: byOwnerName, app=target
+      expect: Online
+    - kind: Deployment
+      namespace: default
+      labelSelector: byOwnerName, app=replica
+      expect: Online
+status:
+```
+
 ```yaml
 kind: KubeTest
 spec:
   type: serial
   resource:
-  - kind: Pod
-    namespace: default
-    labelSelector: app=jiva
-    expect: Online
   - kind: Pod
     labelSelector: app=jiva
     condition:
@@ -106,9 +123,6 @@ spec:
     condition:
       state: Deleted
     expect: Online
-  - kind: Deployment
-    labelSelector: app=ndm
-    expect: NotFound
   - kind: Deployment
     labelSelector: app=provisioner
     condition:
@@ -123,13 +137,14 @@ status:
 ```
 
 ### Thinking in Code -- WIP
-- pkg/reconcile/v1alpha1/reconcile.go
+- pkg/state/v1alpha1/state.go
 ```go
-type StatusSelector struct {}
 type Reconciler interface {
   // Reconcile abstracts the reconciliation process
   Reconcile() *Response
-  // Expect abstracts expectation if any, post the reconcile process
+}
+type Expecter interface {
+  // Expect abstracts expectation of the state of a resource
   Expect(s ExpectedStatus) *Response
 }
 type Status string
@@ -142,6 +157,7 @@ type ExpectedStatus string
 const (
   Online   ExpectedStatus = "Online"
   NotFound ExpectedStatus = "NotFound"
+  Bound    ExpectedStatus = "Bound"
 )
 type Result string
 const (
