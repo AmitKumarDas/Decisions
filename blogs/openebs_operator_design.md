@@ -7,10 +7,6 @@ kind: OpenEBS
 metadata:
   name: default
 # specification of OpenEBS Operator
-# specifications related to following managed via reconciliation
-# - Install, Update, Upgrade, Probe / Monitor, Self Healing
-# DOUBT: Should above be the job of openebs operator?
-# THINK: Does it help the real human i.e. operator?
 spec:
   # what version of openebs should be enabled/made available
   # version controls install, upgrade & rollback as well
@@ -33,7 +29,6 @@ spec:
   apiServer:
     # A value of false will un-install api server
     enabled: true
-    nodeSelector:
     casTemplate:
       cstor:
         snapshot:
@@ -84,7 +79,8 @@ status:
 ```yaml
 kind: KubeMonitor
 spec:
-  # can monitor in a serial manner or in parallel
+  # can monitor a serial in a serial manner or in parallel
+  # it can take quite some time to get the monitoring result of each resource
   type: serial
   resource:
   - kind: Pod
