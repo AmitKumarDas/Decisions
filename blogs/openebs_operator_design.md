@@ -27,31 +27,32 @@ spec:
       id: 231
     # local volume provisioner
     local:
-      nodeSelector:
+      # template corresponds to a subset of k8s Deployment spec applicable for local volume provisioner
+      template:
   # apiServer is the specification of maya api server
   apiServer:
     # A value of false will un-install api server
     enabled: true
     nodeSelector:
-    cstor:
-      snapshot:
-        casTemplate:
+    casTemplate:
+      cstor:
+        snapshot:
           create: default
           delete: default
           list: default
-      volume:
-        casTemplate:
-          create: default
-          delete: default
-          list: default
-          read: default
-    jiva:
-      volume:
-        casTemplate:
+        volume:
           create: default
           delete: default
           list: default
           read: default
+      jiva:
+        volume:
+          create: default
+          delete: default
+          list: default
+          read: default
+    # template corresponds to a subset of k8s Deployment spec applicable for maya api server
+    template:
 ```
 
 ### KubeMonitor Operator - A generic reconciler to monitor kubernetes resource(s) -- WIP
