@@ -107,13 +107,14 @@ status:
 ```
 
 ### IscsiMonitor -- An operator to monitor iscsi sessions
-- IscsiMonitor picks up iscsi targets and updates the `volumes` field
-- Starts jobs on all the nodes initiating iscsi connection
-- Jobs will check if iscsi session for the required target is Online or Offline
-- Jobs will update the `status.volumes` field
-- Jobs will get into completed state
-- Jobs will be removed
-- `status` field will be updated
+- IscsiMonitor operator picks up iscsi targets and portals from PV objects
+- Starts DaemonSet Pods on all the nodes initiating iscsi connection
+- Each pod will calculate iscsi session status(-es) for the required iscsi target(s)
+- Each pod will create a `IscsiMonitorItem` spec
+- Operator will watch for `IscsiMonitorItem` spec(s) & update the status.volumes field
+- Operator will calculate the status.state field based on status.volumes field
+- Operator will either delete the DaemonSet if all `IscsiMonitorItem` specs are in COMPLETED state
+- Operator will resync if one or more `IscsiMonitorItem` specs are in INIT state
 ```yaml
 kind: IscsiMonitor
 spec:
@@ -127,20 +128,33 @@ spec:
     image:
     command:
     args:
-# added/removed while watching kubernetes persistent volumes based on volumeSelector
-volumes:
- - name:
-   target:
-   portal:
 status:
+  # state value is derived based on individual status of status.volumes
   state:
   volumes:
-  - target:
+  - node:
+    target:
     portal:
-    node:
     status:
     lastProbeTime:
     lastTransitionTime:
+    lastUpdatedBy:
+    reason:
+    message:
+```
+```yaml
+kind: IscsiMonitorItem
+status:
+  # either INIT or COMPLETED
+  state:
+  volumes:
+  - node:
+    target:
+    portal:
+    status:
+    lastProbeTime:
+    lastTransitionTime:
+    lastUpdatedBy:
     reason:
     message:
 ```
