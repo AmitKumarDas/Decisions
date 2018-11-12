@@ -50,14 +50,14 @@ spec:
     template:
 ```
 
-### KubeMonitor Operator - A generic reconciler to monitor kubernetes resource(s) -- WIP
+### KubeTest Operator - A generic reconciler to test kubernetes resource(s) -- WIP
 - Will be used to test OpenEBS Operator
 - Can be used to inject failures optionally
 - Some of the usecases are:
 - Can be used to test if all openebs PVs have dependent resources
-  - In other words, can be used to detect stale resources
+  - In other words, can be used to **detect stale resources**
 ```yaml
-kind: KubeMonitor
+kind: KubeTest
 spec:
   resource:
   - kind: PersistentVolume
@@ -77,7 +77,7 @@ status:
 ```
 
 ```yaml
-kind: KubeMonitor
+kind: KubeTest
 spec:
   # can monitor a serial in a serial manner or in parallel
   # it can take quite some time to get the monitoring result of each resource
@@ -87,23 +87,62 @@ spec:
     labelSelector: app=jiva
     fault:
       state: Deleted
-    expect: Online
+    expect: Running
   - kind: Deployment
     labelSelector: app=maya
     fault:
       state: Deleted
-    expect: Online
+    expect: Available
   - kind: Deployment
     labelSelector: app=provisioner
     fault:
       state: Deleted
-    expect: Online
+    expect: Available
   - kind: Deployment
     labelSelector: app=provisioner
     fault:
       image: openebs/bad-image:0.0.1
-    expect: Online
+    expect: Available
 status:
+```
+
+### IscsiMonitor -- An operator to monitor iscsi sessions
+- IscsiMonitor picks up iscsi targets and updates the `volumes` field
+- Starts jobs on all the nodes initiating iscsi connection
+- Jobs will check if iscsi session for the required target is Online or Offline
+- Jobs will update the `status.volumes` field
+- Jobs will get into completed state
+- Jobs will be removed
+- `status` field will be updated
+```yaml
+kind: IscsiMonitor
+spec:
+  volumeSelector:
+  - label:
+    annotation:
+    namespace:
+    name:
+  job:
+    nodeSelector:
+    image:
+    command:
+    args:
+# added/removed while watching kubernetes persistent volumes based on volumeSelector
+volumes:
+ - name:
+   target:
+   portal:
+status:
+  state:
+  volumes:
+  - target:
+    portal:
+    node:
+    status:
+    lastProbeTime:
+    lastTransitionTime:
+    reason:
+    message:
 ```
 
 ### Thinking in Code -- WIP
