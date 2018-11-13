@@ -110,11 +110,11 @@ status:
 - IscsiMonitor operator picks up iscsi targets and portals from PV objects
 - Starts DaemonSet Pods on all the nodes initiating iscsi connection
 - Each pod will calculate iscsi session status(-es) for the required iscsi target(s)
-- Each pod will create a `IscsiMonitorItem` spec
-- Operator will watch for `IscsiMonitorItem` spec(s) & update the `status.iscsiSessions` field
-- Operator will calculate the status.state field based on `status.iscsiSessions` field
-- Operator will either delete the DaemonSet if all `IscsiMonitorItem` specs are in COMPLETED state
-- Operator will resync if one or more `IscsiMonitorItem` specs are in INIT state
+- Each pod will create a `IscsiMonitorItem` spec during the process of its execution
+- IscsiMonitor will watch for `IscsiMonitorItem` spec(s) & update the `status.iscsiSessions` field
+- IscsiMonitor will calculate the status.state field based on `status.iscsiSessions` field
+- IscsiMonitor will delete the DaemonSet if all `IscsiMonitorItem` specs are in COMPLETED state
+- IscsiMonitor will resync if one or more `IscsiMonitorItem` specs are in INIT state
 ```yaml
 kind: IscsiMonitor
 spec:
