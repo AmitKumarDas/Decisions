@@ -111,8 +111,8 @@ status:
 - Starts DaemonSet Pods on all the nodes initiating iscsi connection
 - Each pod will calculate iscsi session status(-es) for the required iscsi target(s)
 - Each pod will create a `IscsiMonitorItem` spec
-- Operator will watch for `IscsiMonitorItem` spec(s) & update the status.volumes field
-- Operator will calculate the status.state field based on status.volumes field
+- Operator will watch for `IscsiMonitorItem` spec(s) & update the `status.iscsiSessions` field
+- Operator will calculate the status.state field based on `status.iscsiSessions` field
 - Operator will either delete the DaemonSet if all `IscsiMonitorItem` specs are in COMPLETED state
 - Operator will resync if one or more `IscsiMonitorItem` specs are in INIT state
 ```yaml
@@ -129,9 +129,9 @@ spec:
     command:
     args:
 status:
-  # state value is derived based on individual status of status.volumes
+  # state value is derived based on individual status of status.iscsiSessions
   state:
-  volumes:
+  iscsiSessions:
   - node:
     target:
     portal:
@@ -147,10 +147,10 @@ kind: IscsiMonitorItem
 status:
   # either INIT or COMPLETED
   state:
-  volumes:
+  iscsiSessions:
   - node:
-    target:
     portal:
+    target:
     status:
     lastProbeTime:
     lastTransitionTime:
