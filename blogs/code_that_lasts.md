@@ -16,7 +16,7 @@ malleable to the forces of change"_ ?
 
 ### Devil is in the details
 The stuff that I am going to write below will change based on my experiences and observations. These details should be 
-a live document. These are the details that I believe will _make code more malleable to changes without cracking or being 
+a living document. These are the details that I believe will _make code more malleable to changes without cracking or being 
 prone to bugs_.
 
 #### dated - 16-Nov-2018
