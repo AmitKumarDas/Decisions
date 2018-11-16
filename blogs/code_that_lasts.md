@@ -46,6 +46,7 @@ prone to bugs_.
   - These should reside in a namespace of their own
   - e.g. `pkg/installer/v1alpha1` 
   - or `pkg/controller/openebs/v1alpha1`
+  - or `cmd/maya-apiserver/server/resource_endpoint.go`
 - Unit Testable Caller Code
   - The caller code should also be unit testable
   - However, unit testable caller code is optional
