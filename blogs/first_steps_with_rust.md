@@ -175,12 +175,15 @@ let a: [i32; 5] = [1, 2, 3, 4, 5];
   - Things get more interesting when we start passing around values
   - Switching from using a **string literal**, which is stored on the **stack**, 
   - to using a **String type**, which is stored on the **heap**
-- e.g. string literals are typically copied by value
-  - string type are moved by data
+- _string literals are typically copied by value_
+- _string type are moved by data_
   - accessing a moved data will error out
-- elaborate explanation
+- Elaborate Explanation
   - string literal is stored somewhere in read only memory & not in stack or heap
   - pointer to string literal is stored in stack
+  - Because it’s a string literal, it usually shows up as a reference, 
+  - meaning that we use a pointer to a string stored in permanent memory, 
+  - and it’s guaranteed to be valid for the duration of the entire program, (it has a static lifetime).
 
 ## Simple
 - package
