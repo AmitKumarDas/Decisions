@@ -184,6 +184,13 @@ let a: [i32; 5] = [1, 2, 3, 4, 5];
   - Because it’s a string literal, it usually shows up as a reference, 
   - meaning that we use a pointer to a string stored in permanent memory, 
   - and it’s guaranteed to be valid for the duration of the entire program, (it has a static lifetime).
+- https://medium.com/@thomascountz/ownership-in-rust-part-2-c3e1da89956e
+  - Pass by Reference is referred to as borrowing
+    - Why has borrowing come up as a concept?
+    - So that data can be passed without passing over the ownership
+    - Ownership still lies with the originating source
+    - Hence there is no concept of returning ownership since it was never passed
+    - Ownership implies the responsibility of deallocating space from memory belongs to original source
 
 ## Simple
 - package
