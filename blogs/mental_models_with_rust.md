@@ -170,7 +170,7 @@ let a: [i32; 5] = [1, 2, 3, 4, 5];
 ### Mental Model - Day 3
 
 
-### References from Blogs
+### Mental Model - Ownership
 - https://medium.com/@thomascountz/ownership-in-rust-part-1-112036b1126b
   - Things get more interesting when we start passing around values
   - Switching from using a **string literal**, which is stored on the **stack**, 
@@ -187,10 +187,62 @@ let a: [i32; 5] = [1, 2, 3, 4, 5];
 - https://medium.com/@thomascountz/ownership-in-rust-part-2-c3e1da89956e
   - Pass by Reference is referred to as borrowing
     - Why has borrowing come up as a concept?
-    - So that data can be passed without passing over the ownership
+    - So that data can be passed without passing over the ownershiphttps://medium.chttps://medium.com/capital-one-tech/building-an-event-sourcing-crate-for-rust-2c4294eea165om/capital-one-tech/building-an-event-sourcing-crate-for-rust-2c4294eea165
     - Ownership still lies with the originating source
     - Hence there is no concept of returning ownership since it was never passed
     - Ownership implies the responsibility of deallocating space from memory belongs to original source
+
+### Mental Model - 20-Nov-2018
+- https://medium.com/capital-one-tech/event-sourcing-with-aggregates-in-rust-4022af41cf67
+
+#### Mental Model - Events & Event Source
+- You can build up the state by aggregating the events! also known as _re-hydrate_
+- Events seem to be PAST TENSE VERBS
+- e.g. RESERVED, RELEASED, SHIPPED
+- **!Amit Says** Actions seem to be present tense
+- e.g. RESERVE, RELEASE, SHIP
+
+#### Mental Model - Structs as Enum
+- Ask. Do you want to pattern match on content?
+- Ask. Do you want to pattern match on type?
+- Typically we do it by creating type as an enum
+- Then we somehow pass an action that is mapped against this type
+- How about defining a enum out of struct?
+- In other words, ENUM around the entire content?
+```rust
+struct ProductEventData {
+    quantity: usize,
+    timestamp: usize,
+    sku: String,
+}
+
+enum ProductEvent {
+    Reserved(ProductEventData),
+    Released(ProductEventData),
+    Shipped(ProductEventData),
+}
+```
+- With above you can treat different kinds of product events as a single type
+- Is above a great thing to have?
+
+#### Mental Model - Aggregate
+- Aggregate represents a _calculated state_
+- So aggregate is basically a state
+- Aggregate is the state that a command executes
+- Internals - Command is an imperative to the aggregate for validation
+- Internals - The response of this imperative is a list of eligible events ready for emission
+- Internals - Some aggregates can emit the events directly. However this is not unit testable
+- Internals - Good Practice - Event emission should be a separate concern
+- **!Amit Says** - Command is what I referred to as Action - Imperative - Authoritative - Bossy
+- Here comes the twist - Define aggregate
+- Aggregate should be able to APPLY events SEQUENTIALLY to their state
+- It looks like `func(state1 + event) = state2`
+- Aplying event to an aggregate produces an aggregate with a new state
+- **!Amit Says** - Hey! Should an aggregate be defined as a struct?
+
+### Mental Model - <date>
+- https://medium.com/capital-one-tech/building-an-event-sourcing-crate-for-rust-2c4294eea165
+
 
 ## Simple
 - package
