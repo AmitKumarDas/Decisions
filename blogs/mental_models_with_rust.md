@@ -205,8 +205,12 @@ let a: [i32; 5] = [1, 2, 3, 4, 5];
 #### Mental Model - Structs as Enum
 - Ask. Do you want to pattern match on content?
 - Ask. Do you want to pattern match on type?
-- Typically we do it by creating type as an enum
-- Then we somehow pass an action that is mapped against this type
+- _Take I_
+- Typically we do it by creating a custom defined type & creating various constants out of it
+- In other words, we create ENUMs when presented with such scenarios
+- Then this is used as a field in some struct
+- Finally our entire code base is littered with if else or switch case conditions
+- _Take II_
 - How about defining a enum out of struct?
 - In other words, ENUM around the entire content?
 ```rust
