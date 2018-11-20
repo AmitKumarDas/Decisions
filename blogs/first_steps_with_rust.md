@@ -172,7 +172,15 @@ let a: [i32; 5] = [1, 2, 3, 4, 5];
 
 ### References from Blogs
 - https://medium.com/@thomascountz/ownership-in-rust-part-1-112036b1126b
-- >Things get more interesting when we start passing around values and switching from using a string literal, which is stored on the stack, to using a String type, which is stored on the heap
+  - Things get more interesting when we start passing around values
+  - Switching from using a **string literal**, which is stored on the **stack**, 
+  - to using a **String type**, which is stored on the **heap**
+- e.g. string literals are typically copied by value
+  - string type are moved by data
+  - accessing a moved data will error out
+- elaborate explanation
+  - string literal is stored somewhere in read only memory & not in stack or heap
+  - pointer to string literal is stored in stack
 
 ## Simple
 - package
