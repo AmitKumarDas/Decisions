@@ -170,6 +170,10 @@ let a: [i32; 5] = [1, 2, 3, 4, 5];
 ### Mental Model - Day 3
 
 
+### References from Blogs
+- https://medium.com/@thomascountz/ownership-in-rust-part-1-112036b1126b
+- >Things get more interesting when we start passing around values and switching from using a string literal, which is stored on the stack, to using a String type, which is stored on the heap
+
 ## Simple
 - package
 - file name
