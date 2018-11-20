@@ -239,6 +239,36 @@ enum ProductEvent {
 - It looks like `func(state1 + event) = state2`
 - Aplying event to an aggregate produces an aggregate with a new state
 - **!Amit Says** - Hey! Should an aggregate be defined as a struct?
+- Why do we call it as an aggregate?
+- Is it an aggregate of events?
+- In Rust you can define a trait that describles an aggregate of events
+```rust
+trait Aggregate {
+    type Item;
+
+    fn version(&self) -> u64;
+    fn apply(&self, evt: &Self::Item) -> Self where Self:Sized;
+}
+```
+- Above means:
+  - Aggregates must have a version
+  - Aggregates must have an apply method
+  - Self implies the real thing & not the trait type
+  - Self:Sized implies more predictable memory footprint & not something like a boxed trait object
+- NOTE: Aggregates are calculations for a single entity, not for the entire state of your application
+- Aggregates are short lived
+- Aggregates live long enough to calculate state & validate a command & that's it
+
+#### Mental Model - Entity
+- We still need to define the entity on which aggregate is bound
+```rust
+#[derive(Debug)]
+struct Product {
+    version: usize,
+    qty_on_hand: usize,
+    sku: String,
+}
+```
 
 ### Mental Model - <date>
 - https://medium.com/capital-one-tech/building-an-event-sourcing-crate-for-rust-2c4294eea165
