@@ -270,7 +270,7 @@ struct Product {
 }
 ```
 
-### Mental Model - <date>
+### Mental Model - ?date?
 - https://medium.com/capital-one-tech/building-an-event-sourcing-crate-for-rust-2c4294eea165
 
 
