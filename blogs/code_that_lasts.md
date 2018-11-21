@@ -44,6 +44,9 @@ prone to bugs_.
   - These is the place which ties up the business logic
   - These are the feature implementors
   - These should reside in a namespace of their own
+  - These might make use of DependencyInjection library e.g. `wire`
+  - These might need to make use of profiling library
+    - e.g. `https://github.com/pkg/profile`
   - e.g. `pkg/installer/v1alpha1` 
   - or `pkg/controller/openebs/v1alpha1`
   - or `cmd/maya-apiserver/server/resource_endpoint.go`
