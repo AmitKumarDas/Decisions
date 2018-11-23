@@ -12,6 +12,14 @@ easier.
 #### Low Level Design - Good Parts - 1
 - variable declaration, definition, transformation, autosave
 - `spec.let` & `spec.template` dictionaries will be stored at RunTask runner
+
+```yaml
+kind: RunTask
+spec:
+  let:
+  template:
+```
+
 ```yaml
 kind: RunTask
 spec:
