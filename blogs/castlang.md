@@ -16,15 +16,26 @@ easier.
 kind: RunTask
 spec:
   let:
-  - podName: my-pod
-  - podNamespace: default
+  - myPod: |
+      kind: Pod
+      apiVersion: v1
+      metadata:
+        name: Hulla
+  - isSvc: "true"
+```
+
+```yaml
+kind: RunTask
+spec:
   template:
   - pod: |
       {{- $name := .TaskResult.name | default "cool" -}}
+      {{- $ns := .TaskResult.namespace | default "default" -}}
       kind: Pod
       apiVersion: v1
       metadata:
         name: $name
+        namespace: $ns
 ```
 
 ```go
