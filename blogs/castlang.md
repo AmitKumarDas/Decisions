@@ -11,9 +11,13 @@ easier.
 
 #### Low Level Design - Good Parts - 1
 - variable declaration, definition, transformation, autosave
+- `spec.let` & `spec.template` dictionaries will be stored at RunTask runner
 ```yaml
 kind: RunTask
 spec:
+  let:
+  - podName: my-pod
+  - podNamespace: default
   template:
   - pod: |
       {{- $name := .TaskResult.name | default "cool" -}}
@@ -30,6 +34,7 @@ type runtask struct {
 }
 
 type RunTaskSpec struct {
-  template map[string]string `json:"template"`
+  let      map[string]string `json:"let"` # dict of variable & its value
+  template map[string]string `json:"template"` # dict of variable with templated value
 }
 ```
