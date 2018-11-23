@@ -12,12 +12,15 @@ easier.
 #### Low Level Design - Good Parts - 1
 - variable declaration, definition, transformation, autosave
 - `spec.let` & `spec.template` dictionaries will be stored at RunTask runner
+- `run` executes the actions
 
 ```yaml
 kind: RunTask
 spec:
   let:
   template:
+run:
+output:
 ```
 
 ```yaml
@@ -37,13 +40,31 @@ kind: RunTask
 spec:
   template:
   - pod: |
-      {{- $name := .TaskResult.name | default "cool" -}}
-      {{- $ns := .TaskResult.namespace | default "default" -}}
+      {{- $name := .spec.let.name | default "cool" -}}
+      {{- $ns := .spec.let.namespace | default "default" -}}
       kind: Pod
       apiVersion: v1
       metadata:
         name: $name
         namespace: $ns
+  - val: |
+      {{- $name := .spec.let.name | default "cool" -}}
+      {{ $name | suffix "-dude" }}
+```
+
+```yaml
+kind: RunTask
+run:
+  - id: 101
+    action: list
+    kind: Pod
+    labelSelector: app=jiva
+  - id: 102
+    action: create
+    podContent: ${spec.template.pod}
+  - id: 103
+    action: create
+    podContent: ${spec.let.myPod}
 ```
 
 ```go
