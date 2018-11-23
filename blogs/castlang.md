@@ -5,10 +5,9 @@ easier.
 
 ### CASTemplate - Good Parts - 1
 - variable declaration & definition via go template functions before the task yaml
-  - e.g. `{{- $name := .TaskResult.name | default "cool" -}}`
-  - e.g. `{{- $resourceLimitsVal := fromYaml .Config.PoolResourceLimits.value -}}`
-- task yaml makes use of these variables as go templating
-
+- task yaml makes use of these variables to be finally executed via go-templating
+- Note - This is about variable definition, transformation of value, & templating
+- NOTE - This is not about Kubernetes API invocation
 
 #### Low Level Design - Good Parts - 1
 - variable declaration, definition, transformation, autosave
