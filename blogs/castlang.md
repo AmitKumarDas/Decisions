@@ -47,13 +47,13 @@ spec:
 ```
 
 ```go
-type runtask struct {
-  meta ObjectMeta
-  spec RunTaskSpec `json:"spec"`
+type RunTask struct {
+  ObjectMeta
+  Spec RunTaskSpec `json:"spec"`
 }
 
 type RunTaskSpec struct {
-  let      map[string]string `json:"let"` // dict of variable & its value
-  template map[string]string `json:"template"` // dict of variable with templated value
+  Let      map[string]string `json:"let"` // dict of variable with its direct value
+  Template map[string]string `json:"template"` // dict of variable with its templated value
 }
 ```
