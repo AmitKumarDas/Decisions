@@ -53,7 +53,7 @@ type runtask struct {
 }
 
 type RunTaskSpec struct {
-  let      map[string]string `json:"let"` # dict of variable & its value
-  template map[string]string `json:"template"` # dict of variable with templated value
+  let      map[string]string `json:"let"` // dict of variable & its value
+  template map[string]string `json:"template"` // dict of variable with templated value
 }
 ```
