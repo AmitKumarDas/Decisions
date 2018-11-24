@@ -62,11 +62,11 @@ spec:
     - id: 102
       action: create
       kind: Pod
-      content: ${spec.template.pod}
+      content: ${@.spec.template.pod}
     - id: 103
       action: create
       kind: Pod
-      content: ${spec.let.myPod}
+      content: ${@.spec.let.myPod}
 ```
 
 ```go
@@ -110,7 +110,7 @@ spec:
       kind: PodList
       labelSelector: app=jiva,org=openebs
 expect:
-  - pod: ${spec.run.101}
+  - pod: ${@.spec.run.101}
     match: 
       - status == Online
       - kind == PodList
