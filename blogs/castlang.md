@@ -2,7 +2,9 @@
 
 This is the next version of CASTemplate. This should provide all the benefits that CASTemplate provides as well help 
 building kubernetes workflows easier. This version concentrates on RunTask. A RunTask can get executed via CASTemplate 
-runner or via a new kubernetes controller.
+runner or via a new kubernetes controller. Care has been taken not to modify CASTemplate as it is user facing and hence is
+prone to breaking its users. This attempt to improvise CASTemplate code named **CASTLang** tries to make RunTask as 
+independent and user friendly than its earlier version.
 
 #### Low Level Design
 - The design boils down to:
