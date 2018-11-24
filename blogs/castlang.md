@@ -22,8 +22,9 @@ kind: RunTask
 spec:
   let:
   template:
-run:
+  run:
 output:
+status:
 ```
 
 ```yaml
@@ -57,17 +58,20 @@ spec:
 
 ```yaml
 kind: RunTask
-run:
-  - id: 101
-    action: list
-    kind: Pod
-    labelSelector: app=jiva
-  - id: 102
-    action: create
-    podContent: ${spec.template.pod}
-  - id: 103
-    action: create
-    podContent: ${spec.let.myPod}
+spec:
+  run:
+    - id: 101
+      action: list
+      kind: Pod
+      labelSelector: app=jiva
+    - id: 102
+      action: create
+      kind: Pod
+      content: ${spec.template.pod}
+    - id: 103
+      action: create
+      kind: Pod
+      content: ${spec.let.myPod}
 ```
 
 ```go
@@ -80,4 +84,35 @@ type RunTaskSpec struct {
   Let      map[string]string `json:"let"` // dict of variable with its direct value
   Template map[string]string `json:"template"` // dict of variable with its templated value
 }
+```
+
+### SpinOffs
+- One can extend RunTask to meet their specific requirement
+- I shall explain how `Testing` extends from RunTask
+- Most of stuff remains same baring `expect`
+
+```yaml
+kind: Testing
+spec:
+  let:
+  template:
+  run:
+expect:
+status:
+```
+
+```yaml
+kind: Testing
+spec:
+  let:
+  template:
+  run:
+expect:
+  - pod: ${spec.run.101}
+    match: 
+      - status == Online
+      - kind == Pod
+      - namespace == default
+      - labels == app=jiva,org=openebs
+status:
 ```
