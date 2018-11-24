@@ -1,8 +1,8 @@
 ## CASTLang
 
 This is the next version of CASTemplate. This should provide all the benefits that CASTemplate provides as well help 
-building workflows easier. This version concentrates on RunTask. A RunTask can get executed via CASTemplate runner or via 
-a new kubernetes controller.
+building kubernetes workflows easier. This version concentrates on RunTask. A RunTask can get executed via CASTemplate 
+runner or via a new kubernetes controller.
 
 #### Low Level Design
 - The design boils down to:
@@ -89,34 +89,27 @@ type RunTaskSpec struct {
 - Most of stuff remains same baring `expect`
 
 ```yaml
-kind: Testing
+kind: RunTask
 spec:
   let:
   template:
   run:
-expect:
+  expect:
 status:
 ```
 
 ```yaml
-kind: Testing
+kind: RunTask
 spec:
   let:
   template:
   run:
-expect:
-  - pod: ${spec.run.101}
-    match: 
-      - status == Online
-      - kind == Pod
-      - namespace == default
-      - labels == app=jiva,org=openebs
+  expect:
+    - pod: ${spec.run.101}
+      match: 
+        - status == Online
+        - kind == Pod
+        - namespace == default
+        - labels == app=jiva,org=openebs
 status:
-```
-
-```go
-type Testing struct {
-  RunTask
-  Expect   RunTaskExpect `json:"expect"`
-}
 ```
