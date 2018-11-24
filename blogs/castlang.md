@@ -4,14 +4,9 @@ This is the next version of CASTemplate. This should provide all the benefits th
 building workflows easier. This version concentrates on RunTask. A RunTask can get executed via CASTemplate runner or via 
 a new kubernetes controller.
 
-### CASTemplate - Good Parts - 1
-- variable declaration & definition via go template functions before the task yaml
-- task yaml makes use of these variables to be finally executed via go-templating
-- Note - This is about variable definition, transformation of value, & templating
-- NOTE - This is not about Kubernetes API invocation
-
-#### Low Level Design - Good Parts - 1
-- Variable declaration, definition, transformation, autosave
+#### Low Level Design
+- The design boils down to:
+  - Variable Declaration, Definition, Transformation, & AutoSave
 - `spec.let` & `spec.template` dictionaries will be stored at RunTask runner
 - `spec.let` lets us declare variables with corresponding values
 - `spec.template` lets us declare variables with corresponding values as go based templates
