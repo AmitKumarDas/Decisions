@@ -87,7 +87,7 @@ type RunTaskSpec struct {
 ### SpinOffs
 - One can extend RunTask to meet their specific requirement
 - I shall explain how `Testing` extends from RunTask
-- Most of stuff remains same baring `expect`
+- Most of stuff remains same baring `expect` which gets introduced as a new field
 
 ```yaml
 kind: TestTask
@@ -114,7 +114,7 @@ expect:
     match: 
       - status == Online
       - kind == PodList
-      - namespace in default,openebs
+      - namespace In default,openebs
       - labels == app=jiva,org=openebs
 status:
 ```
