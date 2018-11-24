@@ -122,6 +122,6 @@ status:
 ```go
 type TestTask struct {
   RunTask
-  Expect []TestMatcher `json:"expect"` // matchers used when running this task to build testing logic
+  Expect []TestExpect `json:"expect"` // matchers used when running this task to build testing logic
 }
 ```
