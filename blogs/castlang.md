@@ -6,7 +6,7 @@ runner or via a new kubernetes controller.
 
 #### Low Level Design
 - The design boils down to:
-  - Variable Declaration, Definition, Transformation, & AutoSave
+  - Variable Declaration, Definition, Transformation, Actions & AutoSave
 - `spec.let` & `spec.template` dictionaries will be stored at RunTask runner
 - `spec.let` lets us declare variables with corresponding values
 - `spec.template` lets us declare variables with corresponding values as go based templates
@@ -74,6 +74,7 @@ type RunTask struct {
   ObjectMeta
   Spec   RunTaskSpec `json:"spec"`
   Status RunTaskStatus `json:"status"`
+  Output String `json:"output"` // template that is used to build the output of this task
 }
 
 type RunTaskSpec struct {
@@ -89,27 +90,34 @@ type RunTaskSpec struct {
 - Most of stuff remains same baring `expect`
 
 ```yaml
-kind: RunTask
+kind: TestTask
 spec:
   let:
   template:
   run:
-  expect:
+expect:
 status:
 ```
 
 ```yaml
-kind: RunTask
+kind: TestTask
 spec:
   let:
   template:
   run:
-  expect:
-    - pod: ${spec.run.101}
-      match: 
-        - status == Online
-        - kind == Pod
-        - namespace == default
-        - labels == app=jiva,org=openebs
+expect:
+  - pod: ${spec.run.101}
+    match: 
+      - status == Online
+      - kind == Pod
+      - namespace == default
+      - labels == app=jiva,org=openebs
 status:
+```
+
+```go
+type TestTask struct {
+  RunTask
+  Expect []TestMatcher `json:"expect"` // matchers used when running this task to build testing logic
+}
 ```
