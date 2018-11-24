@@ -12,10 +12,9 @@ easier.
 #### Low Level Design - Good Parts - 1
 - Variable declaration, definition, transformation, autosave
 - `spec.let` & `spec.template` dictionaries will be stored at RunTask runner
+- `spec.let` lets us declare variables with corresponding values
+- `spec.template` lets us declare variables with corresponding go based templates
 - `run` executes the actions
-- Saving the values need not always be nested inside map[string]interface{}
-  - It can be keyed at dotted keys e.g. `nameParams := map[string]string{"pv.name": pvName}`
-  - However, need to choose only one way to save them
 
 ```yaml
 kind: RunTask
