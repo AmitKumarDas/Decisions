@@ -13,7 +13,7 @@ easier.
 - Variable declaration, definition, transformation, autosave
 - `spec.let` & `spec.template` dictionaries will be stored at RunTask runner
 - `spec.let` lets us declare variables with corresponding values
-- `spec.template` lets us declare variables with corresponding go based templates
+- `spec.template` lets us declare variables with corresponding values as go based templates
 - `run` executes the actions
 
 ```yaml
