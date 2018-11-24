@@ -1,7 +1,8 @@
 ## CASTLang
 
-This is the next version of CASTemplate. This should provide all the benefits that CASTemplate provides as well make scripting
-easier.
+This is the next version of CASTemplate. This should provide all the benefits that CASTemplate provides as well help 
+building workflows easier. This version concentrates on RunTask. A RunTask can get executed via CASTemplate runner or via 
+a new kubernetes controller.
 
 ### CASTemplate - Good Parts - 1
 - variable declaration & definition via go template functions before the task yaml
@@ -76,12 +77,14 @@ spec:
 ```go
 type RunTask struct {
   ObjectMeta
-  Spec RunTaskSpec `json:"spec"`
+  Spec   RunTaskSpec `json:"spec"`
+  Status RunTaskStatus `json:"status"`
 }
 
 type RunTaskSpec struct {
   Let      map[string]string `json:"let"` // dict of variable with its direct value
   Template map[string]string `json:"template"` // dict of variable with its templated value
+  Run      []Runnable        `json:"run"` // list of runnables that get executed
 }
 ```
 
@@ -114,4 +117,11 @@ expect:
       - namespace == default
       - labels == app=jiva,org=openebs
 status:
+```
+
+```go
+type Testing struct {
+  RunTask
+  Expect   RunTaskExpect `json:"expect"`
+}
 ```
