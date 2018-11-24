@@ -57,7 +57,7 @@ spec:
   run:
     - id: 101
       action: list
-      kind: Pod
+      kind: PodList
       labelSelector: app=jiva
     - id: 102
       action: create
@@ -105,12 +105,16 @@ spec:
   let:
   template:
   run:
+    - id: 101
+      action: list
+      kind: PodList
+      labelSelector: app=jiva,org=openebs
 expect:
   - pod: ${spec.run.101}
     match: 
       - status == Online
-      - kind == Pod
-      - namespace == default
+      - kind == PodList
+      - namespace in default,openebs
       - labels == app=jiva,org=openebs
 status:
 ```
