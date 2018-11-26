@@ -78,19 +78,41 @@ type entity struct {
   p1 string
 }
 
-type EntityList []*entity
-
 // OptionFunc helps in building the entity instance
 type OptionFunc func(*entity)
 
 // New returns a new instance of entity based on the provided options
-func New(opts ...OptionFunc) *entity {}
+func New(opts ...OptionFunc) *entity {
+  var e entity
+  for _, o := range opts {
+    o(&e)
+  }
+  return &e
+}
+
+func Default(opts ...OptionFunc) *entity {
+  return defaults(New(opts))
+}
+
+// defaults sets default fields if not set previously
+func defaults(e *entity) *entity {
+  if e == nil {
+    e = &entity{}
+  }
+  if len(e.p1) == 0 {
+    e.p1="noop"
+  }
+  return e
+}
 
 func P1(p1 string) OptionFunc {
   return func(e *entity) {
     e.p1 = p1
   }
 }
+
+// EntityList represents a list of entities
+type EntityList []*entity
 
 // Predicate abstracts filtering condition based on entity
 type Predicate func(* entity) bool
