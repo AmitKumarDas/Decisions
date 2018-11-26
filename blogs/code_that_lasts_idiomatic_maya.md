@@ -22,26 +22,26 @@ prone to bugs_.
 #### High Level
 - start date - 16-Nov-2018
 - updated on:
-  - ...
+  - 26-Nov-2018
 
 - API:
   - Should have well defined payloads also known as API types
   - These API types should be in a well defined namespace/packaging
-  - e.g. `pkg/apis/org.group/resource-name/v1alpha1/`
+  - e.g. `pkg/apis/org.group/entity-name/version/`
 - Entity
   - Should have resources/entities that closely match (or exactly match) these API types
   - These entities should be in their own defined namespace (different than API namespaces)
-  - e.g. `pkg/resource-name/v1alpha1/`
+  - e.g. `pkg/entity-name/version/`
   - EntityList i.e. a collection of these entities should be a well defined type
   - refer - https://medium.com/@amit.das/thinking-in-types-3c234eb17680
-- EntityHelpers
+- EntityAddons
   - Above entities may have some or all of these:
   - Builder, ListBuilder
   - RestClient,
   - Template e.g. GoTemplate
   - Predicate, Map, Filter, Middleware, etc functions i.e. streaming APIs
-  - All of these helpers can reside in the same namespace that is meant for entity
-  - i.e. `pkg/resource-name/v1alpha1`
+  - All of these addons can reside in the same namespace that is meant for entity
+  - i.e. `pkg/entity-name/version`
 - Unit Testable Entity
   - The entity along with their helpers must be Unit Testable
 - Caller Code / Service Code
