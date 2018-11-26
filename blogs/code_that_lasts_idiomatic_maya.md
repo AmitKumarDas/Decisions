@@ -94,18 +94,19 @@ func Default(opts ...OptionFunc) *entity {
   return defaults(New(opts))
 }
 
-// defaults sets default fields if not set previously
-func defaults(e *entity) *entity {
+// default sets default fields if not set previously
+func default(e *entity) *entity {
   if e == nil {
     e = &entity{}
   }
   if len(e.p1) == 0 {
-    e.p1="noop"
+    e.p1 = "noop"
   }
   return e
 }
 
-func P1(p1 string) OptionFunc {
+// SetP1 sets p1 field
+func SetP1(p1 string) OptionFunc {
   return func(e *entity) {
     e.p1 = p1
   }
