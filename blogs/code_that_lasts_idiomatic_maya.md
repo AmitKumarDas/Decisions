@@ -83,6 +83,7 @@ type entity struct {
 type builder struct {
   e       *entity
   default bool
+  checks  []Predicate
 }
 
 // OptionFunc helps in building the entity instance
@@ -128,21 +129,44 @@ func Builder() *builder {
   return &builder{e: New()}
 }
 
+// P2 sets p2 field against entity instance
 func (b *builder) P2(p2 string) *builder {
   b.e.p2 = p2
   return b
 }
 
+// SetDefaults will set default flag
 func (b *builder) SetDefaults() *builder {
   b.default = true
   return b
 }
 
-func (b *builder) Build() *entity {
+// AddCheck adds a check to be done against entity
+func (b *builder) AddCheck(c Predicate) *builder {
+  b.checks = append(b.checks, c)
+  return b
+}
+
+// validate will run the checks against the entity
+func (b *builder) validate() error {
+  for _, c := range b.checks {
+    if !c(b.e) {
+      return ValidationFailedError(c)
+    }
+  }
+  return nil
+}
+
+// Build will return the final instance of entity
+func (b *builder) Build() (*entity, error) {
   if b.default {
     b.e = default(b.e)
   }
-  return b.e
+  err := b.validate()
+  if err != nil {
+    return nil, err
+  }
+  return b.e, nil
 }
 
 // EntityList represents a list of entities
