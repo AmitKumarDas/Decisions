@@ -76,6 +76,13 @@ type Interface interface {}
 // - 3rd party functions, etc
 type entity struct {
   p1 string
+  p2 string
+}
+
+// builder is used to build the entity
+type builder struct {
+  e       *entity
+  default bool
 }
 
 // OptionFunc helps in building the entity instance
@@ -96,6 +103,8 @@ func Default(opts ...OptionFunc) *entity {
 
 // default sets default fields if not set previously
 func default(e *entity) *entity {
+  // TODO
+  // check if nil check is required ?
   if e == nil {
     e = &entity{}
   }
@@ -110,6 +119,30 @@ func SetP1(p1 string) OptionFunc {
   return func(e *entity) {
     e.p1 = p1
   }
+}
+
+// Builder returns a new instance of builder
+func Builder() *builder {
+  // TODO
+  // check if New returns a non-nil instance ?
+  return &builder{e: New()}
+}
+
+func (b *builder) P2(p2 string) *builder {
+  b.e.p2 = p2
+  return b
+}
+
+func (b *builder) SetDefaults() *builder {
+  b.default = true
+  return b
+}
+
+func (b *builder) Build() *entity {
+  if b.default {
+    b.e = default(b.e)
+  }
+  return b.e
 }
 
 // EntityList represents a list of entities
