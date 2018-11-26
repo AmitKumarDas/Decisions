@@ -22,7 +22,7 @@ prone to bugs_.
 #### High Level
 - start date - 16-Nov-2018
 - updated on:
-  - 
+  - ...
 
 - API:
   - Should have well defined payloads also known as API types
@@ -62,8 +62,49 @@ prone to bugs_.
 #### Low Level
 - start date - 26 Nov 2018
 - updated on:
-  - 
+  - ...
 
 ```go
+// pkg/entity/version/entity.go
+
+// Interface defines the public contracts of this namespace
+type Interface interface {}
+
+// structure that composes 
+// - fields, 
+// - 3rd party interfaces, 
+// - 3rd party functions, etc
+type entity struct {
+  p1 string
+}
+
+type EntityList []*entity
+
+// OptionFunc helps in building the entity instance
+type OptionFunc func(*entity)
+
+// New returns a new instance of entity based on the provided options
+func New(opts ...OptionFunc) *entity {}
+
+func P1(p1 string) OptionFunc {
+  return func(e *entity) {
+    e.p1 = p1
+  }
+}
+
+// Predicate abstracts filtering condition based on entity
+type Predicate func(* entity) bool
+
+func (l EntityList) Map(opt OptionFunc, pl ...Predicate) EntityList {}
+
+func (l EntityList) MapIfAny(opt OptionFunc, pl ...Predicate) EntityList {}
+
+func (l EntityList) MapAll(opts []OptionFunc, pl ...Predicate) EntityList {}
+
+func (l EntityList) MapAllIfAny(opts []OptionFunc, pl ...Predicate) EntityList {}
+
+func (l EntityList) Filter(pl ...Predicate) EntityList {}
+
+func (l EntityList) FilterIfAny(pl ...Predicate) EntityList {}
 
 ```
