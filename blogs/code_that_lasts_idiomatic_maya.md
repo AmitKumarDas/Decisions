@@ -19,7 +19,11 @@ The stuff that I am going to write below will change based on my experiences and
 a living document. These are the details that I believe will _make code more malleable to changes without cracking or being 
 prone to bugs_.
 
-#### dated - 16-Nov-2018
+#### High Level
+- start date - 16-Nov-2018
+- updated on:
+  - 
+
 - API:
   - Should have well defined payloads also known as API types
   - These API types should be in a well defined namespace/packaging
@@ -54,3 +58,12 @@ prone to bugs_.
   - The caller code should also be unit testable
   - However, unit testable caller code is optional
   - Some may want to test this via integration tests
+
+#### Low Level
+- start date - 26 Nov 2018
+- updated on:
+  - 
+
+```go
+
+```
