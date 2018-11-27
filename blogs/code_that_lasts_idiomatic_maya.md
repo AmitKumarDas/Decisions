@@ -20,9 +20,10 @@ a living document. These are the details that I believe will _make code more mal
 prone to bugs_.
 
 #### High Level
-- start date - 16-Nov-2018
+- start date - 16 Nov 2018
 - updated on:
-  - 26-Nov-2018
+  - 26 Nov 2018
+  - 27 Nov 2018
 
 - API:
   - Should have well defined payloads also known as API types
@@ -37,6 +38,7 @@ prone to bugs_.
 - EntityAddons
   - Above entities may have some or all of these:
   - Builder, ListBuilder
+  - Errors,
   - RestClient,
   - Template e.g. GoTemplate
   - Predicate, Map, Filter, Middleware, etc functions i.e. streaming APIs
@@ -62,7 +64,7 @@ prone to bugs_.
 #### Low Level
 - start date - 26 Nov 2018
 - updated on:
-  - ...
+  - 27 Nov 2018
 
 ```go
 // pkg/entity/version/entity.go
@@ -115,8 +117,8 @@ func default(e *entity) *entity {
   return e
 }
 
-// SetP1 sets p1 field
-func SetP1(p1 string) OptionFunc {
+// WithP1 sets p1 field
+func WithP1(p1 string) OptionFunc {
   return func(e *entity) {
     e.p1 = p1
   }
