@@ -10,7 +10,7 @@ import (
 
 // LogWatcher is the interface of a log watcher.
 type LogWatcher interface {
-	// Watch starts watching logs and returns logs via a channel.
+  // Watch starts watching logs and returns logs via a channel.
   //
   // Comments
   // A channel can also be returned
@@ -21,10 +21,10 @@ type LogWatcher interface {
   // Log comes from different package
   // In other words, log is treated as an API/types 
   // log watcher is treated as business logic
-	Watch() (<-chan *types.Log, error)
+  Watch() (<-chan *types.Log, error)
   
-	// Stop stops the log watcher. Resources open should be closed properly.
-	Stop()
+  // Stop stops the log watcher. Resources open should be closed properly.
+  Stop()
 }
 
 // WatcherConfig is the configuration of the log watcher.
@@ -40,24 +40,24 @@ type LogWatcher interface {
 // with defaults, while setting other fields are dependent on some conditions.
 // In such cases, much more thought is required to build the spec itself.
 type WatcherConfig struct {
-	// Plugin is the name of plugin which is currently used.
-	// Currently supported: filelog, journald, kmsg.
-	Plugin string `json:"plugin,omitempty"`
+  // Plugin is the name of plugin which is currently used.
+  // Currently supported: filelog, journald, kmsg.
+  Plugin string `json:"plugin,omitempty"`
 	
   // PluginConfig is a key/value configuration of a plugin. Valid configurations
-	// are defined in different log watcher plugin.
-	PluginConfig map[string]string `json:"pluginConfig,omitempty"`
+  // are defined in different log watcher plugin.
+  PluginConfig map[string]string `json:"pluginConfig,omitempty"`
 	
   // LogPath is the path to the log
-	LogPath string `json:"logPath,omitempty"`
+  LogPath string `json:"logPath,omitempty"`
 	
   // Lookback is the time log watcher looks up
-	Lookback string `json:"lookback,omitempty"`
+  Lookback string `json:"lookback,omitempty"`
 	
   // Delay is the time duration log watcher delays after node boot time. This is
-	// useful when the log watcher needs to wait for some time until the node
-	// becomes stable.
-	Delay string `json:"delay,omitempty"`
+  // useful when the log watcher needs to wait for some time until the node
+  // becomes stable.
+  Delay string `json:"delay,omitempty"`
 }
 
 // WatcherCreateFunc is the create function of a log watcher.
@@ -75,7 +75,7 @@ var createFuncs = map[string]types.WatcherCreateFunc{}
 
 // registerLogWatcher registers a createFunc for a log watcher.
 func registerLogWatcher(name string, create types.WatcherCreateFunc) {
-	createFuncs[name] = create
+  createFuncs[name] = create
 }
 
 // GetLogWatcherOrDie get a log watcher based on the passed in configuration.
@@ -91,11 +91,11 @@ func registerLogWatcher(name string, create types.WatcherCreateFunc) {
 // Comments
 // This is kind of singleton, but we really donot need to do init() or 
 func GetLogWatcherOrDie(config types.WatcherConfig) types.LogWatcher {
-	create, ok := createFuncs[config.Plugin]
-	if !ok {
-		glog.Fatalf("No create function found for plugin %q", config.Plugin)
-	}
-	glog.Infof("Use log watcher of plugin %q", config.Plugin)
-	return create(config)
+  create, ok := createFuncs[config.Plugin]
+  if !ok {
+    glog.Fatalf("No create function found for plugin %q", config.Plugin)
+  }
+  glog.Infof("Use log watcher of plugin %q", config.Plugin)
+  return create(config)
 }
 ```
