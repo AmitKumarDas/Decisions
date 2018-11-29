@@ -1,6 +1,6 @@
 
-refer - https://github.com/kubernetes/node-problem-detector/blob/master/pkg/systemlogmonitor/logwatchers/types/log_watcher.go
-refer - https://github.com/kubernetes/node-problem-detector/blob/master/pkg/systemlogmonitor/logwatchers/log_watchers.go
+- refer - https://github.com/kubernetes/node-problem-detector/blob/master/pkg/systemlogmonitor/logwatchers/types/log_watcher.go
+- refer - https://github.com/kubernetes/node-problem-detector/blob/master/pkg/systemlogmonitor/logwatchers/log_watchers.go
 ```go
 package types
 
@@ -31,6 +31,14 @@ type LogWatcher interface {
 //
 // Comments
 // No need to repeat Watcher
+//
+// Comments
+// You can treat Config similar to specification. IMO if these are intended 
+// to be provided as a whole by the caller. 
+//
+// However, there are cases when some fields of these structures can be set 
+// with defaults, while setting other fields are dependent on some conditions.
+// In such cases, much more thought is required to build the spec itself.
 type WatcherConfig struct {
 	// Plugin is the name of plugin which is currently used.
 	// Currently supported: filelog, journald, kmsg.
