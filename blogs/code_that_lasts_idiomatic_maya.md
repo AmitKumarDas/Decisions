@@ -102,7 +102,7 @@ func New(opts ...OptionFunc) *entity {
 }
 
 func Default(opts ...OptionFunc) *entity {
-  return defaults(New(opts))
+  return default(New(opts))
 }
 
 // default sets default fields if not set previously
