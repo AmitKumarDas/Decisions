@@ -64,7 +64,8 @@ prone to bugs_.
 #### Low Level
 - start date - 26 Nov 2018
 - updated on:
-  - 27 Nov 2018
+  - 27 Nov 2018, 
+  - 30 Nov 2018
 
 ```go
 // pkg/entity/version/entity.go
@@ -245,3 +246,5 @@ func (l EntityList) Filter(pl ...Predicate) EntityList {}
 func (l EntityList) FilterIfAny(pl ...Predicate) EntityList {}
 
 ```
+#### Low Level - References
+- https://github.com/openebs/maya/tree/master/pkg/msg/v1alpha1
