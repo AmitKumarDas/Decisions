@@ -112,7 +112,7 @@ status:
   - e.g. `labelSelector: pv=${PV_NAME}` will result into `labelSelector: pv=actual-name-of-pv`
 
 
-### KubeTest - A generic reconciler to test kubernetes resource(s)
+### KubeTest Operator - A generic reconciler to test kubernetes resource(s)
 - Can be used to inject failures optionally
 ```yaml
 kind: KubeTest
@@ -144,7 +144,7 @@ spec:
 status:
 ```
 
-### IscsiMonitor -- An operator to monitor iscsi sessions
+### IscsiMonitor - Operator to monitor iscsi sessions
 - IscsiMonitor operator picks up iscsi targets and portals from PV objects
 - Starts DaemonSet Pods on all the nodes initiating iscsi connection
 - Each pod will calculate iscsi session status(-es) for the required iscsi target(s)
@@ -273,7 +273,7 @@ func GetOpenEBSProvisionerSpecs(imageTag string) *appsv1.deployment {}
 ```
 
 ### Case for Workflow Oriented Operator
-- Read it here[CASTLang](https://github.com/AmitKumarDas/Decisions/blob/master/blogs/castlang_spinsoff_operator.md)
+- Read it here [CASTLang](https://github.com/AmitKumarDas/Decisions/blob/master/blogs/castlang_spinsoff_operator.md).
 
 ### Old Drafts
 #### Draft 1 -- dated 24/Oct/2018
