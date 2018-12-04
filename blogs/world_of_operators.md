@@ -158,29 +158,32 @@ status:
 ```
 
 ### IscsiMonitor - Operator to monitor iscsi sessions - WIP
-- IscsiMonitor operator picks up iscsi targets and portals from PV objects
-- Starts DaemonSet Pods on all the nodes initiating iscsi connection
-- Each pod will calculate iscsi session status(-es) for the required iscsi target(s)
-- Each pod will create a `IscsiMonitorItem` spec during the process of its execution
-- IscsiMonitor will watch for `IscsiMonitorItem` spec(s) & update the `status.iscsiSessions` field
-- IscsiMonitor will calculate the status.state field based on `status.iscsiSessions` field
-- IscsiMonitor will delete the DaemonSet if all `IscsiMonitorItem` specs are in COMPLETED state
-- IscsiMonitor will resync if one or more `IscsiMonitorItem` specs are in INIT state
+- IscsiMonitor operator filters specific nodes _(phase 1)_
+- IscsiMonitor operator picks up iscsi targets and portals from PV objects _(phase 2)_
+  - These details are used later to check iscsi sessions on the node
+- Starts DaemonSet Pods on all the filtered nodes 
+  - Check for the presence of iscsi binary _(phase 1)_
+  - Run checks w.r.t iscsi session _(phase 2)_
+- Each DaemonSet pod will create & update a `IscsiMonitorJob` custom resource during the process of its execution
+- IscsiMonitor controller will watch its own spec as well as `IscsiMonitorJob` spec(s) & reconcile
+- IscsiMonitor controller will delete DaemonSet once monitoring check is done for that reconcile operation
+- Owner references will be set in such a way that all `IscsiMonitorJob` resources get deleted once DaemonSet gets deleted
+
 ```yaml
 kind: IscsiMonitor
 spec:
-  volumeSelector:
+  nodeSelector: # filter nodes
   - label:
-    annotation:
+    name:
+  volumeSelector: # filter volumes 
+  - label:
     namespace:
     name:
-  job:
-    nodeSelector:
+  job: # daemon set specifications
     image:
     command:
     args:
 status:
-  # state value is derived based on individual status of status.iscsiSessions
   phase:
   conditions:
   - check: Session
@@ -197,7 +200,7 @@ status:
     message:
 ```
 ```yaml
-kind: IscsiMonitorItem
+kind: IscsiMonitorJob
 status:
   # Initializing, Completed, Failed, etc
   phase:
