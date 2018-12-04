@@ -181,14 +181,17 @@ spec:
     args:
 status:
   # state value is derived based on individual status of status.iscsiSessions
-  state:
-  iscsiSessions:
-  - node:
+  phase:
+  conditions:
+  - check: Session
+    type: Available
+    status: "true"
+    node:
     target:
     portal:
-    status:
     lastProbeTime:
     lastTransitionTime:
+    lastUpdateTime:
     lastUpdatedBy:
     reason:
     message:
@@ -196,15 +199,23 @@ status:
 ```yaml
 kind: IscsiMonitorItem
 status:
-  # either INIT or COMPLETED
-  state:
-  iscsiSessions:
-  - node:
+  # Initializing, Completed, Failed, etc
+  phase:
+  conditions:
+  - check: Binary
+    type: Available
+    status: "true"
+  - check: Binary
+    type: Permission
+    status: "true"
+  - check: Session
+    type: Available
+    status:
+    node:
     portal:
     target:
-    status:
-    lastProbeTime:
     lastTransitionTime:
+    lastUpdateTime:
     lastUpdatedBy:
     reason:
     message:
