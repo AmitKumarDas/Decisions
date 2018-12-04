@@ -93,6 +93,8 @@ type RunTaskSpec struct {
 - Assumptions:
   - Depends on consuming Kubernetes APIs
   - Based on workflow or pipelining of tasks
+  - Do not name this as `KubeTest` as we want this to be more task/worker oriented.
+  - NOTE: There is a separate proposal for [KubeTest](https://github.com/AmitKumarDas/Decisions/blob/master/blogs/openebs_operator_design.md)
 
 ```yaml
 kind: TestTask
