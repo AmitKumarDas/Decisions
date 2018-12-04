@@ -272,6 +272,9 @@ func GetMayaAPIServerSpecs(imageTag string) *appsv1.deployment {}
 func GetOpenEBSProvisionerSpecs(imageTag string) *appsv1.deployment {}
 ```
 
+### Case for Workflow Oriented Operator
+- Read it here[CASTLang](https://github.com/AmitKumarDas/Decisions/blob/master/blogs/castlang_spinsoff_operator.md)
+
 ### Old Drafts
 #### Draft 1 -- dated 24/Oct/2018
 
