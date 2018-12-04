@@ -1,10 +1,10 @@
 ## CASTLang
 
-CAStLang is the _code name_ for next version of CASTemplate. This should provide all the benefits that CASTemplate provides 
+CASTLang is the _code name_ for next version of CASTemplate. This should provide all the benefits that CASTemplate provides 
 as well help building **kubernetes workflows easier**. This version concentrates on RunTask. A RunTask can get executed via 
-CASTemplate runner or via a new kubernetes controller. Care has been taken not to modify CASTemplate as it is user facing and 
-hence is prone to breaking its users. This attempt to improvise CASTemplate code named **CASTLang** tries to make RunTask as 
-independent and devops friendly than its earlier version.
+CASTemplate runner or via a new kubernetes controller. Care has been taken **NOT to modify CASTemplate** as it is user 
+facing and hence is prone to breaking its users. This attempt to improvise CASTemplate code named **CASTLang** tries to make 
+RunTask as independent and devops friendly than its earlier version.
 
 #### Low Level Design
 - The design boils down to:
@@ -88,8 +88,11 @@ type RunTaskSpec struct {
 
 ### SpinOffs
 - One can extend RunTask to meet their specific requirement
-- I shall explain how `Testing` extends from RunTask
+- I shall explain how `TestTask` extends from RunTask
 - Most of stuff remains same baring `expect` which gets introduced as a new field
+- Assumptions:
+  - Depends on consuming Kubernetes APIs
+  - Based on workflow or pipelining of tasks
 
 ```yaml
 kind: TestTask
