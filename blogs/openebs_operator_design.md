@@ -1,7 +1,7 @@
+## World of Operators
 
-### OpenEBS Operator Specification -- WIP
-- This is the typical default operator specification that gets generated and applied before the operator logic kicks in
 
+### OpenEBS - A Operator to install & manage OpenEBS components - WIP
 ```yaml
 kind: OpenEBS
 metadata:
@@ -10,7 +10,19 @@ metadata:
 spec:
   # what version of openebs should be enabled/made available
   # version controls install, upgrade & rollback as well
-  version: 0.7.0
+  version: 0.8.0
+```
+
+- This is the typical default operator specification that is **generated** and applied before the operator logic kicks in
+```yaml
+kind: OpenEBS
+metadata:
+  name: default
+# specification of OpenEBS Operator
+spec:
+  # what version of openebs should be enabled/made available
+  # version controls install, upgrade & rollback as well
+  version: 0.8.0
   # volumeProvisioner is the specification of volume provisioner
   volumeProvisioner:
     # A value of false will un-install volume provisioner
@@ -50,7 +62,7 @@ spec:
     template:
 ```
 
-### KubeNote Operator - A generic reconciler to spot kubernetes resource(s) & their state(s)
+### KubeNote Operator - A generic reconciler to spot kubernetes resource(s) & their state(s) - WIP
 - Use-Cases:
   - Find presence of OpenEBS components
   - Verify if all openebs PVs have dependent resources with appropriate states
@@ -112,7 +124,7 @@ status:
   - e.g. `labelSelector: pv=${PV_NAME}` will result into `labelSelector: pv=actual-name-of-pv`
 
 
-### KubeTest Operator - A generic reconciler to test kubernetes resource(s)
+### KubeTest Operator - A generic reconciler to test kubernetes resource(s) - WIP
 - Can be used to inject failures optionally
 ```yaml
 kind: KubeTest
@@ -144,7 +156,7 @@ spec:
 status:
 ```
 
-### IscsiMonitor - Operator to monitor iscsi sessions
+### IscsiMonitor - Operator to monitor iscsi sessions - WIP
 - IscsiMonitor operator picks up iscsi targets and portals from PV objects
 - Starts DaemonSet Pods on all the nodes initiating iscsi connection
 - Each pod will calculate iscsi session status(-es) for the required iscsi target(s)
@@ -197,7 +209,10 @@ status:
     message:
 ```
 
-### Thinking in Code -- WIP
+### Case for Workflow Oriented Operator
+- Read it here [CASTLang](https://github.com/AmitKumarDas/Decisions/blob/master/blogs/castlang_spinsoff_operator.md).
+
+### Thinking in Code -- My Rough Notes
 - pkg/state/v1alpha1/state.go
 ```go
 type Reconciler interface {
@@ -272,10 +287,7 @@ func GetMayaAPIServerSpecs(imageTag string) *appsv1.deployment {}
 func GetOpenEBSProvisionerSpecs(imageTag string) *appsv1.deployment {}
 ```
 
-### Case for Workflow Oriented Operator
-- Read it here [CASTLang](https://github.com/AmitKumarDas/Decisions/blob/master/blogs/castlang_spinsoff_operator.md).
-
-### Old Drafts
+### Old & Rejected Drafts
 #### Draft 1 -- dated 24/Oct/2018
 
 - Review Comment - This is not a specification i.e. statement
