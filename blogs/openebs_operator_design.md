@@ -13,7 +13,8 @@ spec:
   version: 0.8.0
 ```
 
-- This is the typical default operator specification that is **generated** and applied before the operator logic kicks in
+- This is the **generated** specification from above original spec
+- This gets applied before operator logic kicks in
 ```yaml
 kind: OpenEBS
 metadata:
