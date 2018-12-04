@@ -50,32 +50,70 @@ spec:
     template:
 ```
 
-### KubeTest Operator - A generic reconciler to test kubernetes resource(s) -- WIP
-- Will be used to test OpenEBS Operator
-- Can be used to inject failures optionally
-- Some of the usecases are:
-- Can be used to test if all openebs PVs have dependent resources
-  - In other words, can be used to **detect stale resources**
+### KubeNote Operator - A generic reconciler to spot kubernetes resource(s) & their state(s)
+- Use-Cases:
+  - Find presence of OpenEBS components
+  - Verify if all openebs PVs have dependent resources with appropriate states
+    - i.e. **detect stale resources**
+
+#### UseCase #1 - Presence of OpenEBS components
 ```yaml
-kind: KubeTest
+kind: KubeNote
+spec:
+  resource:
+  - kind: Deployment
+    namespace: openebs
+    name: maya-apiserver
+    expect: Progressing, Available
+    owns:
+    - kind: Pod
+      expect: Running
+    - kind: ReplicaSet
+      expect: Available
+    links:
+    - kind: Service
+      name: maya-apiserver-svc
+      expect: Present
+status:
+```
+
+Notes:
+- `links` & `owns` are two approaches to query resources that are either _linked to_ or _owned by_ original resource
+- There can be different set of expectations based on the resource being queried
+- e.g. a Pod can have below expectations:
+  - Running, Initialized, Ready, PodScheduled
+- Similarly a Container can have below expectations:
+  - Ready
+- A Deployment can have following expectations:
+  - Progressing, Available
+- **Tip**: It might be good to have multiple expectations from the targeted resource
+
+#### UseCase #2 - Verify if any OpenEBS volumes are orphaned
+```yaml
+kind: KubeNote
 spec:
   resource:
   - kind: PersistentVolume
     namespace: default
     labelSelector: provisioner=openebs
     expect: Bound
-    owns:
+    links:
     - kind: Deployment
       namespace: default
-      labelSelector: byOwnerName, app=target
+      labelSelector: pv=${PV_NAME}, app=target
       expect: Online
     - kind: Deployment
       namespace: default
-      labelSelector: byOwnerName, app=replica
+      labelSelector: pv=${PV_NAME}, app=replica
       expect: Online
 status:
 ```
+- **Tip**: Use golang os.expand for variable expansion 
+  - e.g. `labelSelector: pv=${PV_NAME}` will result into `labelSelector: pv=actual-name-of-pv`
 
+
+### KubeTest - A generic reconciler to test kubernetes resource(s)
+- Can be used to inject failures optionally
 ```yaml
 kind: KubeTest
 spec:
