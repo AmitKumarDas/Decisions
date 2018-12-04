@@ -130,7 +130,7 @@ status:
 ```yaml
 kind: KubeTest
 spec:
-  # can monitor a serial in a serial manner or in parallel
+  # can monitor in a serial order or in parallel
   # it can take quite some time to get the monitoring result of each resource
   type: serial
   resource:
