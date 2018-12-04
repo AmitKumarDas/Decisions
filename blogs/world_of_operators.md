@@ -172,10 +172,10 @@ status:
 ```yaml
 kind: IscsiMonitor
 spec:
-  nodeSelector: # filter nodes
+  nodeSelector: # filter nodes -- phase 1
   - label:
     name:
-  volumeSelector: # filter volumes 
+  volumeSelector: # filter volumes -- phase 2
   - label:
     namespace:
     name:
@@ -186,7 +186,17 @@ spec:
 status:
   phase:
   conditions:
-  - check: Session
+  - check: Binary # phase 1
+    type: Available
+    status: "true"
+    node:
+    lastProbeTime:
+    lastTransitionTime:
+    lastUpdateTime:
+    lastUpdatedBy:
+    reason:
+    message:
+  - check: Session # phase 2
     type: Available
     status: "true"
     node:
@@ -205,13 +215,13 @@ status:
   # Initializing, Completed, Failed, etc
   phase:
   conditions:
-  - check: Binary
+  - check: Binary # phase 1
     type: Available
     status: "true"
-  - check: Binary
+  - check: Binary # phase 1
     type: Permission
     status: "true"
-  - check: Session
+  - check: Session # phase 2
     type: Available
     status:
     node:
