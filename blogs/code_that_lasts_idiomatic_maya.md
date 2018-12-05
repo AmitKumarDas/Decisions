@@ -119,20 +119,23 @@ type builder struct {
 // This is an alternative approach to build an entity
 //
 // NOTE:
-// However, this has got much more use unlike a builder. This
-// function signature is fundamental to build powerful codebase.
-// Developers familiar with functional programming, streaming APIs, etc
-// can relate more with this approach. The power is realized when this
-// typed function is combined with following:
+// However, this exhibit more malleable characteristics than that of builder. 
+// This function signature is fundamental to building powerful codebase.
+// Developers familiar with **functional programming**, **streaming APIs**, etc
+// can relate more with this approach. The power is realized when this typed
+// function is combined with following:
+//
 // 1/ predicates 
 // 2/ transformers also called mappers 
 // 3/ predicates as well as transformers
 //
-// Above is the essence of functional programming and has been given 
-// different names.
+// Above is essentially functional programming and its worth noting to learn 
+// more on this from different languages.
 //
-// TODO
-// Write the names to this pattern given in different languages
+// TODO:
+// !!Help Needed!! ??Contributors??
+//
+// Write the names & stories they offer to this pattern in different languages
 type OptionFunc func(*entity)
 
 // New returns a new instance of entity based on the provided options
@@ -150,11 +153,14 @@ func New(opts ...OptionFunc) *entity {
   return &e
 }
 
+// Default is a variant of New. It returns an instance of entity
+// by filling up the default fields that are not set previously.
 func Default(opts ...OptionFunc) *entity {
   return default(New(opts))
 }
 
-// default sets default fields if not set previously
+// default sets default fields against the provided entity if not 
+// set previously
 func default(e *entity) *entity {
   // TODO
   // check if nil check is required ?
@@ -168,6 +174,12 @@ func default(e *entity) *entity {
 }
 
 // WithP1 sets p1 field
+//
+// NOTE:
+// This returns a typed function that enables WithP1 to
+// participate in various combinations. For example it can be 
+// passed as an argument to New, Default, Map, MapAll, etc 
+// functions and be a part of building a higher order feature.
 func WithP1(p1 string) OptionFunc {
   return func(e *entity) {
     e.p1 = p1
