@@ -19,8 +19,8 @@ We know each one in the team writes code in a different way. It is good in one w
 write code. A developer is free to choose a particular pattern that suits the requirements. OpenEBS developers have been 
 doing this for some time now. Alas, this has a lot of associated costs. Lot of review cycles, longer time to implement 
 business logic, even longer effort required to implement test logic, un-testable blocks of code, lack of code re-usability. 
-This made us realize about specific patterns that stand out and can help in writing **better**, **faster** yet **testable** 
-code. Well, idiomatic maya is all about _internalizing_ these patterns into making openebs _antifragile_.
+This made us realize about specific patterns that stand out and can help in writing **better**, **quicker**, **testable**, &
+**re-usable** code. Well! _Idiomatic Maya_ is all about _internalizing_ these patterns into making openebs _antifragile_.
 
 ### Devil is in the details
 The stuff that I am going to write below will change based on my experiences and observations. These details should be 
