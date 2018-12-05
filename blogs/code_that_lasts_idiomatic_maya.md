@@ -323,6 +323,9 @@ func (l PredicateList) Any(e *entity) bool {
 // Map runs the provided transformation against each 
 // entity found in the list iff all the provided 
 // predicates succeed
+//
+// NOTE:
+// Map defaults to AND-ing of predicates
 func (l EntityList) Map(opt OptionFunc, pl ...Predicate) {
   for _, e := range l {
     if PredicateList(pl).All(e) {
@@ -333,6 +336,10 @@ func (l EntityList) Map(opt OptionFunc, pl ...Predicate) {
 
 // MapIfAny runs the provided option against each 
 // entity if at-least one predicate succeeds
+//
+// NOTE:
+// MayIfAny as the name suggests is based on OR-ing of
+// predicates
 func (l EntityList) MapIfAny(opt OptionFunc, pl ...Predicate) {
   for _, e := range l {
     if PredicateList(pl).Any(e) {
