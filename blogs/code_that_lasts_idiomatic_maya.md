@@ -365,6 +365,8 @@ func (l EntityList) Filter(pl ...Predicate) EntityList {}
 func (l EntityList) FilterIfAny(pl ...Predicate) EntityList {}
 
 ```
-#### Low Level - References
+#### Code References
 - https://github.com/openebs/maya/tree/master/pkg/msg/v1alpha1
 - https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/util/errors/errors.go
+- https://github.com/weaveworks/scope/blob/master/render/filters.go
+- https://github.com/pkg/profile/blob/master/profile.go
