@@ -211,14 +211,17 @@ func (b *builder) P2(p2 string) *builder {
   return b
 }
 
-// UseDefaults will turn on default fields' 
-// setting
+// UseDefaults will turn on default fields' setters
 func (b *builder) UseDefaults() *builder {
   b.default = true
   return b
 }
 
 // AddCheck adds a check to be done against entity
+//
+// NOTE:
+// AddCheck makes use of Predicate rather than exposing
+// new methods for every new condition
 func (b *builder) AddCheck(c Predicate) *builder {
   b.checks = append(b.checks, c)
   return b
@@ -259,20 +262,26 @@ func (b *builder) Build() (*entity, error) {
 // Comparator(s), etc to build high level logic.
 type EntityList []*entity
 
-// Predicate abstracts filtering condition based on 
-// entity
+// Predicate abstracts conditional logic w.r.t an entity
 type Predicate func(* entity) bool
 
-// PredicateList is a typed representation of list 
-// of predicates
+// PredicateList is a typed representation of list of
+// predicates
+//
+// NOTE:
+// Defining a type against this collection enables
+// building custom operators on top of predicates.
+// For example, **OR**, **AND**, etc operators can be 
+// built on top of predicates.
 type PredicateList []Predicate
 
 // All returns true if all the predicate conditions 
 // pass successfully against the provided entity
+//
+// NOTE:
+// All represents AND-ing of predicates found in
+// PredicateList
 func (l PredicateList) All(e *entity) bool {
-  if len(l) == 0 {
-    return true
-  }
   for _, p := range l {
     if !p(e) {
       return false
@@ -284,6 +293,10 @@ func (l PredicateList) All(e *entity) bool {
 // Any returns true if at-least one of the predicate 
 // condition pass successfully against the provided 
 // entity
+//
+// NOTE:
+// Any represents OR-ing of predicates found in
+// PredicateList
 func (l PredicateList) Any(e *entity) bool {
   if len(l) == 0 {
     return true
