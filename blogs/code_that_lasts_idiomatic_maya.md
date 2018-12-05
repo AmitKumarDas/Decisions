@@ -134,7 +134,7 @@ type builder struct {
 //
 // 1/ predicates 
 // 2/ transformers also called mappers 
-// 3/ predicates as well as transformers
+// 3/ predicates & transformers together
 //
 // Above is essentially functional programming and its 
 // worth noting to learn more on this from different 
