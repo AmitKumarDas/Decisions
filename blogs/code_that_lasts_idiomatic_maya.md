@@ -14,6 +14,14 @@ Remember the mighty trees that cannot bend usually break or get uprooted during 
 plants which seem to be more fragile come out unscathed. The question that we need to ask ourselves is _"is your code 
 malleable to the forces of change"_ ?
 
+### Patterns as a language to communicate
+We know each one in the team writes code in a different way. It is good in one way that language does not become a barrier to
+write code. A developer is free to choose a particular pattern that suits the requirements. OpenEBS developers have been 
+doing this for some time now. Alas, this has a lot of associated costs. Lot of review cycles, longer time to implement logic, 
+non testable blocks of code. This has made us realize about specific patterns that stand out and can help in writing 
+better, faster yet testable code. Well, idiomatic maya is all about internalizing these patterns which can make openebs 
+antifragile.
+
 ### Devil is in the details
 The stuff that I am going to write below will change based on my experiences and observations. These details should be 
 a living document. These are the details that I believe will _make code more malleable to changes without cracking or being 
@@ -68,31 +76,72 @@ prone to bugs_.
   - 30 Nov 2018
 
 ```go
-// pkg/entity/version/entity.go
+// pkg/entity/v1alpha1/entity.go
+
+package v1alpha1
 
 // Interface defines the public contracts of this namespace
-type Interface interface {}
+type Interface interface {
+  // contracts i.e. methods that need to be exposed
+}
 
 // structure that composes 
-// - fields, 
-// - 3rd party interfaces, 
-// - 3rd party functions, etc
+// - fields
+// - 3rd party interfaces -- can be mocked
+// - 3rd party functions -- can be mocked
 type entity struct {
   p1 string
   p2 string
 }
 
 // builder is used to build the entity
+// 
+// NOTE:
+// A builder is typically used when the wrapped entity has lots of 
+// fields. Some of the times, caller is not interested to fill all
+// these fields. While at other scenarios, caller is interested to
+// run validations against one or more of these fields. Interestingly,
+// there will be cases where both of the above is applicable.
+//
+// NOTE:
+// This lets the caller code make use of multiple dot notation to invoke
+// multiple methods. This makes the caller code readable IMO.
 type builder struct {
   e       *entity
   default bool
   checks  []Predicate
+  errors  []error
 }
 
 // OptionFunc helps in building the entity instance
+//
+// NOTE:
+// This is an alternative approach to build an entity
+//
+// NOTE:
+// However, this has got much more use unlike a builder. This
+// function signature is fundamental to build powerful codebase.
+// Developers familiar with functional programming, streaming APIs, etc
+// can relate more with this approach. The power is realized when this
+// typed function is combined with following:
+// 1/ predicates 
+// 2/ transformers also called mappers 
+// 3/ predicates as well as transformers
+//
+// Above is the essence of functional programming and has been given 
+// different names.
+//
+// TODO
+// Write the names to this pattern given in different languages
 type OptionFunc func(*entity)
 
 // New returns a new instance of entity based on the provided options
+//
+// NOTE:
+// New is built on top of passing typed functions that can be thought
+// of as fragments to build the entity & then return the same. The 
+// arguments are variadic, which means passing zero arguments will compile
+// fine.
 func New(opts ...OptionFunc) *entity {
   var e entity
   for _, o := range opts {
