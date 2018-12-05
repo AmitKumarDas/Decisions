@@ -73,7 +73,8 @@ prone to bugs_.
 - start date - 26 Nov 2018
 - updated on:
   - 27 Nov 2018, 
-  - 30 Nov 2018
+  - 30 Nov 2018,
+  - 05 Dec 2018
 
 ```go
 // pkg/entity/v1alpha1/entity.go
