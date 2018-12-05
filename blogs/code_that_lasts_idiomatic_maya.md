@@ -259,10 +259,21 @@ func (b *builder) Build() (*entity, error) {
 // is essential to utilize the power of functional
 // programming. This type is typically used along
 // with Predicate(s), Filter(s), Transformer(s), 
-// Comparator(s), etc to build high level logic.
+// Comparator(s), etc necessary to build higher 
+// level logic.
 type EntityList []*entity
 
 // Predicate abstracts conditional logic w.r.t an entity
+//
+// NOTE:
+// Predicate is a functional approach versus traditional
+// approach to mix conditions such as *if-else* within
+// blocks of business logic
+//
+// NOTE:
+// Predicate approach enables clear separation of
+// conditionals from imperatives i.e. actions that
+// form the business logic
 type Predicate func(* entity) bool
 
 // PredicateList is a typed representation of list of
@@ -309,8 +320,9 @@ func (l PredicateList) Any(e *entity) bool {
   return false
 }
 
-// Map runs the provided option against each entity 
-// if all predicates succeed
+// Map runs the provided transformation against each 
+// entity found in the list iff all the provided 
+// predicates succeed
 func (l EntityList) Map(opt OptionFunc, pl ...Predicate) {
   for _, e := range l {
     if PredicateList(pl).All(e) {
