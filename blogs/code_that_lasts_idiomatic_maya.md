@@ -210,8 +210,9 @@ func (b *builder) P2(p2 string) *builder {
   return b
 }
 
-// SetDefaults will set default flag
-func (b *builder) SetDefaults() *builder {
+// UseDefaults will turn on default fields' 
+// setting
+func (b *builder) UseDefaults() *builder {
   b.default = true
   return b
 }
@@ -248,6 +249,13 @@ func (b *builder) Build() (*entity, error) {
 }
 
 // EntityList represents a list of entities
+//
+// NOTE:
+// Defining a type to this simple collection
+// is essential to utilize the power of functional
+// programming. This type is typically used along
+// with Predicate(s), Filter(s), Transformer(s), 
+// Comparator(s), etc to build high level logic.
 type EntityList []*entity
 
 // Predicate abstracts filtering condition based on 
