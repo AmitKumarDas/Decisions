@@ -226,10 +226,13 @@ func (b *builder) AddCheck(c Predicate) *builder {
 func (b *builder) validate() error {
   for _, c := range b.checks {
     if !c(b.e) {
-      return ValidationFailedError(c)
+      b.errors = append(b.errors, ValidationFailedError(c))
     }
   }
-  return nil
+  if len(b.errors) == 0 {
+    return nil
+  }
+  return GenericValidationFailedError
 }
 
 // Build will return the final instance of entity
