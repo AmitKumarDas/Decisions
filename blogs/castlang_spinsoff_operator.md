@@ -121,7 +121,7 @@ spec:
 kind: RunTask
 spec:
   config:
-  - template: |
+  - spec: |
       kind: Pod
       apiVersion: v1
       metadata:
@@ -157,15 +157,58 @@ spec:
   - id: 101
     action: list
     kind: PodList
-    opts:
-    - labelSelector app=jiva
-    - namespaceSelector default,openebs
-  - id: 102
+    options:
+    - func: labelSelector app=jiva
+    - func: namespaceSelector default,openebs
+```
+
+- Run - Example 2
+```yaml
+kind: RunTask
+spec:
+  run:
+  - id: 101
     action: create
     kind: Pod
-    opts:
-    - spec ${@.config.podtpl}
-    - useTemplate ${@.config.values}
+    options:
+    - func: template ${@.config.podtpl} ${@.config.values}
+```
+
+- Run - Example 3
+```yaml
+kind: RunTask
+spec:
+  run:
+  - id: 101
+    action: create
+    kind: Pod
+    options:
+    - func: spec ${@.config.spec}
+```
+
+- Run - Example 4
+```yaml
+kind: RunTask
+spec:
+  config:
+  - tolerations:
+    - key: "key"
+      operator: "Equal"
+      value: "value"
+      effect: "NoSchedule"
+  - ns: openebs
+  run:
+  - id: 101
+    action: create
+    kind: Pod
+    options:
+    - func: spec ${@.config.spec}
+    - func: toleration ${@.config.tolerations}
+      conditions:
+      - isCAST
+      - isNamespace ${@.config.ns}
+    conditions:
+    - isVersion ${@.config.k8s11}
 ```
 
 ### SpinOffs
