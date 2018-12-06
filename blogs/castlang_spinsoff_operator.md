@@ -197,6 +197,7 @@ spec:
       value: "value"
       effect: "NoSchedule"
   - ns: openebs
+  - k8s11: v1.11.0
   run:
   - id: 101
     action: create
