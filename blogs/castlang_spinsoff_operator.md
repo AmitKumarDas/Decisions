@@ -86,6 +86,94 @@ type RunTaskSpec struct {
 }
 ```
 
+#### Low Level Design - v2.0
+- The design boils down to:
+  - Variable Declaration, Definition, Options, Predicates Actions & AutoSave
+
+- Main structure
+```yaml
+kind: RunTask
+spec:
+  config:
+  run:
+output:
+status:
+```
+
+- Config - Example 1
+```yaml
+kind: RunTask
+spec:
+  config: # map[string]interface{}
+  - volume:
+    - name: myvol
+      namespace: default
+      taints:
+      - key: type
+        operator: In
+        value: node1
+  - pool:
+    - name: mypool
+```
+
+- Config - Example 2
+```yaml
+kind: RunTask
+spec:
+  config:
+  - template: |
+      kind: Pod
+      apiVersion: v1
+      metadata:
+        name: Hulla
+```
+
+- Config - Example 3
+```yaml
+kind: RunTask
+spec:
+  config:
+  - values: 
+    - name: poddy
+      namespace: default
+  - data:
+    - name: herdy
+      namespace: openebs
+  - podtpl: |
+    {{- $name := .values.name | default "cool" -}}
+    {{- $ns := .values.namespace | default "default" -}}
+    kind: Pod
+    apiVersion: v1
+    metadata:
+      name: $name
+      namespace: $ns
+```
+
+- Run - Example 1
+```yaml
+kind: RunTask
+spec:
+  run:
+  - id: 101
+    action: list
+    kind: PodList
+    opts:
+    - labelSelector app=jiva
+    - namespaceSelector default,openebs
+  - id: 102
+    action: create
+    kind: Pod
+    opts:
+    - spec ${@.config.podtpl}
+    - useTemplate ${@.config.values}
+  - id: 103
+    action: create
+    kind: Pod
+    opts:
+    - spec ${@.config.podtpl}
+    - useTemplate ${@.config.data}
+```
+
 ### SpinOffs
 - One can extend RunTask to meet their specific requirement
 - I shall explain how `TestTask` extends from RunTask
