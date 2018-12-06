@@ -166,12 +166,6 @@ spec:
     opts:
     - spec ${@.config.podtpl}
     - useTemplate ${@.config.values}
-  - id: 103
-    action: create
-    kind: Pod
-    opts:
-    - spec ${@.config.podtpl}
-    - useTemplate ${@.config.data}
 ```
 
 ### SpinOffs
