@@ -380,4 +380,5 @@ func (l EntityList) FilterIfAny(pl ...Predicate) EntityList {}
 - https://github.com/weaveworks/scope/blob/master/render/filters.go
 - https://github.com/pkg/profile/blob/master/profile.go
 - https://github.com/operator-framework/operator-sdk/blob/master/doc/design/milestone-0.0.2/query-api.md
+- https://github.com/kubernetes-sigs/controller-runtime/blob/master/example/main.go
 - [Thinking In Types](https://medium.com/@amit.das/thinking-in-types-3c234eb17680)
