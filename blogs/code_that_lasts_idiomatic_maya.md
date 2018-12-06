@@ -74,7 +74,8 @@ prone to bugs_.
 - updated on:
   - 27 Nov 2018, 
   - 30 Nov 2018,
-  - 05 Dec 2018
+  - 05 Dec 2018,
+  - 06 Dec 2018
 
 ```go
 // pkg/entity/v1alpha1/entity.go
@@ -155,6 +156,14 @@ type OptionFunc func(*entity)
 // can be thought of as fragments to build the entity 
 // & then return the same. The arguments are variadic, 
 // which means passing zero arguments will compile fine.
+//
+// NOTE:
+// Why variadic functional parameters? 
+// This follows open-close principle which allows us to
+// extend the New() with unforeseen parameters without 
+// modifying the New()'s signature. Remember modification
+// here means **breaking users** i.e. callers, dependent
+// code, etc.
 func New(opts ...OptionFunc) *entity {
   var e entity
   for _, o := range opts {
