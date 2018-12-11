@@ -75,7 +75,8 @@ prone to bugs_.
   - 27 Nov 2018, 
   - 30 Nov 2018,
   - 05 Dec 2018,
-  - 06 Dec 2018
+  - 06 Dec 2018,
+  - 11 Dec 2018
 
 ```go
 // pkg/entity/v1alpha1/entity.go
@@ -193,7 +194,7 @@ func default(e *entity) *entity {
   return e
 }
 
-// WithP1 sets p1 field
+// SetP1 sets p1 field
 //
 // NOTE:
 // This returns a typed function that enables WithP1
@@ -201,7 +202,7 @@ func default(e *entity) *entity {
 // it can be passed as an argument to New, Default, Map,
 // MapAll, etc functions and be a part of building a 
 // higher order feature.
-func WithP1(p1 string) OptionFunc {
+func SetP1(p1 string) OptionFunc {
   return func(e *entity) {
     e.p1 = p1
   }
@@ -214,8 +215,8 @@ func Builder() *builder {
   return &builder{e: New()}
 }
 
-// P2 sets p2 field against entity instance
-func (b *builder) P2(p2 string) *builder {
+// SetP2 sets p2 field against entity instance
+func (b *builder) SetP2(p2 string) *builder {
   b.e.p2 = p2
   return b
 }
