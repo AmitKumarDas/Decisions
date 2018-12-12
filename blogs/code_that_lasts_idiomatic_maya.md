@@ -142,6 +142,10 @@ type builder struct {
 // worth noting to learn more on this from different 
 // languages.
 //
+// In Rust, this is probably known as fold
+// i.e. repeated re-assignment of entity that results in
+// another version of entity
+//
 // TODO:
 // !!Help Needed!! ??Contributors??
 //
@@ -284,7 +288,7 @@ type EntityList []*entity
 // Predicate approach enables clear separation of
 // conditionals from imperatives i.e. actions that
 // form the business logic
-type Predicate func(* entity) bool
+type Predicate func(* entity) (nameOrMsg string, ok bool)
 
 // PredicateList is a typed representation of list of
 // predicates
