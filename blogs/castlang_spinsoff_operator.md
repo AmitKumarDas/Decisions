@@ -212,7 +212,33 @@ spec:
     - isVersion ${@.config.k8s11}
 ```
 
-### SpinOffs
+### SpinOffs - CASTemplate
+- CASTemplate can be a pure templating solution that generates one or more yamls(s)
+```yaml
+kind: CASTemplate
+spec:
+  config:
+  - values: 
+    - name: poddy
+      namespace: default
+  - podTemplate: |
+    {{- $name := .values.name | default "cool" -}}
+    {{- $ns := .values.namespace | default "default" -}}
+    kind: Pod
+    apiVersion: v1
+    metadata:
+      name: $name
+      namespace: $ns
+  run:
+  - id: 101
+    action: output # action is set to output implicitly
+    kind: Pod
+    options:
+    - func: template ${@.config.podTemplate} ${@.config.values}
+```
+
+
+### SpinOffs - TestTask
 - One can extend RunTask to meet their specific requirement
 - I shall explain how `TestTask` extends from RunTask
 - Most of stuff remains same baring `expect` which gets introduced as a new field
