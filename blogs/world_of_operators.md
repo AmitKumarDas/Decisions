@@ -174,11 +174,10 @@ kind: IscsiMonitor
 metadata:
   name: TestMyIscsi
 spec:
-  castemplate: # if daemonset generation is to be done via castemplate
-    name: # optional; can be auto set from filtered castemplate
-    labelSelector: # optional;
-    revisionNumber: # hidden; auto set from filtered castemplate
   daemonset: # daemon set specifications
+    castemplate: # optional; if mentioned will populate the spec
+      name:
+      config:
     spec:
 status:
   phase:
