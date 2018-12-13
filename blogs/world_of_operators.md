@@ -39,7 +39,7 @@ spec:
       castemplate: # optional; if mentioned will populate the spec
         name:
         apiVersion:
-        config: # config to override castemplate default config
+        config: # config to override castemplate default config; existing helm values should fit in
       spec: # will get populated via [1] castemplate && config or [2] can be inline; [1] overrides [2]
   # apiServer is the specification of maya api server
   apiServer:
@@ -48,7 +48,7 @@ spec:
     castemplate: # optional; if mentioned will populate the spec
       name:
       apiVersion:
-      config: # config to override castemplate default config
+      config: # config to override castemplate default config; existing helm values should fit in
     spec: # will get populated via [1] castemplate && config or [2] can be inline; [1] overrides [2]
 ```
 
@@ -166,7 +166,7 @@ spec:
   daemonset: # daemon set specifications
     castemplate: # optional; if mentioned will populate the spec
       name:
-      config: # overrides default config present at cas template
+      config: # overrides default config present at cas template; existing helm values should fit in
     spec: # will get generated either via [1] above castemplate && config or [2] can be inline; [1] overrides [2]
 status:
   phase:
