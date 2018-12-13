@@ -58,14 +58,17 @@ kind: RunTask
 spec:
   run:
     - id: 101
+      name: # optional; set to id value if not set
       action: list
       kind: PodList
       labelSelector: app=jiva
     - id: 102
+      name: # optional; set to id value if not set
       action: create
       kind: Pod
       content: ${@.spec.template.pod}
     - id: 103
+      name: # optional; set to id value if not set
       action: create
       kind: Pod
       content: ${@.spec.let.myPod}
@@ -155,6 +158,7 @@ kind: RunTask
 spec:
   run:
   - id: 101
+    name: # optional; set to id value if not set
     action: list
     kind: PodList
     options:
@@ -168,6 +172,7 @@ kind: RunTask
 spec:
   run:
   - id: 101
+    name: # optional; set to id value if not set
     action: create
     kind: Pod
     options:
@@ -180,6 +185,7 @@ kind: RunTask
 spec:
   run:
   - id: 101
+    name: # optional; set to id value if not set
     action: create
     kind: Pod
     options:
@@ -200,6 +206,7 @@ spec:
   - k8s11: v1.11.0
   run:
   - id: 101
+    name: # optional; set to id value if not set
     action: create
     kind: Pod
     options:
@@ -217,7 +224,7 @@ spec:
 ```yaml
 kind: CASTemplate
 spec:
-  config:
+  defaultConfig:
   - values: 
     - name: poddy
       namespace: default
@@ -229,9 +236,10 @@ spec:
     metadata:
       name: $name
       namespace: $ns
-  run:
+  generate:
   - id: 101
-    action: output # action is set to output implicitly
+    name: # optional; set to id value if not set
+    action: output # hidden; action is set to output implicitly
     kind: Pod
     options:
     - func: template ${@.config.podTemplate} ${@.config.values}
@@ -265,6 +273,7 @@ spec:
   template:
   run:
     - id: 101
+      name: # optional; set to id value if not set
       action: list
       kind: PodList
       labelSelector: app=jiva,org=openebs
