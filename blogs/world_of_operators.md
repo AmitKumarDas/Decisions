@@ -39,7 +39,7 @@ spec:
       castemplate: # optional; if mentioned will populate the spec
         name:
         config: # config to override castemplate default config
-      spec: # will get populated via [1] castemplate && config or [2] can be inline
+      spec: # will get populated via [1] castemplate && config or [2] can be inline; [1] overrides [2]
   # apiServer is the specification of maya api server
   apiServer:
     # A value of false will un-install api server
@@ -47,7 +47,7 @@ spec:
     castemplate: # optional; if mentioned will populate the spec
       name:
       config: # config to override castemplate default config
-    spec: # will get populated via [1] castemplate && config or [2] can be inline
+    spec: # will get populated via [1] castemplate && config or [2] can be inline; [1] overrides [2]
 ```
 
 ### KubeNote Operator - A generic reconciler to spot kubernetes resource(s) & their state(s) - WIP
@@ -165,7 +165,7 @@ spec:
     castemplate: # optional; if mentioned will populate the spec
       name:
       config: # overrides default config present at cas template
-    spec: # will get generated either via [1] above castemplate && config or [2] can be inline
+    spec: # will get generated either via [1] above castemplate && config or [2] can be inline; [1] overrides [2]
 status:
   phase:
   conditions:
