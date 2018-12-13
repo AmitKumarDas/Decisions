@@ -36,31 +36,18 @@ spec:
       id: 231
     # local volume provisioner
     local:
-      # template corresponds to a subset of k8s Deployment spec applicable for local volume provisioner
-      template:
+      castemplate: # optional; if mentioned will populate the spec
+        name:
+        config: # config to override castemplate default config
+      spec: # will get populated via 1/ castemplate && config or 2/ via code
   # apiServer is the specification of maya api server
   apiServer:
     # A value of false will un-install api server
     enabled: true
-    casTemplate:
-      cstor:
-        snapshot:
-          create: default
-          delete: default
-          list: default
-        volume:
-          create: default
-          delete: default
-          list: default
-          read: default
-      jiva:
-        volume:
-          create: default
-          delete: default
-          list: default
-          read: default
-    # template corresponds to a subset of k8s Deployment spec applicable for maya api server
-    template:
+    castemplate: # optional; if mentioned will populate the spec
+      name:
+      config: # config to override castemplate default config
+    spec: # will get populated via 1/ castemplate & config or 2/ via code
 ```
 
 ### KubeNote Operator - A generic reconciler to spot kubernetes resource(s) & their state(s) - WIP
