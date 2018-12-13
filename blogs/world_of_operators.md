@@ -38,6 +38,7 @@ spec:
     local:
       castemplate: # optional; if mentioned will populate the spec
         name:
+        apiVersion:
         config: # config to override castemplate default config
       spec: # will get populated via [1] castemplate && config or [2] can be inline; [1] overrides [2]
   # apiServer is the specification of maya api server
@@ -46,6 +47,7 @@ spec:
     enabled: true
     castemplate: # optional; if mentioned will populate the spec
       name:
+      apiVersion:
       config: # config to override castemplate default config
     spec: # will get populated via [1] castemplate && config or [2] can be inline; [1] overrides [2]
 ```
