@@ -171,18 +171,15 @@ status:
 
 ```yaml
 kind: IscsiMonitor
+metadata:
+  name: TestMyIscsi
 spec:
-  nodeSelector: # filter nodes -- phase 1
-  - label:
-    name:
-  volumeSelector: # filter volumes -- phase 2
-  - label:
-    namespace:
-    name:
-  job: # daemon set specifications
-    image:
-    command:
-    args:
+  castemplate: # if daemonset generation is to be done via castemplate
+    name: # optional; can be auto set from filtered castemplate
+    labelSelector: # optional;
+    revisionNumber: # hidden; auto set from filtered castemplate
+  daemonset: # daemon set specifications
+    spec:
 status:
   phase:
   conditions:
