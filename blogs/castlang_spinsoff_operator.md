@@ -236,13 +236,14 @@ spec:
     metadata:
       name: $name
       namespace: $ns
-  generate:
+  templates:
   - id: 101
-    name: # optional; set to id value if not set
-    action: output # hidden; action is set to output implicitly
+    name: # optional; set to id value if not set; used for descriptive stuff
+    result: # hidden when viewed as yaml; set after executing this action
     kind: Pod
     options:
-    - func: template ${@.config.podTemplate} ${@.config.values}
+    - func: template ${@.config.podTemplate} ${@.config.values} # make use of .config & not .defaultConfig
+status: # perhaps hidden while viewing the yaml
 ```
 
 
