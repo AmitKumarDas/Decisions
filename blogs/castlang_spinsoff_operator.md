@@ -6,89 +6,6 @@ CASTemplate runner or via a new kubernetes controller. Care has been taken **NOT
 facing and hence is prone to breaking its users. This attempt to improvise CASTemplate code named **CASTLang** tries to make 
 RunTask as independent and devops friendly than its earlier version.
 
-#### Low Level Design - v1.0
-- The design boils down to:
-  - Variable Declaration, Definition, Transformation, Actions & AutoSave
-- `spec.let` & `spec.template` dictionaries will be stored at RunTask runner
-- `spec.let` lets us declare variables with corresponding values
-- `spec.template` lets us declare variables with corresponding values as go based templates
-- `run` executes the actions
-
-```yaml
-kind: RunTask
-spec:
-  let:
-  template:
-  run:
-output:
-status:
-```
-
-```yaml
-kind: RunTask
-spec:
-  let:
-  - myPod: |
-      kind: Pod
-      apiVersion: v1
-      metadata:
-        name: Hulla
-  - isSvc: "true"
-```
-
-```yaml
-kind: RunTask
-spec:
-  template:
-  - pod: |
-      {{- $name := .spec.let.name | default "cool" -}}
-      {{- $ns := .spec.let.namespace | default "default" -}}
-      kind: Pod
-      apiVersion: v1
-      metadata:
-        name: $name
-        namespace: $ns
-  - val: |
-      {{- $name := .spec.let.name | default "cool" -}}
-      {{ $name | suffix "-dude" }}
-```
-
-```yaml
-kind: RunTask
-spec:
-  run:
-    - id: 101
-      name: # optional; set to id value if not set
-      action: list
-      kind: PodList
-      labelSelector: app=jiva
-    - id: 102
-      name: # optional; set to id value if not set
-      action: create
-      kind: Pod
-      content: ${@.spec.template.pod}
-    - id: 103
-      name: # optional; set to id value if not set
-      action: create
-      kind: Pod
-      content: ${@.spec.let.myPod}
-```
-
-```go
-type RunTask struct {
-  ObjectMeta
-  Spec   RunTaskSpec `json:"spec"`
-  Status RunTaskStatus `json:"status"`
-  Output String `json:"output"` // template that is used to build the output of this task
-}
-
-type RunTaskSpec struct {
-  Let      map[string]string `json:"let"` // dict of variable with its direct value
-  Template map[string]string `json:"template"` // dict of variable with its templated value
-  Run      []Runnable        `json:"run"` // list of runnables that get executed
-}
-```
-
 #### Low Level Design - v2.0
 - The design boils down to:
   - Variable Declaration, Definition, Options, Predicates Actions & AutoSave
@@ -143,8 +60,8 @@ spec:
     - name: herdy
       namespace: openebs
   - podtpl: |
-    {{- $name := .values.name | default "cool" -}}
-    {{- $ns := .values.namespace | default "default" -}}
+    {{- $name := .config.values.name | default "cool" -}}
+    {{- $ns := .config.values.namespace | default "default" -}}
     kind: Pod
     apiVersion: v1
     metadata:
@@ -204,6 +121,7 @@ spec:
       effect: "NoSchedule"
   - ns: openebs
   - k8s11: v1.11.0
+  - spec: abc
   run:
   - id: 101
     name: # optional; set to id value if not set
@@ -211,7 +129,7 @@ spec:
     kind: Pod
     options:
     - func: spec ${@.config.spec}
-    - func: toleration ${@.config.tolerations}
+    - func: addTolerations ${@.config.tolerations}
       conditions:
       - isCAST
       - isNamespace ${@.config.ns}
@@ -229,8 +147,8 @@ spec:
     - name: poddy
       namespace: default
   - podTemplate: |
-    {{- $name := .values.name | default "cool" -}}
-    {{- $ns := .values.namespace | default "default" -}}
+    {{- $name := .config.values.name | default "cool" -}}
+    {{- $ns := .config.values.namespace | default "default" -}}
     kind: Pod
     apiVersion: v1
     metadata:
@@ -242,10 +160,10 @@ spec:
     result: # hidden when viewed as yaml; set after executing this action
     kind: Pod
     options:
-    - func: template ${@.config.podTemplate} ${@.config.values} # make use of .config & not .defaultConfig
-status: # perhaps hidden while viewing the yaml
+    # make use of .config & not .defaultConfig
+    - func: template ${@.config.podTemplate} ${@.config.values}
+status: # hidden while viewing the yaml; used in code
 ```
-
 
 ### SpinOffs - TestTask
 - One can extend RunTask to meet their specific requirement
