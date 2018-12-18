@@ -176,10 +176,10 @@ status: # hidden while viewing the yaml; used in code
   - NOTE: There is a separate proposal for [KubeTest](https://github.com/AmitKumarDas/Decisions/blob/master/blogs/openebs_operator_design.md)
 
 #### My Conviction on TestTask
-More than the technical aspects that I mentioned above, I view this as a compelling tool to radical customer-centrism. I
-view this tool to enables dev, test, users, doc authors and so on as a quick and easy handle to try, test, verify their
-expectations. For example, an user wants to verify if upgrade from version x to version y is successful and then test if
-provisioning works as expected in the new version. This user needs to articulate the `TestTask` to tell the truth.
+More than the technical aspects that I mentioned above, I view this as a compelling tool to radical customer-centrism. 
+This tool lets **dev, test, users, doc authors and so on** as a quick and easy approach to try, test, and verify their 
+expectations. For example, an user wants to verify if upgrade from version **X** to version **Y** is successful and then 
+test if provisioning works as expected in the new version. With _TestTask_, user needs to articulate the requirements as specs and on execution of TestTask verifies the truth of the same.
 
 ```yaml
 kind: TestTask
