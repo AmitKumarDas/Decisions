@@ -15,7 +15,7 @@ RunTask as independent and devops friendly than its earlier version.
 kind: RunTask
 spec:
   config:
-  run:
+  runs:
 status:
 ```
 
@@ -72,7 +72,7 @@ spec:
 ```yaml
 kind: RunTask
 spec:
-  run:
+  runs:
   - id: 101
     name: # optional; set to id value if not set
     action: list
@@ -86,7 +86,7 @@ spec:
 ```yaml
 kind: RunTask
 spec:
-  run:
+  runs:
   - id: 101
     name: # optional; set to id value if not set
     action: create
@@ -99,7 +99,7 @@ spec:
 ```yaml
 kind: RunTask
 spec:
-  run:
+  runs:
   - id: 101
     name: # optional; set to id value if not set
     action: create
@@ -121,7 +121,7 @@ spec:
   - ns: openebs
   - k8s11: v1.11.0
   - spec: abc
-  run:
+  runs:
   - id: 101
     name: # optional; set to id value if not set
     action: create
@@ -183,37 +183,39 @@ test if provisioning works as expected in the new version. With _TestTask_, user
 ```yaml
 kind: TestTask
 spec:
-  let:
-  template:
-  run:
-expect:
+  given:
+  when:
+  then:
 status:
 ```
 
 ```yaml
 kind: TestTask
 spec:
-  let:
-  template:
-  run:
+  given:
+  when:
     - id: 101
       name: # optional; set to id value if not set
       action: list
       kind: PodList
       labelSelector: app=jiva,org=openebs
-expect:
-  - pod: ${@.spec.run.101}
-    match: 
-      - status == Online
-      - kind == PodList
-      - namespace In default,openebs
-      - labels == app=jiva,org=openebs
+      expect:
+        match:
+        - status == Online
+        - kind == PodList
+        - namespace In default,openebs
+        - labels == app=jiva,org=openebs
+  then:
+    - id: 201
+      action: get
+      kind: Pod
+      name: cstor
+      expect:
+        retry:
+        match:
+        - status == Online
+        - kind == PodList
+        - namespace In default,openebs
+        - labels == app=jiva,org=openebs
 status:
-```
-
-```go
-type TestTask struct {
-  RunTask
-  Expect []TestExpect `json:"expect"` // matchers used when running this task to build testing logic
-}
 ```
