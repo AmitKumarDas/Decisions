@@ -16,7 +16,6 @@ kind: RunTask
 spec:
   config:
   run:
-output:
 status:
 ```
 
