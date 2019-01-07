@@ -9,7 +9,8 @@ metadata:
 # specification of OpenEBS Operator
 spec:
   # what version of openebs should be enabled/made available
-  # version controls install, upgrade & rollback as well
+  # version controls install, upgrade & rollback all components
+  # of openebs
   version: 0.8.0
 ```
 
@@ -39,6 +40,9 @@ spec:
       castemplate: # optional; if mentioned will populate the spec
         name:
         apiVersion:
+        # currently this is cluster scoped
+        # eventually, this should be namespaced
+        namespace:
         config: # config to override castemplate default config; existing helm values should fit in
       spec: # will get populated via [1] castemplate && config or [2] can be inline; [1] overrides [2]
   # apiServer is the specification of maya api server
@@ -48,6 +52,9 @@ spec:
     castemplate: # optional; if mentioned will populate the spec
       name:
       apiVersion:
+      # currently this is cluster scoped
+      # eventually, this should be namespaced
+      namespace:
       config: # config to override castemplate default config; existing helm values should fit in
     spec: # will get populated via [1] castemplate && config or [2] can be inline; [1] overrides [2]
 ```
