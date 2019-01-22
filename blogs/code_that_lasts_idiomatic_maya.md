@@ -380,6 +380,7 @@ func (l EntityList) FilterIfAny(pl ...Predicate) EntityList {}
 
 ```
 #### Code References
+- https://github.com/tmrts/go-patterns/blob/master/idiom/functional-options.md
 - https://github.com/openebs/maya/tree/master/pkg/msg/v1alpha1
 - https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/util/errors/errors.go
 - https://github.com/weaveworks/scope/blob/master/render/filters.go
