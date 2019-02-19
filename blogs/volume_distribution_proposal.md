@@ -128,7 +128,7 @@ func AntiAffinityLabel(lbl string) selectionBuildOption {
 
 func (s *selection) validate() error {
   if s.isAntiAffinityLabel() && s.isPreferAntiAffinityLabel() {
-    return errors.New("invalid selection policies: antiAffinity and preferAntiAffinity can not be together")
+    return errors.New("invalid selection: antiAffinity and preferAntiAffinity policies can not be together")
   }
   return nil
 }
