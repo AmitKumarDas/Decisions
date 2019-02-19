@@ -47,7 +47,7 @@ func (l *cspList) FilterNames(p ...predicate) []string {
   plist = append(plist, p...)
   for _, csp := range l {
     if plist.all(csp) {
-      filtered = append(filtered, csp)
+      filtered = append(filtered, csp.name)
     }
   }
   return filtered
