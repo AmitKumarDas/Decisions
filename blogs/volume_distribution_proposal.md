@@ -2,8 +2,8 @@
 ##### [cstor only] - find eligible node(s) to place the replica
   - `pkg/volume/cstorpool/v1alpha1/doc.go`
 ```go
-// This namespace caters to cstorpool related operations that are a part of
-// volume related provisioning.
+// This namespace caters to cstorpool related operations that
+// are a part of overall volume related provisioning.
 ```
 
   - `pkg/volume/cstorpool/v1alpha1/cstorpool.go`
@@ -13,52 +13,98 @@ import (
   cvr "github.com/openebs/maya/pkg/cstorvolumereplica/v1alpha1"
 )
 
-type policy int
+type policyName string
 
 const (
-  // PreferAntiAffinityLabelPolicy when specified will prefer distributing
-  // data across pools if possible; else will default to any pool
-  PreferAntiAffinityLabelPolicy policy = iota + 1
-
-  // AntiAffinityLabelPolicy when specified will distribute
-  // data across pools that are not associated with
-  // the label
-  AntiAffinityLabelPolicy
+  antiAffinityLabelPolicy policyName = "anti-affinity-label"
+  preferAntiAffinityLabelPolicy policyName = "prefer-anti-affinity-label"
 )
 
-type selection struct {
-  policies              []policy
-  antiAffinityLabel string
+type policy interface {
+  name() policyName
+  filter([]string) []string
 }
 
+type antiAffinityLabel struct {
+  labelSelector string
+}
+
+func (p antiAffinityLabel) name() policyName {
+  return antiAffinityLabelPolicy
+}
+
+func (p antiAffinityLabel) filter(pools []string) []string {
+  if p.labelSelector == "" {
+    return pools
+  }
+  plist := csp.ListBuilder().WithNames(pools).List()
+  exclude := cvr.ListBuilder().WithLabel(p.labelSelector).List().GetPoolNames()
+  return plist.Filter(csp.IsNotName(exclude...))
+}
+
+type preferAntiAffinityLabel struct {
+  antiAffinityLabel
+}
+
+func (p preferAntiAffinityLabel) name() policyName {
+  return preferAntiAffinityLabelPolicy
+}
+
+func (p preferAntiAffinityLabel) filter(pools []string) []string {
+  plist := p.antiAffinityLabel.Filter(pools)
+  if len(plist) > 0 {
+    return plist
+  }
+  return pools
+}
+
+type selection struct {
+  // list of original pools aginst whom 
+  // selection will be made
+  pools                []string
+
+  // selection is based on these policies
+  policies             []policy
+}
+
+// selectionBuildOption is a typed function that
+// abstracts configuring a selection instance
 type selectionBuildOption func(*selection)
 
-func newSelection(opts ...selectionBuildOption) *selection {
-  s := &selection{}
+func newSelection(pools []string, opts ...selectionBuildOption) *selection {
+  s := &selection{pools: pools}
   for _, o := opts {
     o(s)
   }
   return s
 }
 
-func (s *selection) isPolicy(p policy) bool {
+// isPolicy determines if the provided policy 
+// needs to be considered during selection
+func (s *selection) isPolicy(p policyName) bool {
   if len(s.policies) == 0 {
     return false
   }
   for _, pol := range s.policies {
-    if pol == p {
+    if pol.name() == p {
       return true
     }
   }
   return false
 }
 
+// isPreferAntiAffinityLabel determines if
+// prefer anti affinity label needs to be
+// considered during selection
 func (s *selection) isPreferAntiAffinityLabel() bool {
-  return s.isPolicy(PreferAntiAffinityLabelPolicy)
+  return s.isPolicy(preferAntiAffinityLabelPolicy)
 }
 
+// isAntiAffinityLabel determines if anti affinity
+// label needs to be considered during
+// selection
 func (s *selection) isAntiAffinityLabel() bool {
-  return s.isPolicy(AntiAffinityLabelPolicy)
+  return s.isPolicy(antiAffinityLabelPolicy)
 }
 
 // PreferAntiAffinityLabel adds anti affinity label
@@ -66,8 +112,8 @@ func (s *selection) isAntiAffinityLabel() bool {
 // selection
 func PreferAntiAffinityLabel(lbl string) selectionBuildOption {
   return func(s *selection) {
-    s.antiAffinityLabel = lbl
-    s.policies = append(s.policies, PreferAntiAffinityLabelPolicy)
+    p := preferAntiAffinityLabel{labelSelector: lbl}
+    s.policies = append(s.policies, p)
   }
 }
 
@@ -75,44 +121,48 @@ func PreferAntiAffinityLabel(lbl string) selectionBuildOption {
 // to be used during pool selection
 func AntiAffinityLabel(lbl string) selectionBuildOption {
   return func(s *selection) {
-    s.antiAffinityLabel = lbl
-    s.policies = append(s.policies, AntiAffinityLabelPolicy)
+    a := antiAffinityLabel{labelSelector: lbl}
+    s.policies = append(s.policies, a)
   }
 }
 
-// Filter will filter the given pools based on the selection
-// options
+func (s *selection) validate() error {
+  if s.isAntiAffinityLabel() && s.isPreferAntiAffinityLabel() {
+    return errors.New("invalid selection policies: antiAffinity and preferAntiAffinity can not be together")
+  }
+  return nil
+}
+
+func (s *selection) filter() []string {
+  var filtered []string
+  if len(s.policies) == 0 {
+    return s.pools
+  }
+  filtered = append(filtered, s.pools...)
+  for _, policy := range s.policies {
+    filtered = policy.filter(filtered)
+  }
+}
+
+// Filter will filter the given pools based on the 
+// selection options
 func Filter(origPools []string, opts ...selectionBuildOption) []string {
-  var pools []string
   if len(opts) == 0 {
     return origPools
   }
-  s := newSelection(opts...)
-  if s.isAntiAffinityLabel() || s.isPreferAntiAffinityLabel() {
-    pools := ExcludePoolWithLabel(origPools, s.antiAffinityLabel)
+  s := newSelection(origPools, opts...)
+  err := s.validate()
+  if err != nil {
+    // log the error here
+    return nil
   }
-  if len(pools) > 0 {
-    return pools
-  }
-  if s.isPreferAntiAffinityLabel() {
-    return origPools
-  }
-  return pools
-}
-
-func ExcludePoolWithLabel(origPools []string, lblSelector string) []string {
-  if lblSelector == "" {
-    return origPools
-  }
-  pools := csp.ListBuilder().WithNames(origPools).List()
-  exclude := cvr.ListBuilder().WithLabel(lblSelector).List().GetPoolNames()
-  return pools.Filter(csp.IsNotName(exclude...))
+  return s.filter()
 }
 
 // expose below go functions as go template functions
-// Filter                             as cspFilter
+// Filter                      as cspFilter
 // AntiAffinityLabel           as cspAntiAffinity
-// PreferAntiAffinityLabel as cspPreferAntiAffinity
+// PreferAntiAffinityLabel     as cspPreferAntiAffinity
 ```
   - `pkg/cstorpool/v1alpha1`
     - define structs & predicates & other functions
