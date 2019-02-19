@@ -76,11 +76,8 @@ func (b *listBuilder) List() *cspList {
 
   - `pkg/cstorvolumereplica/v1alpha1`
 ```go
-// TODO
-// exclude := cvr.ListBuilder().WithLabelOption(l.labelSelector).List().GetPoolNames()
-
 type cvr struct {
-  // name of the cvr
+  // name of cstor volume replica
   name string
 }
 
