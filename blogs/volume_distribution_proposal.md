@@ -1,5 +1,84 @@
 #### Low Level Implementation
 ##### [cstor only] - find eligible node(s) to place the replica
+  - `pkg/cstorpool/v1alpha1`
+```go
+type csp struct {
+  // name of cstor pool
+  name string
+}
+
+type predicate func(*csp) bool
+
+type predicateList []predicate
+
+func (l predicateList) all(c *csp) bool {
+  for _, pred := range l {
+    if !pred(c) {
+      return false
+    }
+  }
+  return true
+}
+
+// IsNotName returns false if csp 
+// does not belong to any of the provided
+// names
+func IsNotName(names ...string) predicate {
+  return func(c *csp) bool {
+    for _, name := range names {
+      if name == c.name {
+        return false
+      }
+    }
+    return true
+  }
+}
+
+type cspList struct {
+  // list of cstor pools
+  items   []*csp
+}
+
+func (l *cspList) FilterNames(p ...predicate) []string {
+  var (
+    filtered []string
+    plist    predicateList
+  )
+  plist = append(plist, p...)
+  for _, csp := range l {
+    if plist.all(csp) {
+      filtered = append(filtered, csp)
+    }
+  }
+  return filtered
+}
+
+type listBuilder struct {
+  list cspList
+}
+
+func ListBuilder() *listBuilder {
+  return &listBuilder{list: &cspList{}}
+}
+
+func (b *listBuilder) WithNames(pools ...string) *listBuilder {
+  for _, pool := range pools {
+    item := &csp{name: pool}
+    b.list.items = append(b.list.items, item)
+  }
+  return b
+}
+
+func (b *listBuilder) List() *cspList {
+  return b.list
+}
+```
+
+  - `pkg/cstorvolumereplica/v1alpha1`
+```go
+// TODO
+```
+
   - `pkg/volume/cstorpool/v1alpha1/doc.go`
 ```go
 // This namespace caters to cstorpool related operations that
@@ -33,13 +112,13 @@ func (p antiAffinityLabel) name() policyName {
   return antiAffinityLabelPolicy
 }
 
-func (p antiAffinityLabel) filter(pools []string) []string {
-  if p.labelSelector == "" {
+func (l antiAffinityLabel) filter(pools []string) []string {
+  if l.labelSelector == "" {
     return pools
   }
+  exclude := cvr.ListBuilder().WithLabel(l.labelSelector).List().GetPoolNames()
   plist := csp.ListBuilder().WithNames(pools).List()
-  exclude := cvr.ListBuilder().WithLabel(p.labelSelector).List().GetPoolNames()
-  return plist.Filter(csp.IsNotName(exclude...))
+  return plist.FilterNames(csp.IsNotName(exclude...))
 }
 
 type preferAntiAffinityLabel struct {
@@ -164,10 +243,6 @@ func Filter(origPools []string, opts ...selectionBuildOption) []string {
 // AntiAffinityLabel           as cspAntiAffinity
 // PreferAntiAffinityLabel     as cspPreferAntiAffinity
 ```
-  - `pkg/cstorpool/v1alpha1`
-    - define structs & predicates & other functions
-  - `pkg/cstorvolumereplica/v1alpha1`
-    - define structs & predicates & other functions
   - template will look something similar to below:
 ```yaml
 - {{- $poolUids := keys .ListItems.cvolPoolList.pools }}
