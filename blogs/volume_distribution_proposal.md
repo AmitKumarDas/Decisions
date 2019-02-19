@@ -203,9 +203,6 @@ func newSelection(pools []string, opts ...selectionBuildOption) *selection {
 // isPolicy determines if the provided policy 
 // needs to be considered during selection
 func (s *selection) isPolicy(p policyName) bool {
-  if len(s.policies) == 0 {
-    return false
-  }
   for _, pol := range s.policies {
     if pol.name() == p {
       return true
