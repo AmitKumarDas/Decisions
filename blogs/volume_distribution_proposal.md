@@ -54,7 +54,7 @@ func (l *cspList) FilterNames(p ...predicate) []string {
 }
 
 type listBuilder struct {
-  list cspList
+  list *cspList
 }
 
 func ListBuilder() *listBuilder {
@@ -77,6 +77,51 @@ func (b *listBuilder) List() *cspList {
   - `pkg/cstorvolumereplica/v1alpha1`
 ```go
 // TODO
+// exclude := cvr.ListBuilder().WithLabelOption(l.labelSelector).List().GetPoolNames()
+
+type cvr struct {
+  // name of the cvr
+  name string
+}
+
+type cvrList struct {
+  // option to use to filter
+  // during list execution
+  labelOption  string
+
+  // list of cstor volume replicas
+  items []cvr
+}
+
+func (l *cvrList) GetPoolNames() []string {
+  var names []string
+  for _, cvr := range l.items {
+    names = append(names, cvr.name)
+  }
+  return names
+}
+
+type listBuilder struct {
+  list *cvrList
+}
+
+func ListBuilder() *listBuilder {
+  return &listBuilder{list: &cvrList{}}
+}
+
+func (b *listBuilder) WithLabelOption(label string) *listBuilder {
+  b.list.labelOption = label
+  return b
+}
+
+func (b *listBuilder) List() *cvrList{
+  if len(b.list.items) != 0 {
+    return b.list
+  }
+  // TODO
+  // make a list API call using label as one
+  // of the list options
+}
 ```
 
   - `pkg/volume/cstorpool/v1alpha1/doc.go`
@@ -116,7 +161,7 @@ func (l antiAffinityLabel) filter(pools []string) []string {
   if l.labelSelector == "" {
     return pools
   }
-  exclude := cvr.ListBuilder().WithLabel(l.labelSelector).List().GetPoolNames()
+  exclude := cvr.ListBuilder().WithLabelOption(l.labelSelector).List().GetPoolNames()
   plist := csp.ListBuilder().WithNames(pools).List()
   return plist.FilterNames(csp.IsNotName(exclude...))
 }
