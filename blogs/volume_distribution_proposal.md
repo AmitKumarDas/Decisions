@@ -1,11 +1,15 @@
 #### Updates
-- Version: 8
+- Version: 9
 - LastUpdatedOn: 21-Feb-2019
 
 #### Low Level Implementation
-##### [cstor only] - find eligible node(s) to place the replica
-  - `pkg/cstorpool/v1alpha1`
+##### [cstor only] - find eligible node(s) to place the replica	
+  - `pkg/cstorpool/v1alpha1/cstorpool.go`
 ```go
+import (
+  apis "github.com/openebs/maya/pkg/apis/openebs.io/v1alpha1"
+)
+
 type csp struct {
   // actual cstor pool object
   object *apis.CstorPool
@@ -30,13 +34,13 @@ func (l predicateList) all(c *csp) bool {
   return true
 }
 
-// IsNotName returns true if provided csp 
-// instance name does not match with any
-// of the provided names
-func IsNotName(names ...string) predicate {
+// IsNotUID returns true if provided csp 
+// instance's UID does not match with any
+// of the provided UIDs
+func IsNotUID(uids ...string) predicate {
   return func(c *csp) bool {
-    for _, name := range names {
-      if name == c.object.Name {
+    for _, uid := range uids {
+      if uid == c.object.UID {
         return false
       }
     }
@@ -49,11 +53,11 @@ type cspList struct {
   items   []*csp
 }
 
-// FilterNames will filter the csp instances 
+// FilterUIDs will filter the csp instances 
 // if all the predicates succeed against that
-// csp. The filtered csp instances' names will
+// csp. The filtered csp instances' UIDs will
 // be returned
-func (l *cspList) FilterNames(p ...predicate) []string {
+func (l *cspList) FilterUIDs(p ...predicate) []string {
   var (
     filtered []string
     plist    predicateList
@@ -61,7 +65,7 @@ func (l *cspList) FilterNames(p ...predicate) []string {
   plist = append(plist, p...)
   for _, csp := range l {
     if plist.all(csp) {
-      filtered = append(filtered, csp.object.Name)
+      filtered = append(filtered, csp.object.UID)
     }
   }
   return filtered
@@ -79,11 +83,11 @@ func ListBuilder() *listBuilder {
   return &listBuilder{list: &cspList{}}
 }
 
-// WithNames builds a list of cstor pools
-// based on the provided pool names
-func (b *listBuilder) WithNames(poolNames ...string) *listBuilder {
-  for _, name := range poolNames {
-    item := &csp{object: &apis.CstorPool{Name: name}}
+// WithUIDs builds a list of cstor pools
+// based on the provided pool UIDs
+func (b *listBuilder) WithUIDs(poolUIDs ...string) *listBuilder {
+  for _, uid := range poolUIDs {
+    item := &csp{object: &apis.CstorPool{UID: uid}}
     b.list.items = append(b.list.items, item)
   }
   return b
@@ -197,6 +201,10 @@ func (k *kubeclient) List(namespace string, opts metav1.ListOptions) (*apis.CSto
 
   - `pkg/cstorvolumereplica/v1alpha1/cstorvolumereplica.go`
 ```go
+const (
+  cstorPoolUIDLabelKey string = "cstorpool.openebs.io/uid"
+)
+
 type cvr struct {
   // actual cstor volume replica
   // object
@@ -208,14 +216,16 @@ type cvrList struct {
   items []cvr
 }
 
-// GetPoolNames returns the current
-// list of pool names
-func (l *cvrList) GetPoolNames() []string {
-  var names []string
+// GetPoolUIDs returns a list of cstor pool
+// UIDs corresponding to cstor volume replica
+// instances
+func (l *cvrList) GetPoolUIDs() []string {
+  var uids []string
   for _, cvr := range l.items {
-    names = append(names, cvr.object.Name)
+    uid := cvr.Labels[cstorPoolUIDLabelKey]
+    uids = append(uids, uid)
   }
-  return names
+  return uids
 }
 
 // listBuilder enables building
@@ -253,7 +263,7 @@ func (b *listBuilder) List() *cvrList{
 
   - `pkg/algorithm/cstorpoolselect/v1alpha1/doc.go`
 ```go
-// This namespace caters to cstorpool's selection
+// This package caters to cstorpool's selection
 // related operations
 ```
 
@@ -306,19 +316,23 @@ func (p antiAffinityLabel) name() policyName {
 // selector. In other words, it applies anti
 // affinity rule against the provided list of
 // pools.
-func (l antiAffinityLabel) filter(poolNames []string) ([]string, error) {
+func (l antiAffinityLabel) filter(poolUIDs []string) ([]string, error) {
   if l.labelSelector == "" {
-    return poolNames, nil
+    return poolUIDs, nil
   }
   // pools that are already associated with 
   // this label should be excluded
+  //
+  // NOTE: we try without giving any namespace
+  // so that it lists from all available 
+  // namespaces
   cvrs, err := cvr.KubeClient().List("", l.labelSelector)
   if err != nil {
     return nil, err
   }
   exclude := cvr.ListBuilder().WithListObject(cvrs).List().GetPoolNames()
-  plist := csp.ListBuilder().WithNames(poolNames).List()
-  return plist.FilterNames(csp.IsNotName(exclude...)), nil
+  plist := csp.ListBuilder().WithUIDs(poolUIDs).List()
+  return plist.FilterUIDs(csp.IsNotName(exclude...)), nil
 }
 
 // preferAntiAffinityLabel is a pool
@@ -336,15 +350,15 @@ func (p preferAntiAffinityLabel) name() policyName {
 // with the difference being; this logic returns all
 // the provided pools if there are no pools that 
 // satisfy antiAffinity rule
-func (p preferAntiAffinityLabel) filter(poolNames []string) ([]string, error) {
-  plist, err := p.antiAffinityLabel.filter(poolNames)
+func (p preferAntiAffinityLabel) filter(poolUIDs []string) ([]string, error) {
+  plist, err := p.antiAffinityLabel.filter(poolUIDs)
   if err != nil {
     return nil, err
   }
   if len(plist) > 0 {
     return plist, nil
   }
-  return pools, nil
+  return poolUIDs, nil
 }
 
 // selection enables selecting required pools
@@ -360,7 +374,7 @@ func (p preferAntiAffinityLabel) filter(poolNames []string) ([]string, error) {
 type selection struct {
   // list of original pools aginst whom 
   // selection will be made
-  pools                []string
+  poolUIDs             []string
 
   // selection is based on these policies
   policies             []policy
@@ -372,8 +386,8 @@ type buildOption func(*selection)
 
 // newSelection returns a new instance of
 // selection
-func newSelection(pools []string, opts ...buildOption) *selection {
-  s := &selection{pools: pools}
+func newSelection(poolUIDs []string, opts ...buildOption) *selection {
+  s := &selection{poolUIDs: poolUIDs}
   for _, o := opts {
     o(s)
   }
@@ -442,10 +456,10 @@ func (s *selection) filter() ([]string, error) {
     err error
   )
   if len(s.policies) == 0 {
-    return s.pools, nil
+    return s.poolUIDs, nil
   }
-  // make a copy of original pools
-  filtered = append(filtered, s.pools...)
+  // make a copy of original pool UIDs
+  filtered = append(filtered, s.poolUIDs...)
   for _, policy := range s.policies {
     filtered, err = policy.filter(filtered)
     if err != nil {
@@ -455,14 +469,14 @@ func (s *selection) filter() ([]string, error) {
   return filtered, nil
 }
 
-// Filter will return filtered pool names
+// Filter will return filtered pool UIDs
 // from the provided list based on pool 
 // selection options
-func Filter(origPools []string, opts ...buildOption) ([]string, error) {
+func Filter(origPoolUIDs []string, opts ...buildOption) ([]string, error) {
   if len(opts) == 0 {
-    return origPools, nil
+    return origPoolUIDs, nil
   }
-  s := newSelection(origPools, opts...)
+  s := newSelection(origPoolUIDs, opts...)
   err := s.validate()
   if err != nil {
     return nil, err
