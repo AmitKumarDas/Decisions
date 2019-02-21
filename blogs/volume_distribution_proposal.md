@@ -330,9 +330,9 @@ func (l antiAffinityLabel) filter(poolUIDs []string) ([]string, error) {
   if err != nil {
     return nil, err
   }
-  exclude := cvr.ListBuilder().WithListObject(cvrs).List().GetPoolNames()
+  exclude := cvr.ListBuilder().WithListObject(cvrs).List().GetPoolUIDs()
   plist := csp.ListBuilder().WithUIDs(poolUIDs).List()
-  return plist.FilterUIDs(csp.IsNotName(exclude...)), nil
+  return plist.FilterUIDs(csp.IsNotUID(exclude...)), nil
 }
 
 // preferAntiAffinityLabel is a pool
