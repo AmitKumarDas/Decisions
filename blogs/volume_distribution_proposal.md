@@ -201,6 +201,10 @@ func (k *kubeclient) List(namespace string, opts metav1.ListOptions) (*apis.CSto
 
   - `pkg/cstorvolumereplica/v1alpha1/cstorvolumereplica.go`
 ```go
+import (
+  apis "github.com/openebs/maya/pkg/apis/openebs.io/v1alpha1"
+)
+
 const (
   cstorPoolUIDLabelKey string = "cstorpool.openebs.io/uid"
 )
