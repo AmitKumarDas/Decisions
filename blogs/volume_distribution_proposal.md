@@ -1,20 +1,26 @@
 #### Updates
-- Version: 5
-- LastUpdatedOn: 20-Feb-2019
+- Version: 6
+- LastUpdatedOn: 21-Feb-2019
 
 #### Low Level Implementation
 ##### [cstor only] - find eligible node(s) to place the replica
   - `pkg/cstorpool/v1alpha1`
 ```go
 type csp struct {
-  // name of cstor pool
-  name string
+  // actual cstor pool object
+  object *apis.CstorPool
 }
 
+// predicate defines an abstraction 
+// to determine conditional checks
+// against the provided csp instance
 type predicate func(*csp) bool
 
 type predicateList []predicate
 
+// all returns true if all the predicates
+// succeed against the provided csp
+// instance
 func (l predicateList) all(c *csp) bool {
   for _, pred := range l {
     if !pred(c) {
@@ -24,13 +30,13 @@ func (l predicateList) all(c *csp) bool {
   return true
 }
 
-// IsNotName returns false if csp 
-// does not belong to any of the provided
-// names
+// IsNotName returns true if provided csp 
+// instance name does not match with any
+// of the provided names
 func IsNotName(names ...string) predicate {
   return func(c *csp) bool {
     for _, name := range names {
-      if name == c.name {
+      if name == c.object.Name {
         return false
       }
     }
@@ -43,6 +49,10 @@ type cspList struct {
   items   []*csp
 }
 
+// FilterNames will filter the csp instances 
+// if all the predicates succeed against that
+// csp. The filtered csp instances' names will
+// be returned
 func (l *cspList) FilterNames(p ...predicate) []string {
   var (
     filtered []string
@@ -51,28 +61,37 @@ func (l *cspList) FilterNames(p ...predicate) []string {
   plist = append(plist, p...)
   for _, csp := range l {
     if plist.all(csp) {
-      filtered = append(filtered, csp.name)
+      filtered = append(filtered, csp.object.Name)
     }
   }
   return filtered
 }
 
+// listBuilder enables building a
+// list of csp instances
 type listBuilder struct {
   list *cspList
 }
 
+// ListBuilder returns a new instance of
+// listBuilder object
 func ListBuilder() *listBuilder {
   return &listBuilder{list: &cspList{}}
 }
 
-func (b *listBuilder) WithNames(pools ...string) *listBuilder {
-  for _, pool := range pools {
-    item := &csp{name: pool}
+// WithNames builds a list of cstor pools
+// based on the provided pool names
+func (b *listBuilder) WithNames(poolNames ...string) *listBuilder {
+  for _, name := range poolNames {
+    item := &csp{object: &apis.CstorPool{Name: name}}
     b.list.items = append(b.list.items, item)
   }
   return b
 }
 
+// List returns the list of csp
+// instances that were built by 
+// this builder
 func (b *listBuilder) List() *cspList {
   return b.list
 }
@@ -81,100 +100,140 @@ func (b *listBuilder) List() *cspList {
   - `pkg/cstorvolumereplica/v1alpha1`
 ```go
 type cvr struct {
-  // name of cstor volume replica
-  name string
+  // actual cstor volume replica
+  // object
+  object *apis.CstorVolumeReplica
 }
 
 type cvrList struct {
-  // option to use to filter
-  // during list execution
-  labelOption  string
-
   // list of cstor volume replicas
   items []cvr
 }
 
+// GetPoolNames returns the current
+// list of pool names
 func (l *cvrList) GetPoolNames() []string {
   var names []string
   for _, cvr := range l.items {
-    names = append(names, cvr.name)
+    names = append(names, cvr.object.Name)
   }
   return names
 }
 
+// listBuilder enables building
+// an instance of cvrList
 type listBuilder struct {
   list *cvrList
 }
 
+// ListBuilder returns a new instance
+// of listBuilder
 func ListBuilder() *listBuilder {
   return &listBuilder{list: &cvrList{}}
 }
 
-func (b *listBuilder) WithLabelOption(label string) *listBuilder {
-  b.list.labelOption = label
+// WithListObject builds the list of cvr
+// instances based on the provided
+// cvr api instances
+func (b *listBuilder) WithListObject(list *apis.CstorVolumeReplicaList) *listBuilder {
+  if list == nil {
+    return b
+  }
+  for _, cvr := range list.Items {
+    b.list.items = append(b.list.items, cvr{object: &cvr})
+  }
   return b
 }
 
+// List returns the list of cvr
+// instances that was built by this
+// builder
 func (b *listBuilder) List() *cvrList{
-  if len(b.list.items) != 0 {
-    return b.list
-  }
-  // TODO
-  // make a list API call using label as one
-  // of the list options
+  return b.list
 }
 ```
 
-  - `pkg/volume/cstorpool/v1alpha1/doc.go`
+  - `pkg/algorithm/cstorpoolselect/v1alpha1/doc.go`
 ```go
-// This namespace caters to cstorpool related operations that
-// are a part of overall volume related provisioning.
+// This namespace caters to cstorpool's selection
+// related operations
 ```
 
-  - `pkg/volume/poolselection/v1alpha1/poolselection.go`
+  - `pkg/algorithm/cstorpoolselect/v1alpha1/select.go`
 ```go
 import (
   csp "github.com/openebs/maya/pkg/cstorpool/v1alpha1"
   cvr "github.com/openebs/maya/pkg/cstorvolumereplica/v1alpha1"
 )
 
+// policyName is a type that caters to 
+// naming of various pool selection 
+// policies
 type policyName string
 
 const (
+  // antiAffinityLabelPolicy is the name of the 
+  // policy that applies anti-affinity rule based on
+  // label
   antiAffinityLabelPolicy policyName = "anti-affinity-label"
+  
+  // preferAntiAffinityLabelPolicy is the name of 
+  // the policy that does a best effort while appling
+  // anti-affinity rule based on label
   preferAntiAffinityLabelPolicy policyName = "prefer-anti-affinity-label"
 )
 
+// policy exposes the contracts that need
+// to be satisfied by any pool selection
+// implementation
 type policy interface {
   name() policyName
   filter([]string) []string
 }
 
+// antiAffinityLabel is a pool selection
+// policy implementation
 type antiAffinityLabel struct {
   labelSelector string
 }
 
+// name returns the name of this
+// policy
 func (p antiAffinityLabel) name() policyName {
   return antiAffinityLabelPolicy
 }
 
-func (l antiAffinityLabel) filter(pools []string) []string {
+// filter excludes the pool(s) if they are
+// already associated with the label 
+// selector. In other words, it applies anti
+// affinity rule against the provided list of
+// pools.
+func (l antiAffinityLabel) filter(poolNames []string) []string {
   if l.labelSelector == "" {
-    return pools
+    return poolNames
   }
+  // pools that are already associated with 
+  // this label should be excluded
   exclude := cvr.ListBuilder().WithLabelOption(l.labelSelector).List().GetPoolNames()
-  plist := csp.ListBuilder().WithNames(pools).List()
+  plist := csp.ListBuilder().WithNames(poolNames).List()
   return plist.FilterNames(csp.IsNotName(exclude...))
 }
 
+// preferAntiAffinityLabel is a pool
+// selection policy implementation
 type preferAntiAffinityLabel struct {
   antiAffinityLabel
 }
 
+// name returns the name of this policy
 func (p preferAntiAffinityLabel) name() policyName {
   return preferAntiAffinityLabelPolicy
 }
 
+// filter piggybacks on antiAffinityLabel policy
+// with the difference being, this returns all
+// the provided pools if there are no pools that 
+// satisfy antiAffinity rule
 func (p preferAntiAffinityLabel) filter(pools []string) []string {
   plist := p.antiAffinityLabel.Filter(pools)
   if len(plist) > 0 {
@@ -183,6 +242,16 @@ func (p preferAntiAffinityLabel) filter(pools []string) []string {
   return pools
 }
 
+// selection enables selecting required pools
+// based on the registered policies
+//
+// NOTE:
+//  There can be cases where multiple policies
+// can be set to determine the required pools
+//
+// NOTE:
+//  This code will evolve as we try implementing
+// different set of policies
 type selection struct {
   // list of original pools aginst whom 
   // selection will be made
