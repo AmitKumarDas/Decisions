@@ -1,5 +1,5 @@
 #### Updates
-- Version: 6
+- Version: 7
 - LastUpdatedOn: 21-Feb-2019
 
 #### Low Level Implementation
@@ -172,15 +172,15 @@ import (
 type policyName string
 
 const (
-  // antiAffinityLabelPolicy is the name of the 
+  // antiAffinityLabelPolicyName is the name of the 
   // policy that applies anti-affinity rule based on
   // label
-  antiAffinityLabelPolicy policyName = "anti-affinity-label"
+  antiAffinityLabelPolicyName policyName = "anti-affinity-label"
   
-  // preferAntiAffinityLabelPolicy is the name of 
+  // preferAntiAffinityLabelPolicyName is the name of 
   // the policy that does a best effort while appling
   // anti-affinity rule based on label
-  preferAntiAffinityLabelPolicy policyName = "prefer-anti-affinity-label"
+  preferAntiAffinityLabelPolicyName policyName = "prefer-anti-affinity-label"
 )
 
 // policy exposes the contracts that need
@@ -200,7 +200,7 @@ type antiAffinityLabel struct {
 // name returns the name of this
 // policy
 func (p antiAffinityLabel) name() policyName {
-  return antiAffinityLabelPolicy
+  return antiAffinityLabelPolicyName
 }
 
 // filter excludes the pool(s) if they are
@@ -227,11 +227,11 @@ type preferAntiAffinityLabel struct {
 
 // name returns the name of this policy
 func (p preferAntiAffinityLabel) name() policyName {
-  return preferAntiAffinityLabelPolicy
+  return preferAntiAffinityLabelPolicyName
 }
 
 // filter piggybacks on antiAffinityLabel policy
-// with the difference being, this returns all
+// with the difference being; this logic returns all
 // the provided pools if there are no pools that 
 // satisfy antiAffinity rule
 func (p preferAntiAffinityLabel) filter(pools []string) []string {
@@ -261,11 +261,13 @@ type selection struct {
   policies             []policy
 }
 
-// selectionBuildOption is a typed function that
+// buildOption is a typed function that
 // abstracts configuring a selection instance
-type selectionBuildOption func(*selection)
+type buildOption func(*selection)
 
-func newSelection(pools []string, opts ...selectionBuildOption) *selection {
+// newSelection returns a new instance of
+// selection
+func newSelection(pools []string, opts ...buildOption) *selection {
   s := &selection{pools: pools}
   for _, o := opts {
     o(s)
@@ -288,66 +290,73 @@ func (s *selection) isPolicy(p policyName) bool {
 // prefer anti affinity label needs to be
 // considered during selection
 func (s *selection) isPreferAntiAffinityLabel() bool {
-  return s.isPolicy(preferAntiAffinityLabelPolicy)
+  return s.isPolicy(preferAntiAffinityLabelPolicyName)
 }
 
 // isAntiAffinityLabel determines if anti affinity
 // label needs to be considered during
 // selection
 func (s *selection) isAntiAffinityLabel() bool {
-  return s.isPolicy(antiAffinityLabelPolicy)
+  return s.isPolicy(antiAffinityLabelPolicyName)
 }
 
 // PreferAntiAffinityLabel adds anti affinity label
 // as a preferred policy to be used during pool 
 // selection
-func PreferAntiAffinityLabel(lbl string) selectionBuildOption {
+func PreferAntiAffinityLabel(lbl string) buildOption {
   return func(s *selection) {
     p := preferAntiAffinityLabel{labelSelector: lbl}
     s.policies = append(s.policies, p)
   }
 }
 
-// AntiAffinityLabel adds anti affinity as a policy
-// to be used during pool selection
-func AntiAffinityLabel(lbl string) selectionBuildOption {
+// AntiAffinityLabel adds anti affinity label
+// as a policy to be used during pool selection
+func AntiAffinityLabel(lbl string) buildOption {
   return func(s *selection) {
     a := antiAffinityLabel{labelSelector: lbl}
     s.policies = append(s.policies, a)
   }
 }
 
+// validate runs some validations/checks
+// against this selection instance
 func (s *selection) validate() error {
   if s.isAntiAffinityLabel() && s.isPreferAntiAffinityLabel() {
-    return errors.New("invalid selection: antiAffinity and preferAntiAffinity policies can not be together")
+    return errors.New("invalid selection: both antiAffinity and preferAntiAffinity policies can not be together")
   }
   return nil
 }
 
+// filter returns the final list of pools that
+// gets selected, after passing the original list
+// of pools through the registered selection policies
 func (s *selection) filter() []string {
   var filtered []string
   if len(s.policies) == 0 {
     return s.pools
   }
+  // make a copy of original pools
   filtered = append(filtered, s.pools...)
   for _, policy := range s.policies {
     filtered = policy.filter(filtered)
   }
+  return filtered
 }
 
-// Filter will filter the given pools based on the 
+// Filter will return filtered pool names
+// from the provided list based on pool 
 // selection options
-func Filter(origPools []string, opts ...selectionBuildOption) []string {
+func Filter(origPools []string, opts ...buildOption) ([]string, error) {
   if len(opts) == 0 {
-    return origPools
+    return origPools, nil
   }
   s := newSelection(origPools, opts...)
   err := s.validate()
   if err != nil {
-    // log the error here
-    return nil
+    return nil, err
   }
-  return s.filter()
+  return s.filter(), nil
 }
 
 // expose below go functions as go template functions
