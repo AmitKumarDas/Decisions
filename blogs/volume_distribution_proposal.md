@@ -1,6 +1,6 @@
 #### Updates
 - Version: 11
-- LastUpdatedOn: 21-Feb-2019
+- LastUpdatedOn: 22-Feb-2019
 
 #### Low Level Implementation
 ##### [cstor only] - find eligible node(s) to place the replica	
