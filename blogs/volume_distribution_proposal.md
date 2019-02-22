@@ -251,8 +251,8 @@ func (b *listBuilder) WithListObject(list *apis.CstorVolumeReplicaList) *listBui
   if list == nil {
     return b
   }
-  for _, cvr := range list.Items {
-    b.list.items = append(b.list.items, cvr{object: &cvr})
+  for _, c := range list.Items {
+    b.list.items = append(b.list.items, cvr{object: &c})
   }
   return b
 }
