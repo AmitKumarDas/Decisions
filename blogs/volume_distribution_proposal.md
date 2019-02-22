@@ -13,7 +13,7 @@ import (
 type csp struct {
   // actual cstor pool object
   object *apis.CstorPool
-}
+}appli
 
 // predicate defines an abstraction 
 // to determine conditional checks
@@ -290,7 +290,7 @@ const (
   antiAffinityLabelPolicyName policyName = "anti-affinity-label"
   
   // preferAntiAffinityLabelPolicyName is the name of 
-  // the policy that does a best effort while appling
+  // the policy that does a best effort while applying
   // anti-affinity rule based on label
   preferAntiAffinityLabelPolicyName policyName = "prefer-anti-affinity-label"
 )
