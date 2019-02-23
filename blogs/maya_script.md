@@ -48,7 +48,7 @@ spec:
     installMayaAPIServer: $(k8sApply .yaml.withAPIServer)
     installNDM: $(k8sApply .yaml.withNDM)
     installProvisioner: $(k8sApply .yaml.withProvisioner)
-    mayaOption: $($opts := k8sKind "deploy" | list k8sName "maya-apiserver" | list k8sPath ".spec.replicas")
+    mayaOption: $($opts := k8sKind "deploy" | push k8sName "maya-apiserver" | push k8sPath ".spec.replicas")
     verifyMayaWith3Replicas: $(k8sGetNumValue $opts | eq 3)
 ```
 
