@@ -85,11 +85,11 @@ spec:
       withNDMYaml: ...
       withProvisionerYaml: ...
       it: should install openebs without problems
-      installSC: ok, 7 secs
-      installClusterRole: ok, 5 secs
-      installMayaAPIServer: ok, 2 secs
-      installNDM: ok, 10 secs
-      installProvisioner: ok, 5 secs
-      mayaOption: ok, 1 secs
-      verifyMayaWith3Replicas: ok, 1 secs
+      installSC: ok, 7secs
+      installClusterRole: ok, 5secs
+      installMayaAPIServer: ok, 2secs
+      installNDM: ok, 10secs
+      installProvisioner: ok, 5secs
+      mayaOption: ok, 1secs
+      verifyMayaWith3Replicas: ok, 1secs
 ```
