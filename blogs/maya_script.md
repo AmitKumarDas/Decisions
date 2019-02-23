@@ -16,7 +16,7 @@ Kubernetes whithout messing with shell scripts.
 - It can accept one or more yaml document(s)
 - It should execute based on the order provided in the specifications
 
-### _Specification_ of Maya Script
+### _Specification_ of MayaScript
 ```go
 // pkg/apis/openebs.io/mayascript/v1alpha1/mayascript.go
 
