@@ -25,3 +25,26 @@ Desire to apply, inject, merge configuration against components or services in a
   - maincontainer
   - tolerations
   - etc
+
+### Specifications of CASConfig
+```yaml
+kind: CASConfig
+spec:
+  scope:
+  config:
+  - policy:
+    values:
+      labels:
+      annotations:
+      envs:
+      containers:
+      sidecars:
+      maincontainer:
+    selector:
+      byLabel:
+      byAnnotation:
+      byNamespace:
+      byKind:
+      byName:
+      byOpenebsVersion:
+```
