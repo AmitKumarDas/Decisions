@@ -46,5 +46,4 @@ spec:
       byNamespace:
       byKind:
       byName:
-      byOpenebsVersion:
 ```
