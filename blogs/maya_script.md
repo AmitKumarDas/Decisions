@@ -18,6 +18,8 @@ Kubernetes whithout messing with shell scripts.
 
 ### _Specification_ of Maya Script
 ```go
+// pkg/apis/openebs.io/mayascript/v1alpha1/mayascript.go
+
 type MayaScript struct {
   metav1.TyeMeta
   metav1.ObjectMeta
@@ -31,6 +33,24 @@ type MayaScriptSpec struct {
 
 type MayaScriptStatus struct {}
 ```
+
+```go
+// pkg/unstruct/v1alpha1/unstruct.go
+
+type buildOption func(*unstruct)
+
+func WithKind(kind string) buildOption {
+  // ...
+}
+
+// Expose this as a go template function 
+// with the name kubeKind
+func WithKindOpt(kind string, opts ...buildOption) []buildOption {
+  opts = append(opts, WithKind(kind))
+  return opts
+}
+```
+
 ```yaml
 kind: MayaScript
 spec:
@@ -43,13 +63,13 @@ spec:
     withNDMYaml: |
     withProvisionerYaml: |
     it: should install openebs without problems
-    installSC: $(k8sApply .yaml.withSC)
-    installClusterRole: $(k8sApply .yaml.withClusterRole)
-    installMayaAPIServer: $(k8sApply .yaml.withAPIServer)
-    installNDM: $(k8sApply .yaml.withNDM)
-    installProvisioner: $(k8sApply .yaml.withProvisioner)
-    mayaOption: $($opts := k8sKind "deploy" | push k8sName "maya-apiserver" | push k8sPath ".spec.replicas")
-    verifyMayaWith3Replicas: $(k8sGetNumValue $opts | eq 3)
+    installSC: $(kubeApply .yaml.withSC)
+    installClusterRole: $(kubeApply .yaml.withClusterRole)
+    installMayaAPIServer: $(kubeApply .yaml.withAPIServer)
+    installNDM: $(kubeApply .yaml.withNDM)
+    installProvisioner: $(kubeApply .yaml.withProvisioner)
+    mayaOption: $($opts := kubeKind "deploy" | kubeName "maya-apiserver" | kubePath ".spec.replicas")
+    verifyMayaWith3Replicas: $(kubeGetNumericValue $opts | eq 3)
 ```
 
 ```yaml
