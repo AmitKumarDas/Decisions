@@ -31,8 +31,10 @@ Desire to apply, inject, merge configuration against components or services in a
 kind: CASConfig
 spec:
   scope:
+    type: # namespace or cluster
+    values: # array of namespace values
   config:
-  - policy:
+  - name: # name of this config
     values:
       labels:
       annotations:
