@@ -1,6 +1,6 @@
 ### Info
-- Version: 1
-- Last Updated On: 23 Feb 2019
+- Version: 2
+- Last Updated On: 25 Feb 2019
 
 ### Motivation
 What if there is an easy way to code adhoc stuff or automations with respect to 
@@ -79,21 +79,21 @@ spec:
 ```yaml
 kind: MayaScript
 spec:
-  status:
-    output:
-      desc: I would like to manage my kubernetes scripts in a better way
-      given: a kubernetes cluster with 3 nodes
-      withSCYaml: ...
-      withClusterRoleYaml: ...
-      withAPIServerYaml: ...
-      withNDMYaml: ...
-      withProvisionerYaml: ...
-      it: should install openebs without problems
-      installSC: ok, 7secs
-      installClusterRole: ok, 5secs
-      installMayaAPIServer: ok, 2secs
-      installNDM: ok, 10secs
-      installProvisioner: ok, 5secs
-      mayaOption: ok, 1secs
-      verifyMayaWith3Replicas: ok, 1secs
+status:
+  output:
+    desc: I would like to manage my kubernetes scripts in a better way
+    given: a kubernetes cluster with 3 nodes
+    withSCYaml: ...
+    withClusterRoleYaml: ...
+    withAPIServerYaml: ...
+    withNDMYaml: ...
+    withProvisionerYaml: ...
+    it: should install openebs without problems
+    installSC: ok, 7secs
+    installClusterRole: ok, 5secs
+    installMayaAPIServer: ok, 2secs
+    installNDM: ok, 10secs
+    installProvisioner: ok, 5secs
+    mayaOption: ok, 1secs
+    verifyMayaWith3Replicas: ok, 1secs
 ```
