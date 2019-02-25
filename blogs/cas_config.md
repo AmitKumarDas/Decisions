@@ -1,6 +1,6 @@
 ### Info
-- Version: 1
-- Last Updated On: 23 Feb 2019
+- Version: 2
+- Last Updated On: 25 Feb 2019
 
 ### Motivation
 Desire to apply, inject, merge configuration against components or services in a kubernetes cluster.
@@ -11,11 +11,13 @@ Desire to apply, inject, merge configuration against components or services in a
   - Name of this controller is "cas-config controller"
 - It can be embedded inside other resources, e.g.:
   - OpenebsCluster
-  - ComponentSet
-  - CstorVolumeSet
-  - CstorPoolSet
-  - JivaVolumeSet
-- Its targets can be specified via various select rules
+  - CstorVolume
+  - CstorPoolClaim
+  - JivaVolume
+- Embedding object should embed only a single config specifications
+- A config can have targets
+  - A config target is selected via `spec.select` option
+  - A config target is one on which config is applied i.e. injected
 - It can patch, merge, add following configurations:
   - labels
   - annotations
@@ -27,14 +29,51 @@ Desire to apply, inject, merge configuration against components or services in a
   - etc
 
 ### Specifications of CASConfig
+```go
+type CASConfig struct {
+  metav1.TypeMeta
+  metav1.ObjectMeta
+  
+  Spec    Spec    `json:"spec"`
+  Status  Status  `json:"status"`
+}
+
+type Spec struct {
+  Scope   Scope     `json:"scope"`
+  Groups  []Group   `json:"groups"`
+}
+
+type ScopeType
+
+const (
+  ClusterScope    ScopeType = "cluster"
+  NamespaceScope  ScopeType = "namespace"
+)
+
+type Scope struct {
+  Level   ScopeType   `json:"level"`
+}
+
+type Group struct {
+  Name      string      `json:"name"`
+  Values    Values        `json:"data"`
+  Selector  Selector    `json:"selector"`
+}
+
+type Data struct {
+  Labels      map[string]string `json:"labels"`
+  Annotations map[string]string `json:"annotations"`
+}
+```
+
 ```yaml
 kind: CASConfig
 spec:
   scope:
-    type: # namespace or cluster
-    values: # array of namespace values
-  config:
-  - name: # name of this config
+    level:
+    values:
+  group:
+  - name:
     values:
       labels:
       annotations:
@@ -42,8 +81,15 @@ spec:
       containers:
       sidecars:
       maincontainer:
-    selector:
-      byLabel:
+    valueOps:
+    - from:
+        kind:
+        name:
+        select:
+        path:
+    select:
+      byLabels:
+      byLabelOps:
       byAnnotation:
       byNamespace:
       byKind:
