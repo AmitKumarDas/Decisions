@@ -11,9 +11,9 @@ Desire to apply, inject, merge configuration against components or services in a
   - Name of its controller is called as "cas-config controller"
 - It can be embedded inside other resources, e.g.:
   - OpenebsCluster
-  - CstorVolume
-  - CstorPoolClaim
-  - JivaVolume
+  - CstorVolume (_Future_)
+  - CstorPoolClaim (_Future_)
+  - JivaVolume (_Future_)
 - The embedding object should embed only a single config specification
 - A config can have one or more targets
   - A config target is selected via `spec.select` option
@@ -57,7 +57,7 @@ type Scope struct {
 type Group struct {
   Name      string      `json:"name"`
   Values    Values      `json:"values"`
-  Target    Selector    `json:"target"`
+  Selector  Selector    `json:"select"`
 }
 
 type Values struct {
@@ -74,6 +74,15 @@ type LabelOperation struct {
   Name      string    `json:"name"`
   Selector  Selector  `json:"select"`
   Path      string    `json:"path"`
+}
+
+type Selector struct {
+  ByLabels        map[string]string `json:"byLabels"`
+  ByLabelops      []LabelOperation  `json:"byLabelOps"`
+  ByAnnotations   map[string]string `json:"byAnnotations"`
+  ByNamespace     string            `json:"byNamespace"`
+  ByKind          string            `json:"byKind"`
+  ByName          string            `json:"byName"`
 }
 ```
 
@@ -98,10 +107,10 @@ spec:
         name:
         select:
         path:
-    target:
+    select:
       byLabels:
       byLabelOps:
-      byAnnotation:
+      byAnnotations:
       byNamespace:
       byKind:
       byName:
