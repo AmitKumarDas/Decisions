@@ -7,15 +7,15 @@ Desire to apply, inject, merge configuration against components or services in a
 
 ### High Level Design
 - CASConfig is a kubernetes _custom resource_
-- It is optionally controlled by a controller
-  - Name of this controller is "cas-config controller"
+- It can be **optionally** controlled by its own controller
+  - Name of its controller is called as "cas-config controller"
 - It can be embedded inside other resources, e.g.:
   - OpenebsCluster
   - CstorVolume
   - CstorPoolClaim
   - JivaVolume
-- Embedding object should embed only a single config specifications
-- A config can have targets
+- The embedding object should embed only a single config specification
+- A config can have one or more targets
   - A config target is selected via `spec.select` option
   - A config target is one on which config is applied i.e. injected
 - It can patch, merge, add following configurations:
@@ -56,13 +56,24 @@ type Scope struct {
 
 type Group struct {
   Name      string      `json:"name"`
-  Values    Values        `json:"data"`
-  Selector  Selector    `json:"selector"`
+  Values    Values      `json:"values"`
+  Selector  Selector    `json:"select"`
 }
 
-type Data struct {
+type Values struct {
   Labels      map[string]string `json:"labels"`
   Annotations map[string]string `json:"annotations"`
+}
+
+type ValueOps struct {
+  LabelOps    []LabelOperation  `json:"labels"`
+}
+
+type LabelOperation struct {
+  Kind      string    `json:"kind"`
+  Name      string    `json:"name"`
+  Selector  Selector  `json:"select"`
+  Path      string    `json:"path"`
 }
 ```
 
@@ -82,8 +93,8 @@ spec:
       sidecars:
       maincontainer:
     valueOps:
-    - from:
-        kind:
+      labels:
+      - kind:
         name:
         select:
         path:
