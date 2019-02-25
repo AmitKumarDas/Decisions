@@ -57,7 +57,7 @@ type Scope struct {
 type Group struct {
   Name      string      `json:"name"`
   Values    Values      `json:"values"`
-  Selector  Selector    `json:"select"`
+  Target    Selector    `json:"target"`
 }
 
 type Values struct {
@@ -98,7 +98,7 @@ spec:
         name:
         select:
         path:
-    select:
+    target:
       byLabels:
       byLabelOps:
       byAnnotation:
