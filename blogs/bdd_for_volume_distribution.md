@@ -23,8 +23,8 @@ var _ = Describe("StatefulSet", func() {
   })
 
   Describe("deploy a statefulset", func() {
-	  BeforeEach(func() {
-      //
+    BeforeEach(func() {
+     //
     })
 
     It("should distribute the statefulset replicas across pools", func() {
