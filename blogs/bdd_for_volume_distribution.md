@@ -10,24 +10,24 @@
 ### Low Level Design
 ```go
 var _ = Describe("StatefulSet", func() {
-	var (
-		//
+  var (
+	  //
 	)
 
-	BeforeEach(func() {
-		//
-	})
+  BeforeEach(func() {
+	  //
+  })
 
-	AfterEach(func() {
-		//
-	})
+  AfterEach(func() {
+	  //
+  })
 
-	Describe("deploy a statefulset", func() {
-		BeforeEach(func() {
+  Describe("deploy a statefulset", func() {
+	  BeforeEach(func() {
       //
-		})
+	  })
 
-		It("should distribute the statefulset replicas across pools", func() {
+	  It("should distribute the statefulset replicas across pools", func() {
       pvcs, err := pvc.KubeClient().List("", "sts-based-lbl-selectors")
       Ω(err).Should(BeNil())
 
@@ -39,7 +39,7 @@ var _ = Describe("StatefulSet", func() {
       
       pools := cvr.ListBuilder().WithListObject(cvrs).RemoveDuplicate().List().ListPoolName()
 			Ω(pools).Should(HaveLen(3))      
-		})
-	})
+	  })
+  })
 })
 ```
