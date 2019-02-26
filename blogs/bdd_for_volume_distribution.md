@@ -47,7 +47,7 @@ var _ = Describe("StatefulSet", func() {
     })
     
     It("should co-locate the cstor volume targets with application instances", func() {
-      //
+      // future
     })
   })
 })
