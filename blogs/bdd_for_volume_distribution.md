@@ -15,18 +15,20 @@ var _ = Describe("StatefulSet", func() {
   )
 
   BeforeEach(func() {
-    //
+    // apply the sts
+    // verify creation of sts instances
+    // verify creation of pvc instances
+    // verify creation of pvc instances getting bound
   })
 
   AfterEach(func() {
-    //
+    // delete the sts
+    // delete the pvc
+    // verify deletion of sts instances
+    // verify deletion of pvc instances
   })
 
   Describe("deploy a statefulset", func() {
-    BeforeEach(func() {
-      //
-    })
-
     It("should distribute the cstor volume replicas across pools", func() {
       pvcs, _ := pvc.KubeClient().List("", "sts-based-lbl-selectors")
 
