@@ -11,7 +11,7 @@
 ```go
 var _ = Describe("StatefulSet", func() {
   var (
-  //
+    //
   )
 
   BeforeEach(func() {
