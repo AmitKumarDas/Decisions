@@ -28,7 +28,7 @@ var _ = Describe("StatefulSet", func() {
     // verify deletion of pvc instances
   })
 
-  Describe("deploy a statefulset", func() {
+  Describe("test statefulset application on cstor", func() {
     It("should distribute the cstor volume replicas across pools", func() {
       pvcs, _ := pvc.KubeClient().List("", "sts-based-lbl-selectors")
 
