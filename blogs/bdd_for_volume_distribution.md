@@ -1,6 +1,6 @@
 ### Info
-- Version: 1
-- Last Updated On: 25-Feb-2019
+- Version: 2
+- Last Updated On: 26-Feb-2019
 
 ### High Level Design
 - maya/integration-tests/sts/
