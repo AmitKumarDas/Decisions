@@ -1,6 +1,6 @@
 ### Info
-- Version: 2
-- Last Updated On: 25 Feb 2019
+- Version: 3
+- Last Updated On: 27 Feb 2019
 
 ### Motivation
 What if there is an easy way to code adhoc stuff or automations with respect to 
@@ -58,15 +58,15 @@ func WithKindOpt(kind string, opts ...buildOption) []buildOption {
 ```yaml
 kind: MayaScript
 spec:
-  script:
-    desc: I would like to manage my kubernetes scripts in a better way
-    given: a kubernetes cluster with 3 nodes
+  title: I would like to manage my kubernetes scripts in a better way
+  runs:
+  - desc: I have a kubernetes cluster with 3 nodes
     withSCYaml: |
     withClusterRoleYaml: |
     withAPIServerYaml: |
     withNDMYaml: |
     withProvisionerYaml: |
-    it: should install openebs without problems
+  - it: should install openebs without problems
     installSC: $(kubeApply .yaml.withSC)
     installClusterRole: $(kubeApply .yaml.withClusterRole)
     installMayaAPIServer: $(kubeApply .yaml.withAPIServer)
@@ -81,19 +81,20 @@ kind: MayaScript
 spec:
 status:
   output:
-    desc: I would like to manage my kubernetes scripts in a better way
-    given: a kubernetes cluster with 3 nodes
-    withSCYaml: ...
-    withClusterRoleYaml: ...
-    withAPIServerYaml: ...
-    withNDMYaml: ...
-    withProvisionerYaml: ...
-    it: should install openebs without problems
-    installSC: ok, 7secs
-    installClusterRole: ok, 5secs
-    installMayaAPIServer: ok, 2secs
-    installNDM: ok, 10secs
-    installProvisioner: ok, 5secs
-    mayaOption: ok, 1secs
-    verifyMayaWith3Replicas: ok, 1secs
+    title: I would like to manage my kubernetes scripts in a better way
+    runs:
+    - desc: I have a kubernetes cluster with 3 nodes
+      withSCYaml: ...
+      withClusterRoleYaml: ...
+      withAPIServerYaml: ...
+      withNDMYaml: ...
+      withProvisionerYaml: ...
+    - it: should install openebs without problems
+      installSC: ok, 7secs
+      installClusterRole: ok, 5secs
+      installMayaAPIServer: ok, 2secs
+      installNDM: ok, 10secs
+      installProvisioner: ok, 5secs
+      mayaOption: ok, 1secs
+      verifyMayaWith3Replicas: ok, 1secs
 ```
