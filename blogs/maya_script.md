@@ -1,10 +1,9 @@
 ### Info
-- Version: 3
+- Version: 4
 - Last Updated On: 27 Feb 2019
 
 ### Motivation
-What if there is an easy way to code adhoc stuff or automations with respect to 
-Kubernetes whithout messing with shell scripts.
+What if there is an easy way to code adhoc stuff or automations with respect to Kubernetes whithout messing with shell scripts. This will be used internally as a handy tool & is not meant for production purposes. One such example can be writing this to achieve a test case automation.
 
 ### High Level Design - _MayaScript_
 - It is a kubernetes custom resource
