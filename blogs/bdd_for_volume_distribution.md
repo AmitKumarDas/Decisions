@@ -43,7 +43,7 @@ var _ = Describe("StatefulSet", func() {
       
       pools, _ := cstorpool.KubeClient().List("", "lbl-selector-based-on-poolnames")
       nodeNames = cstorpool.Listbuilder().WithListObject(pools).List().ListNodeName()
-      Ω(nodeNames).Should(haveLen(3), "node names count should be 3")
+      Ω(nodeNames).Should(HaveLen(3), "node names count should be 3")
     })
     
     It("should co-locate the cstor volume targets with application instances", func() {
