@@ -73,7 +73,7 @@ spec:
     installNDM: $(kubeApply .yaml.withNDM)
     installProvisioner: $(kubeApply .yaml.withProvisioner)
     mayaOption: $($opts := kubeKind "deploy" | kubeName "maya-apiserver" | kubePath ".spec.replicas")
-    verifyMayaWith3Replicas: $(kubeGetNumericValue $opts | eq 3)
+    verifyMayaWith3Replicas: $(kubeGetNumericValue $opts | should (haveLen 3))
 ```
 
 ```yaml
