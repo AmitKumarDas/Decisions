@@ -76,12 +76,27 @@ const (
   NamespaceScope  ScopeType = "namespace"
 )
 
-// Scope 
+// Scope provides permission options
+// that if satisfied will enable this
+// config to be applied against matching
+// resources
 type Scope struct {
+  // Level flags the permission to execute
+  // this config within a cluster or one 
+  // or more namespaces
   Level   ScopeType   `json:"level"`
+  
+  // Values provide specific namespaces
+  // that are permitted for this config
+  // to operate against
   Values  []string    `json:"values"`
 }
 
+// Policy provides the actual configuration
+// values along with matching resources.
+// Matching resources here refer to those
+// resources which are eligible to have
+// this config operated against
 type Policy struct {
   Name      string      `json:"name"`
   Values    Values      `json:"values"`
