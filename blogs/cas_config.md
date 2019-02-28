@@ -1,9 +1,9 @@
 ### Info
-- Version: 2
-- Last Updated On: 25 Feb 2019
+- Version: 3
+- Last Updated On: 28 Feb 2019
 
 ### Motivation
-Desire to apply, inject, merge configuration against components or services in a kubernetes cluster.
+Desire to apply, inject, merge configuration against targeted resources in a kubernetes cluster. We shall also attempt to run commands against the targeted resources if it fits into the design of cas config.
 
 ### High Level Design
 - CASConfig is a kubernetes _custom resource_
@@ -11,6 +11,7 @@ Desire to apply, inject, merge configuration against components or services in a
   - Name of its controller is called as "cas-config controller"
 - It can be embedded inside other resources, e.g.:
   - OpenebsCluster
+  - Upgrade (_Near Future_)
   - CstorVolume (_Future_)
   - CstorPoolClaim (_Future_)
   - JivaVolume (_Future_)
@@ -27,6 +28,13 @@ Desire to apply, inject, merge configuration against components or services in a
   - maincontainer
   - tolerations
   - etc
+- CAS Config will not execute below actions:
+  - create a resource
+  - delete a resource
+- CAS Config will execute below action only:
+  - patch resources
+  - get resources
+  - list resources
 
 ### Specifications of CASConfig
 ```go
@@ -92,7 +100,7 @@ spec:
   scope:
     level:
     values:
-  group:
+  policies:
   - name:
     values:
       labels:
@@ -101,6 +109,12 @@ spec:
       containers:
       sidecars:
       maincontainer:
+      from:
+        kind:
+        name:
+        path:
+        asType: # optional
+        asKey: # optional
     valueOps:
       labels:
       - kind:
