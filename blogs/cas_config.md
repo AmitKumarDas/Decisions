@@ -33,6 +33,8 @@ Desire to apply, inject, merge configuration against targeted resources in a kub
   - delete a resource
 - CAS Config will execute below action only:
   - patch resources
+  - rollback the patch in-case of any errors
+    - this is also a patch of old config
   - get resources
   - list resources
 
@@ -75,26 +77,25 @@ type Values struct {
   Environments  map[string]string `json:"envs"`
   Containers    []Container       `json:"containers"`
   Sidecars      []Container       `json:"sidecars"`
+  MainContainer Container         `json:"mainContainer"`
+  From          []FromOperation   `json:"from"`
 }
 
-type ValueOps struct {
-  LabelOps    []LabelOperation  `json:"labels"`
-}
-
-type LabelOperation struct {
+type FromOperation struct {
   Kind      string    `json:"kind"`
   Name      string    `json:"name"`
-  Selector  Selector  `json:"select"`
   Path      string    `json:"path"`
+  AsType    string    `json:"asType"`
+  AsKey     string    `json:"asKey"`
 }
 
-type Selector struct {
-  ByLabels        map[string]string `json:"byLabels"`
-  ByLabelops      []LabelOperation  `json:"byLabelOps"`
-  ByAnnotations   map[string]string `json:"byAnnotations"`
-  ByNamespace     string            `json:"byNamespace"`
-  ByKind          string            `json:"byKind"`
-  ByName          string            `json:"byName"`
+type Include struct {
+  Labels          map[string]string   `json:"labels"`
+  Annotations     map[string]string   `json:"annotations"`
+  Namespaces      []string            `json:"namespaces"`
+  Kinds           []string            `json:"kinds"`
+  Names           []string            `json:"names"`
+  ServiceAccounts []string            `json:"serviceAccounts"`
 }
 ```
 
@@ -120,10 +121,10 @@ spec:
         asType: # optional
         asKey: # optional
     include:
-      labels: # map[string]string
-      annotations: # map[string]string
-      namespaces: # []string
-      kinds: # []string
-      names: # []string
-      serviceAccounts: # []string
+      labels:
+      annotations:
+      namespaces:
+      kinds:
+      names:
+      serviceAccounts:
 ```
