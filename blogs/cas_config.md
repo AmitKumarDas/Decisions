@@ -47,8 +47,8 @@ type CASConfig struct {
 }
 
 type Spec struct {
-  Scope   Scope     `json:"scope"`
-  Groups  []Group   `json:"groups"`
+  Scope     Scope      `json:"scope"`
+  Policies  []Policy   `json:"policies"`
 }
 
 type ScopeType
@@ -60,17 +60,21 @@ const (
 
 type Scope struct {
   Level   ScopeType   `json:"level"`
+  Values  []string    `json:"values"`
 }
 
-type Group struct {
+type Policy struct {
   Name      string      `json:"name"`
   Values    Values      `json:"values"`
-  Selector  Selector    `json:"select"`
+  Include   Include     `json:"include"`
 }
 
 type Values struct {
-  Labels      map[string]string `json:"labels"`
-  Annotations map[string]string `json:"annotations"`
+  Labels        map[string]string `json:"labels"`
+  Annotations   map[string]string `json:"annotations"`
+  Environments  map[string]string `json:"envs"`
+  Containers    []Container       `json:"containers"`
+  Sidecars      []Container       `json:"sidecars"`
 }
 
 type ValueOps struct {
@@ -98,9 +102,9 @@ type Selector struct {
 kind: CASConfig
 spec:
   scope:
-    level:
-    values:
-  policies:
+    level: # namespace or cluster
+    values: # names of namespaces
+  policies: # policies will be applied in this order
   - name:
     values:
       labels:
@@ -115,17 +119,11 @@ spec:
         path:
         asType: # optional
         asKey: # optional
-    valueOps:
-      labels:
-      - kind:
-        name:
-        select:
-        path:
-    select:
-      byLabels:
-      byLabelOps:
-      byAnnotations:
-      byNamespace:
-      byKind:
-      byName:
+    include:
+      labels: # map[string]string
+      annotations: # map[string]string
+      namespaces: # []string
+      kinds: # []string
+      names: # []string
+      serviceAccounts: # []string
 ```
