@@ -49,17 +49,34 @@ type CASConfig struct {
 }
 
 type Spec struct {
+  // Scope indicates if the config is meant
+  // to be used within the scope of
+  // namespace or cluster
   Scope     Scope      `json:"scope"`
+  
+  // Policies consist of a list of various 
+  // config options that should be patched
+  // against matching resources
   Policies  []Policy   `json:"policies"`
 }
 
+// ScopeType defines the type of a scope
 type ScopeType
 
 const (
+  // ClusterScope is used to grant the entire 
+  // config to be applied against matching 
+  // resources found in a cluster
   ClusterScope    ScopeType = "cluster"
+  
+  // NamespaceScope is used to grant the entire
+  // config to be applied against matching
+  // resources found in particular namespace or
+  // namespaces
   NamespaceScope  ScopeType = "namespace"
 )
 
+// Scope 
 type Scope struct {
   Level   ScopeType   `json:"level"`
   Values  []string    `json:"values"`
