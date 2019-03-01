@@ -172,16 +172,38 @@ type FromOperation struct {
   Kind      string    `json:"kind"`
   Name      string    `json:"name"`
   Path      string    `json:"path"`
-  ToType    string    `json:"asType"`
-  ToKey     string    `json:"asKey"`
+  ToType    string    `json:"toType"`
+  ToKey     string    `json:"toKey"`
 }
 
+// Include provides the matchers used
+// to select resources
 type Include struct {
+  // Labels if found in resource(s) make
+  // these resources eligible to be
+  // applied with this config
   Labels          map[string]string   `json:"labels"`
+  
+  // Annotations if found in resource(s)
+  // make these resources eligible to be
+  // applied with this config
   Annotations     map[string]string   `json:"annotations"`
+  
+  // Namespaces of resources that are
+  // eligible to be applied with this
+  // config
   Namespaces      []string            `json:"namespaces"`
+  
+  // Kinds of resources that are eligible
+  // to be applied with this config
   Kinds           []string            `json:"kinds"`
+  
+  // Names of resources that are eligible
+  // to be applied with this config
   Names           []string            `json:"names"`
+  
+  // ServiceAccounts of resources that are eligible
+  // to be applied with this config
   ServiceAccounts []string            `json:"serviceAccounts"`
 }
 ```
