@@ -221,9 +221,9 @@ type Include struct {
 kind: CASConfig
 spec:
   scope:
-    level: # namespace or cluster
-    values: # names of namespaces
-  policies: # policies will be applied in this order
+    level:
+    namespaces:
+  policies:
   - name:
     values:
       labels:
@@ -236,8 +236,8 @@ spec:
         kind:
         name:
         path:
-        asType: # optional
-        asKey: # optional
+        toType:
+        toKey:
     include:
       labels:
       annotations:
