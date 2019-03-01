@@ -1,6 +1,6 @@
 ### Info
-- Version: 3
-- Last Updated On: 28 Feb 2019
+- Version: 4
+- Last Updated On: 01 Mar 2019
 
 ### Motivation
 Desire to apply, inject, merge configuration against targeted resources in a kubernetes cluster. We shall also attempt to run commands against the targeted resources if it fits into the design of cas config.
@@ -28,13 +28,13 @@ Desire to apply, inject, merge configuration against targeted resources in a kub
   - maincontainer
   - tolerations
   - etc
-- CAS Config will not execute below actions:
+- CAS Config controller **will not** execute below actions:
   - create a resource
   - delete a resource
-- CAS Config will execute below action only:
+- CAS Config controller will execute below actions only:
   - patch resources
   - rollback the patch in-case of any errors
-    - this is also a patch of old config
+    - e.g. patch with old config info
   - get resources
   - list resources
 
@@ -98,8 +98,23 @@ type Scope struct {
 // resources which are eligible to have
 // this config operated against
 type Policy struct {
+  // Name of this policy
+  //
+  // NOTE:
+  //  Future: It may be used as a reference in 
+  // matching resources to grant or deny this 
+  // particular policy or a set of policies 
+  // versus allowing itself to be applied 
+  // against the entire config
   Name      string      `json:"name"`
+  
+  // Values represent the actual configuration
+  // that gets applied against the matching
+  // resources
   Values    Values      `json:"values"`
+  
+  // Include provides a way to select resources
+  // that match this include rules
   Include   Include     `json:"include"`
 }
 
