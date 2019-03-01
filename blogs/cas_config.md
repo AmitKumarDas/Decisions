@@ -84,12 +84,17 @@ type Scope struct {
   // Level flags the permission to execute
   // this config within a cluster or one 
   // or more namespaces
+  //
+  // Level defaults to namespace scope. In 
+  // other words this config can be applied
+  // against any resource found in the
+  // namespace of this config
   Level   ScopeType   `json:"level"`
   
-  // Values provide specific namespaces
+  // Namespaces provide specific namespaces
   // that are permitted for this config
   // to operate against
-  Values  []string    `json:"values"`
+  Namespaces  []string    `json:"namespaces"`
 }
 
 // Policy provides the actual configuration
