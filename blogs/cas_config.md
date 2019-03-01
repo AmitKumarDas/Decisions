@@ -118,22 +118,62 @@ type Policy struct {
   Include   Include     `json:"include"`
 }
 
+// Values represent configuration that gets
+// applied against matching resources
+//
+// NOTE:
+//  Values can be specified directly or can
+// be extracted from other resources
 type Values struct {
+  // Labels to be applied against the matching
+  // resources
   Labels        map[string]string `json:"labels"`
+  
+  // Annotations to be applied against the
+  // matching resources
   Annotations   map[string]string `json:"annotations"`
+  
+  // Environments to be applied against the
+  // matching resources
   Environments  map[string]string `json:"envs"`
+  
+  // Containers to be set against the matching
+  // resources
+  //
+  // NOTE:
+  //  This will replace any existing containers
+  // of the matching resources
   Containers    []Container       `json:"containers"`
+  
+  // Sidecar containers to be set against the
+  // matching resources
+  //
+  // NOTE:
+  //  This will add/merge to the existing containers
+  // of the matching resources
   Sidecars      []Container       `json:"sidecars"`
+  
+  // MainContainer will replace the main container
+  // of the matching resources
   MainContainer Container         `json:"mainContainer"`
+  
+  // From provides a list of operations that leads
+  // to extraction of configuration from external
+  // resources and subsequently including these
+  // extracted values into this config
   From          []FromOperation   `json:"from"`
 }
 
+// FromOperation provides the necessary properties
+// required to extract value from an external
+// resource and saving this extracted value
+// in this config
 type FromOperation struct {
   Kind      string    `json:"kind"`
   Name      string    `json:"name"`
   Path      string    `json:"path"`
-  AsType    string    `json:"asType"`
-  AsKey     string    `json:"asKey"`
+  ToType    string    `json:"asType"`
+  ToKey     string    `json:"asKey"`
 }
 
 type Include struct {
