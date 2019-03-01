@@ -1,5 +1,5 @@
 ### Info
-- Version: 5
+- Version: 6
 - Last Updated On: 01 Mar 2019
 
 ### Motivation
@@ -23,6 +23,7 @@ _NOTE: It may also attempt to run commands against the targeted resources (e.g. 
   - A config target is selected via `spec.select` option
   - A config target is one on which config is applied i.e. injected
 - It can patch, merge, add following configurations:
+  - spec
   - labels
   - annotations
   - envs
@@ -31,15 +32,15 @@ _NOTE: It may also attempt to run commands against the targeted resources (e.g. 
   - maincontainer
   - tolerations
   - etc
-- CAS Config controller **will not** execute below actions:
+- CAS Config controller **will not** execute below action:
   - create a resource
-  - delete a resource
-- CAS Config controller will execute below actions only:
+- CAS Config controller can execute below actions:
   - patch resources
   - rollback the patch in-case of any errors
     - e.g. patch with old config info
   - get resources
   - list resources
+  - delete resources
 
 ### Specifications of CASConfig
 ```go
@@ -124,6 +125,10 @@ type Policy struct {
   // Include provides a way to select resources
   // that match this include rules
   Include   Include     `json:"include"`
+  
+  // Exclude provides a way to avoid resources
+  // that match this exclude rules
+  Exclude   Include     `json:"exclude"`
 }
 
 // Values represent configuration that gets
@@ -133,6 +138,14 @@ type Policy struct {
 //  Values can be specified directly or can
 // be extracted from other resources
 type Values struct {
+  // Spec to be applied against the matching
+  // resources
+  //
+  // NOTE:
+  //  Empty spec implies deleting the matching
+  // resources
+  Spec          Specification     `json:"spec"`
+
   // Labels to be applied against the matching
   // resources
   Labels        map[string]string `json:"labels"`
@@ -170,6 +183,11 @@ type Values struct {
   // resources and subsequently including these
   // extracted values into this config
   From          []FromOperation   `json:"from"`
+}
+
+type Specification struct {
+  Empty     bool    `json:"empty"`
+  Content   string  `json:"content"`
 }
 
 // FromOperation provides the necessary properties
@@ -213,6 +231,18 @@ type Include struct {
   // ServiceAccounts of resources that are eligible
   // to be applied with this config
   ServiceAccounts []string            `json:"serviceAccounts"`
+  
+  // PathValues represent a resource whose
+  // path's value matches the value provided
+  // here. If the value at this particular
+  // path matches then the resource becomes
+  // eligible to be applied with this config
+  PathValues      []PathValue         `json:"pathValues"`
+}
+
+type PathValue struct {
+  Path    string    `json:"path"`
+  Value   string    `json:"value"`
 }
 ```
 
