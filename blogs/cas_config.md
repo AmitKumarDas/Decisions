@@ -3,7 +3,11 @@
 - Last Updated On: 01 Mar 2019
 
 ### Motivation
-Desire to apply, inject, merge configuration against targeted resources in a kubernetes cluster. It may also attempt to run commands against the targeted resources (e.g. `kubectl exec`) if it fits into the design of cas config.
+Desire to apply, inject, merge configuration against targeted resources in a kubernetes cluster. This started off as an attempt to manage config during the design of OpenEBS operator. However, its utility is beyond Openebs Operator and can be
+used as-is with other custom resources as well. 
+
+_NOTE: It may also attempt to run commands against the targeted resources (e.g. `kubectl exec`) if it fits into the 
+design of cas config._
 
 ### High Level Design
 - CASConfig is a kubernetes _custom resource_
