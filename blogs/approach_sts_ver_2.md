@@ -34,7 +34,7 @@ const (
 	replicaAntiAffinityLabel labelKey = "openebs.io/replica-anti-affinity"
 )
 
-type annotationKey string
+type annotationKey string 
 
 const (
 	// scheduleOnHost is the annotation key
