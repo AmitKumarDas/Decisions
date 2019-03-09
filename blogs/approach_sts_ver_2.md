@@ -6,69 +6,57 @@
 package v1alpha1
 
 import (
-	"errors"
-	"sort"
-	"strings"
-	"text/template"
+  "errors"
+  "sort"
+  "strings"
+  "text/template"
 
-	apis "github.com/openebs/maya/pkg/apis/openebs.io/v1alpha1"
-	csp "github.com/openebs/maya/pkg/cstorpool/v1alpha2"
-	cvr "github.com/openebs/maya/pkg/cstorvolumereplica/v1alpha1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+  apis "github.com/openebs/maya/pkg/apis/openebs.io/v1alpha1"
+  csp "github.com/openebs/maya/pkg/cstorpool/v1alpha2"
+  cvr "github.com/openebs/maya/pkg/cstorvolumereplica/v1alpha1"
+  metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // cvrListFn abstracts fetching of a list of cstor
-//  volume replicas
+// volume replicas
 type cvrListFn func(namespace string, opts metav1.ListOptions) (*apis.CStorVolumeReplicaList, error)
 
 type labelKey string
 
 const (
-	// preferReplicaAntiAffinty is the label key
-	// that refers to preferring of replica
+  // preferReplicaAntiAffinty is the label key
+  // that refers to preferring of replica
   // anti affinity policy
-	preferReplicaAntiAffinityLabel labelKey = "openebs.io/preferred-replica-anti-affinity"
+  preferReplicaAntiAffinityLabel labelKey = "openebs.io/preferred-replica-anti-affinity"
   
-	// replicaAntiAffinty is the label key
-	// that refers to replica anti affinity policy
-	replicaAntiAffinityLabel labelKey = "openebs.io/replica-anti-affinity"
+  // replicaAntiAffinty is the label key
+  // that refers to replica anti affinity policy
+  replicaAntiAffinityLabel labelKey = "openebs.io/replica-anti-affinity"
 )
 
 type annotationKey string 
 
 const (
-	// scheduleOnHost is the annotation key
-	// that refers to hostname to schedule
-	// the replica
-	scheduleOnHostAnnotation annotationKey = "volume.kubernetes.io/selected-node"
+  // scheduleOnHost is the annotation key
+  // that refers to hostname to schedule
+  // the replica
+  scheduleOnHostAnnotation annotationKey = "volume.kubernetes.io/selected-node"
 )
 
 type priority int
 
 const (
-	// lowPriority refers to the priority
+  // lowPriority refers to the priority
   // given to a selection policy
-	lowPriority priority = 1
+  lowPriority priority = 1
 
   // mediumPriority refers to the priority
   // given to a selection policy
-	mediumPriority priority = 2
+  mediumPriority priority = 2
 
-	// highPriority refers to the priority
+  // highPriority refers to the priority
   // given to a selection policy
-	highPriority priority = 3
-)
-
-type executionMode string
-
-const (
-	// multiExection enables execution of
-  // more than one policy during a selection
-	multiExecution executionMode = "multi-mode"
-
-	// singleExecution enables execution of
-  // only one policy during a seclection
-	singleExection executionMode = "single-mode"
+  highPriority priority = 3
 )
 
 // policyName is a type that caters to
@@ -77,25 +65,25 @@ const (
 type policyName string
 
 const (
-	// antiAffinityLabelPolicy is the name of the
-	// policy that applies anti-affinity rule against
+  // antiAffinityLabelPolicy is the name of the
+  // policy that applies anti-affinity rule against
   // storage placement
-	antiAffinityLabelPolicy policyName = "anti-affinity-label"
+  antiAffinityLabelPolicy policyName = "anti-affinity-label"
 
-	// preferAntiAffinityLabelPolicy is the name of
-	// the policy that does a best effort while applying
-	// anti-affinity rule against storage placement
-	preferAntiAffinityLabelPolicy policyName = "prefer-anti-affinity-label"
+  // preferAntiAffinityLabelPolicy is the name of
+  // the policy that does a best effort while applying
+  // anti-affinity rule against storage placement
+  preferAntiAffinityLabelPolicy policyName = "prefer-anti-affinity-label"
 
-	// scheduleOnHostAnnotationPolicy is the name of
-	// the policy that selects the given host to
+  // scheduleOnHostAnnotationPolicy is the name of
+  // the policy that selects the given host to
   // place storage
-	scheduleOnHostAnnotationPolicy policyName = "schedule-on-host"
+  scheduleOnHostAnnotationPolicy policyName = "schedule-on-host"
 
-	// preferScheduleonHostPolicy is the name of 
+  // preferScheduleonHostPolicy is the name of 
   // the policy that does a best effort to select
   // the given host to place storage
-	preferScheduleOnHostAnnotationPolicy policyName = "prefer-schedule-on-host"
+  preferScheduleOnHostAnnotationPolicy policyName = "prefer-schedule-on-host"
 )
 
 // policy exposes contracts that need
@@ -181,10 +169,8 @@ type antiAffinityLabel struct {
 	cvrList cvrListFn
 }
 
-// defaultCVRList is the default
-// implementation of cvrListFn
-func defaultCVRList() cvrListFn {
-	return cvr.KubeClient().List
+func defaultCVRList() {
+  return cvr.KubeClient().List
 }
 
 // priority returns the priority of
@@ -218,9 +204,8 @@ func (p antiAffinityLabel) filter(pools *csp.CSPList) (*csp.CSPList, error) {
 	if err != nil {
 		return nil, err
 	}
-	exclude := cvr.ListBuilder().WithListObject(cvrs).List().GetPoolUIDs()
-	expludedPools := csp.ListBuilder().WithCStorPoolList(pools).List().FilterUIDs(csp.IsNotUID(exclude...))
-	return csp.ListBuilder().WithUIDs(expludedPools...).List(), nil
+	exclude := cvr.ListBuilder().WithAPIList(cvrs).List().GetPoolUIDs()
+	return pools.Filter(csp.IsNotUID(exclude...)), nil
 }
 
 // preferAntiAffinityLabel is a pool
@@ -249,6 +234,18 @@ func (p preferAntiAffinityLabel) filter(pools *csp.CSPList) (*csp.CSPList, error
 	return pools, nil
 }
 
+type executionMode string
+
+const (
+  // multiExection enables execution of
+  // more than one policy during a selection
+  multiExecution executionMode = "multi-mode"
+
+  // singleExecution enables execution of
+  // only one policy during a seclection
+  singleExection executionMode = "single-mode"
+)
+
 // selection enables selecting required pools
 // based on the registered policies
 //
@@ -267,8 +264,8 @@ type selection struct {
 	// selection is based on these policies
 	policies []policy
 
-	// mode is the mode of execution in which
-	// the policies has to be executed
+	// mode flags if selection can consider
+  // multiple policies to select the pools
 	mode executionMode
 }
 
@@ -276,15 +273,22 @@ type selection struct {
 // abstracts configuring a selection instance
 type buildOption func(*selection)
 
+func withDefaultSelection(s *selection) {
+  if string(s.mode) == "" {
+    s.mode = singleExection
+  }
+}
+
 // newSelection returns a new instance of
 // selection
-func newSelection(pools *csp.CSPList, mode executionMode, opts ...buildOption) *selection {
-	s := &selection{pools: pools, mode: mode}
+func newSelection(pools *csp.CSPList, opts ...buildOption) *selection {
+	s := &selection{pools: pools}
 	for _, o := range opts {
 		if o != nil {
 			o(s)
 		}
 	}
+  withDefaultSelection(s)
 	return s
 }
 
@@ -311,6 +315,14 @@ func (s *selection) isPreferAntiAffinityLabel() bool {
 // selection
 func (s *selection) isAntiAffinityLabel() bool {
 	return s.isPolicy(antiAffinityLabelPolicy)
+}
+
+// ExecutionMode sets the execution mode
+// against the provided selection instance
+func ExecutionMode(m executionMode) buildOption {
+	return func(s *selection) {
+		s.mode = m
+	}
 }
 
 // PreferAntiAffinityLabel adds anti affinity label
@@ -350,27 +362,17 @@ func PrioritizeOverAllPrevious(b buildOption) buildOption {
 	}
 }
 
-// GetBuildOptionByAnnotation returns the appropriate buildOptions
-//  based on the input label
-func GetBuildOptionByAnnotation(annotations ...string) []buildOption {
+// GetPolicies returns the appropriate selection
+// policies based on the provided values
+func GetPolicies(values ...string) []buildOption {
 	var opts []buildOption
-	for _, annotation := range annotations {
-		if strings.Contains(annotation, string(scheduleOnHostAnnotation)) {
-			opts = append(opts, PreferScheduleOnHostAnnotation(strings.TrimPrefix(annotation, string(scheduleOnHostAnnotation)+"=")))
-		}
-	}
-	return opts
-}
-
-// GetBuildOptionByLabelSelector returns the appropriate
-// buildOptions based on the input label
-func GetBuildOptionByLabelSelector(labels ...string) []buildOption {
-	var opts []buildOption
-	for _, label := range labels {
-		if strings.Contains(label, string(preferReplicaAntiAffinityLabel)) {
-			opts = append(opts, PreferAntiAffinityLabel(label))
+	for _, val := range values {
+		if strings.Contains(val, string(scheduleOnHostAnnotation)) {
+			opts = append(opts, ScheduleOnHostAnnotation(val)))
+		} else if strings.Contains(label, string(preferReplicaAntiAffinityLabel)) {
+		  opts = append(opts, PreferAntiAffinityLabel(val))
 		} else if strings.Contains(label, string(replicaAntiAffinityLabel)) {
-			opts = append(opts, AntiAffinityLabel(label))
+			opts = append(opts, AntiAffinityLabel(val))
 		}
 	}
 	return opts
@@ -379,10 +381,12 @@ func GetBuildOptionByLabelSelector(labels ...string) []buildOption {
 // validate runs some validations/checks
 // against this selection instance
 func (s *selection) validate() error {
-	if s.isAntiAffinityLabel() && s.isPreferAntiAffinityLabel() {
-		return errors.New("invalid selection: both antiAffinityLabel and preferAntiAffinityLabel policies can not be together")
-	}
-	return nil
+  if s.isAntiAffinityLabel() && s.isPreferAntiAffinityLabel() {
+    return errors.New("invalid selection: both antiAffinityLabel and preferAntiAffinityLabel policies can not be together")
+  } else if s.isScheduleOnHostAnnotation() && s.isPreferScheduleOnHostAnnotation() {
+    return errors.New("invalid selection: both scheduleOnHostAnnotation and preferScheduleOnHostAnnotation policies can not be together")
+  }
+  return nil
 }
 
 // filter returns the final list of pools that
@@ -397,7 +401,7 @@ func (s *selection) filter() (*csp.CSPList, error) {
 		return s.pools, nil
 	}
 	// make a copy of original pool UIDs
-	filtered = s.pools
+	filtered = append(filtered, s.pools...)
 	// Sorting the policies based on the priority
 	sort.SliceStable(s.policies, func(i, j int) bool {
 		return s.policies[i].priority() > s.policies[j].priority()
@@ -416,24 +420,8 @@ func (s *selection) filter() (*csp.CSPList, error) {
 	return filtered, nil
 }
 
-// FilterWithBuildOptions will return filtered pool UIDs
-// from the provided list based on pool
-// selection options
-func FilterWithBuildOptions(originalpools *csp.CSPList, opts ...[]buildOption) ([]string, error) {
-	options := []buildOption{}
-	for _, bopts := range opts {
-		options = append(options, bopts...)
-	}
-	plist, err := Filter(originalpools, options...)
-	if err != nil {
-		return nil, err
-	}
-	return plist.GetPoolUIDs(), nil
-}
-
-// Filter will return filtered pool UIDs
-// from the provided list based on pool
-// selection options
+// Filter will filter the provided pools
+// based on pool selection policies
 func Filter(originalPools *csp.CSPList, opts ...buildOption) (*csp.CSPList, error) {
 	if originalPools == nil {
 		return originalPools, nil
@@ -444,6 +432,16 @@ func Filter(originalPools *csp.CSPList, opts ...buildOption) (*csp.CSPList, erro
 		return nil, err
 	}
 	return s.filter()
+}
+
+// FilterPoolIDs will filter the provided pools
+// based on pool selection policies
+func FilterPoolIDs(originalpools *csp.CSPList, opts ...[]buildOption) ([]string, error) {
+	plist, err := Filter(originalpools, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return plist.GetPoolUIDs(), nil
 }
 
 // TemplateFunctions exposes a few functions as
