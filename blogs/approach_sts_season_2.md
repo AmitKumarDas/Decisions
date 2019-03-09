@@ -246,6 +246,94 @@ const (
   singleExection executionMode = "single-mode"
 )
 
+type policyList struct {
+  items  map[priority][]policy
+}
+
+func (pl *policyList) getAll() []policy {
+  if len(pl.items) == 0 {
+    return nil
+  }
+  var all []policy
+  for priority, policies := range pl.items {
+    all = append(all, policies...)
+  }
+  return all
+}
+
+func (pl *policyList) add(p policy) {
+  pl.items[policy.priority()] = append(pl.items[policy.priority()], policy)
+}
+
+func (pl *policyList) sortByPriority() []policy {
+  if len(pl.items) == 0 {
+    return nil
+  }
+  var sorted []policy
+  for i := lowPriority; i <= highPriority; i++ {
+    if len(pl.items[i]) == 0 {
+      continue
+    }
+    sorted = append(sorted, pl.items[i]...)
+  }
+  return sorted
+}
+
+type policyListPredicate func(*policyList) bool
+
+func hasPolicy(name string) policyListPredicate {
+  return func(pl *policyList) bool {
+    if len(pl.items) == 0 {
+      return false
+    }
+    all := pl.getAll()
+    for _, policy := range all {
+      if policy.name() == name {
+        return true
+      }
+    }
+    return false
+  }
+}
+
+func hasHighPriorityPolicy() policyListPredicate {
+  return func(pl *policyList) bool {
+    if len(pl.items) == 0 {
+      return false
+    }
+    return len(pl.items[highPriority]) != 0
+  }
+}
+
+func hasMediumPriorityPolicy() policyListPredicate {
+  return func(pl *policyList) bool {
+    if len(pl.items) == 0 {
+      return false
+    }
+    return len(pl.items[mediumPriority]) != 0
+  }
+}
+
+func hasLowPriorityPolicy() policyListPredicate {
+  return func(pl *policyList) bool {
+    if len(pl.items) == 0 {
+      return false
+    }
+    return len(pl.items[lowPriority]) != 0
+  }
+}
+
+func (pl *policyList) getTopPriority() policy {
+  if hasHighPriorityPolicy()(pl) {
+    pl.items[highPriority][0]
+  } else if hasMediumPriorityPolicy()(pl) {
+    pl.items[mediumPriority][0]
+  } else if hasLowPriorityPolicy()(pl) {
+    pl.items[lowPriority][0]
+  }
+  return nil
+}
+
 // selection enables selecting required pools
 // based on the registered policies
 //
@@ -262,7 +350,7 @@ type selection struct {
 	pools *csp.CSPList
 
 	// selection is based on these policies
-	policies []policy
+	policies policyList
 
 	// mode flags if selection can consider
   // multiple policies to select the pools
@@ -292,29 +380,23 @@ func newSelection(pools *csp.CSPList, opts ...buildOption) *selection {
 	return s
 }
 
-// isPolicy determines if the provided policy
-// needs to be considered during selection
-func (s *selection) isPolicy(p policyName) bool {
-	for _, pol := range s.policies {
-		if pol.name() == p {
-			return true
-		}
-	}
-	return false
+// hasPolicy determines if the provided policy
+// is part of the selection
+func (s *selection) hasPolicy(p policyName) bool {
+	return s.policies.hasPolicy(p)
 }
 
-// isPreferAntiAffinityLabel determines if
-// prefer anti affinity label needs to be
-// considered during selection
-func (s *selection) isPreferAntiAffinityLabel() bool {
-	return s.isPolicy(preferAntiAffinityLabelPolicy)
+// hasPreferAntiAffinityLabel determines if
+// prefer anti affinity label is part of
+// the selection
+func (s *selection) hasPreferAntiAffinityLabel() bool {
+	return s.hasPolicy(preferAntiAffinityLabelPolicy)
 }
 
-// isAntiAffinityLabel determines if anti affinity
-// label needs to be considered during
-// selection
-func (s *selection) isAntiAffinityLabel() bool {
-	return s.isPolicy(antiAffinityLabelPolicy)
+// hasAntiAffinityLabel determines if anti affinity
+// label is part of the selection
+func (s *selection) hasAntiAffinityLabel() bool {
+	return s.hasPolicy(antiAffinityLabelPolicy)
 }
 
 // ExecutionMode sets the execution mode
@@ -331,7 +413,7 @@ func ExecutionMode(m executionMode) buildOption {
 func PreferAntiAffinityLabel(lbl string) buildOption {
 	return func(s *selection) {
 		p := preferAntiAffinityLabel{antiAffinityLabel{labelSelector: lbl, cvrList: defaultCVRList()}}
-		s.policies = append(s.policies, p)
+		s.policies.add(p)
 	}
 }
 
@@ -339,8 +421,8 @@ func PreferAntiAffinityLabel(lbl string) buildOption {
 // as a policy to be used during pool selection
 func AntiAffinityLabel(lbl string) buildOption {
 	return func(s *selection) {
-		a := antiAffinityLabel{labelSelector: lbl, cvrList: defaultCVRList()}
-		s.policies = append(s.policies, a)
+		p := antiAffinityLabel{labelSelector: lbl, cvrList: defaultCVRList()}
+		s.policies.add(p)
 	}
 }
 
@@ -349,7 +431,7 @@ func AntiAffinityLabel(lbl string) buildOption {
 func PreferScheduleOnHostAnnotation(hostName string) buildOption {
 	return func(s *selection) {
 		p := preferScheduleOnHost{scheduleOnHost{hostName: hostName}}
-		s.policies = append(s.policies, p)
+		s.policies.add(p)
 	}
 }
 
@@ -381,9 +463,9 @@ func GetPolicies(values ...string) []buildOption {
 // validate runs some validations/checks
 // against this selection instance
 func (s *selection) validate() error {
-  if s.isAntiAffinityLabel() && s.isPreferAntiAffinityLabel() {
+  if s.hasAntiAffinityLabel() && s.hasPreferAntiAffinityLabel() {
     return errors.New("invalid selection: both antiAffinityLabel and preferAntiAffinityLabel policies can not be together")
-  } else if s.isScheduleOnHostAnnotation() && s.isPreferScheduleOnHostAnnotation() {
+  } else if s.hasScheduleOnHostAnnotation() && s.hasPreferScheduleOnHostAnnotation() {
     return errors.New("invalid selection: both scheduleOnHostAnnotation and preferScheduleOnHostAnnotation policies can not be together")
   }
   return nil
@@ -402,17 +484,16 @@ func (s *selection) filter() (*csp.CSPList, error) {
 	}
 	// make a copy of original pool UIDs
 	filtered = append(filtered, s.pools...)
-	// Sorting the policies based on the priority
-	sort.SliceStable(s.policies, func(i, j int) bool {
-		return s.policies[i].priority() > s.policies[j].priority()
-	})
+	// Sorting policies based on the priority
+  policies := s.policies.sortByPriority()
 	// Executing policy filters
-	for _, policy := range s.policies {
+	for _, policy := range policies {
 		filtered, err = policy.filter(filtered)
 		if err != nil {
 			return nil, err
 		}
-		// stopping the mode of execution is singleExecution
+		// stopping here if running as
+    // singleExecution mode
 		if s.mode == singleExection {
 			break
 		}
@@ -426,7 +507,7 @@ func Filter(originalPools *csp.CSPList, opts ...buildOption) (*csp.CSPList, erro
 	if originalPools == nil {
 		return originalPools, nil
 	}
-	s := newSelection(originalPools, singleExection, opts...)
+	s := newSelection(originalPools, opts...)
 	err := s.validate()
 	if err != nil {
 		return nil, err
@@ -448,9 +529,8 @@ func FilterPoolIDs(originalpools *csp.CSPList, opts ...[]buildOption) ([]string,
 // go template functions
 func TemplateFunctions() template.FuncMap {
 	return template.FuncMap{
-		"cspGetPolicyByLabelSelector": GetBuildOptionByLabelSelector,
-		"cspGetPolicyByAnnotation":    GetBuildOptionByAnnotation,
-		"cspFilter":                   FilterWithBuildOptions,
+		"cspGetPolicies":              GetPolicies,
+		"cspFilter":                   FilterPoolsIDs,
 		"cspAntiAffinity":             AntiAffinityLabel,
 		"cspPreferAntiAffinity":       PreferAntiAffinityLabel,
 	}
