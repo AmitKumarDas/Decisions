@@ -90,83 +90,83 @@ const (
 // to be satisfied by any pool selection
 // implementation
 type policy interface {
-	priority() priority
-	name() policyName
-	filter(*csp.CSPList) (*csp.CSPList, error)
+  priority() priority
+  name() policyName
+  filter(*csp.CSPList) (*csp.CSPList, error)
 }
 
 // scheduleOnHost is a pool selection
 // implementation
 type scheduleOnHost struct {
-	// hostName holds the name of the
-	// host on which storage needs to
-	// be scheduled
-	hostName string
+  // hostName holds the name of the
+  // host on which storage needs to
+  // be scheduled
+  hostName string
 }
 
 // priority returns the priority of the
 // policy implementation
 func (p scheduleOnHost) priority() priority {
-	return mediumPriority
+  return mediumPriority
 }
 
 // name returns the name of the policy
 // implementation
 func (p scheduleOnHost) name() policyName {
-	return scheduleOnHostAnnotationPolicy
+  return scheduleOnHostAnnotationPolicy
 }
 
 // filter selects the pools available on the host
 // for which the policy has been applied
 func (p scheduleOnHost) filter(pools *csp.CSPList) (*csp.CSPList, error) {
-	if p.hostName == "" {
-		return pools, nil
-	}
+  if p.hostName == "" {
+    return pools, nil
+  }
   filteredPools := pools.Filter(csp.HasAnnotation(string(scheduleOnHostAnnotation), p.hostName))
-	return filteredPools, nil
+  return filteredPools, nil
 }
 
 // preferScheduleOnHost is pool selection
 // implementation
 type preferScheduleOnHost struct {
-	scheduleOnHost
+  scheduleOnHost
 }
 
 // priority return the priority of the policy
 // implementation
 func (p preferScheduleOnHost) priority() priority {
-	return mediumPriority
+  return mediumPriority
 }
 
 // name returns the name of the policy
 // implementation
 func (p preferScheduleOnHost) name() policyName {
-	return preferScheduleOnHostAnnotationPolicy
+  return preferScheduleOnHostAnnotationPolicy
 }
 
 // filter piggybacks on scheduleOnHost policy with 
 // the difference being this logic returns the
 // provided pools if no pools are found on the host
 func (p preferScheduleOnHost) filter(pools *csp.CSPList) (*csp.CSPList, error) {
-	plist, err := p.scheduleOnHost.filter(pools)
-	if err != nil {
-		return nil, err
-	}
-	if len(plist.Items) == 0 {
-		return pools, nil
-	}
-	return plist, nil
+  plist, err := p.scheduleOnHost.filter(pools)
+  if err != nil {
+    return nil, err
+  }
+  if len(plist.Items) == 0 {
+    return pools, nil
+  }
+  return plist, nil
 }
 
 // antiAffinityLabel is a pool selection
 // policy implementation
 type antiAffinityLabel struct {
-	labelSelector string
+  labelSelector string
 
-	// cvrList holds the function to list
-	// cstor volume replica which is useful
-	// mocking
-	cvrList cvrListFn
+  // cvrList holds the function to list
+  // cstor volume replica which is useful
+  // mocking
+  cvrList cvrListFn
 }
 
 func defaultCVRList() {
@@ -176,13 +176,13 @@ func defaultCVRList() {
 // priority returns the priority of
 // this policy
 func (p antiAffinityLabel) priority() priority {
-	return lowPriority
+  return lowPriority
 }
 
 // name returns the name of this
 // policy
 func (p antiAffinityLabel) name() policyName {
-	return antiAffinityLabelPolicy
+  return antiAffinityLabelPolicy
 }
 
 // filter excludes the pool(s) if they are
@@ -191,32 +191,32 @@ func (p antiAffinityLabel) name() policyName {
 // affinity rule against the provided list of
 // pools.
 func (p antiAffinityLabel) filter(pools *csp.CSPList) (*csp.CSPList, error) {
-	if p.labelSelector == "" {
-		return pools, nil
-	}
-	// pools that are already associated with
-	// this label should be excluded
-	//
-	// NOTE: we try without giving any namespace
-	// so that it lists from all available
-	// namespaces
-	cvrs, err := p.cvrList("", metav1.ListOptions{LabelSelector: p.labelSelector})
-	if err != nil {
-		return nil, err
-	}
-	exclude := cvr.ListBuilder().WithAPIList(cvrs).List().GetPoolUIDs()
-	return pools.Filter(csp.IsNotUID(exclude...)), nil
+  if p.labelSelector == "" {
+    return pools, nil
+  }
+  // pools that are already associated with
+  // this label should be excluded
+  //
+  // NOTE: we try without giving any namespace
+  // so that it lists from all available
+  // namespaces
+  cvrs, err := p.cvrList("", metav1.ListOptions{LabelSelector: p.labelSelector})
+  if err != nil {
+    return nil, err
+  }
+  exclude := cvr.ListBuilder().WithAPIList(cvrs).List().GetPoolUIDs()
+  return pools.Filter(csp.IsNotUID(exclude...)), nil
 }
 
 // preferAntiAffinityLabel is a pool
 // selection policy implementation
 type preferAntiAffinityLabel struct {
-	antiAffinityLabel
+  antiAffinityLabel
 }
 
 // name returns the name of this policy
 func (p preferAntiAffinityLabel) name() policyName {
-	return preferAntiAffinityLabelPolicy
+  return preferAntiAffinityLabelPolicy
 }
 
 // filter piggybacks on antiAffinityLabel policy
@@ -224,14 +224,14 @@ func (p preferAntiAffinityLabel) name() policyName {
 // the provided pools if there are no pools that
 // satisfy antiAffinity rule
 func (p preferAntiAffinityLabel) filter(pools *csp.CSPList) (*csp.CSPList, error) {
-	plist, err := p.antiAffinityLabel.filter(pools)
-	if err != nil {
-		return nil, err
-	}
-	if len(plist.Items) > 0 {
-		return plist, nil
-	}
-	return pools, nil
+  plist, err := p.antiAffinityLabel.filter(pools)
+  if err != nil {
+    return nil, err
+  }
+  if len(plist.Items) > 0 {
+    return plist, nil
+  }
+  return pools, nil
 }
 
 type executionMode string
@@ -345,16 +345,16 @@ func (pl *policyList) getTopPriority() policy {
 //  This code will evolve as we try implementing
 // different set of policies
 type selection struct {
-	// list of original pools aginst whom
-	// selection will be made
-	pools *csp.CSPList
+  // list of original pools aginst whom
+  // selection will be made
+  pools *csp.CSPList
 
-	// selection is based on these policies
-	policies policyList
-
-	// mode flags if selection can consider
+  // selection is based on these policies
+  policies policyList
+  
+  // mode flags if selection can consider
   // multiple policies to select the pools
-	mode executionMode
+  mode executionMode
 }
 
 // buildOption is a typed function that
@@ -370,77 +370,68 @@ func withDefaultSelection(s *selection) {
 // newSelection returns a new instance of
 // selection
 func newSelection(pools *csp.CSPList, opts ...buildOption) *selection {
-	s := &selection{pools: pools}
-	for _, o := range opts {
-		if o != nil {
-			o(s)
-		}
-	}
+  s := &selection{pools: pools}
+  for _, o := range opts {
+    if o != nil {
+      o(s)
+    }
+  }
   withDefaultSelection(s)
-	return s
+  return s
 }
 
 // hasPolicy determines if the provided policy
 // is part of the selection
 func (s *selection) hasPolicy(p policyName) bool {
-	return s.policies.hasPolicy(p)
+  return s.policies.hasPolicy(p)
 }
 
 // hasPreferAntiAffinityLabel determines if
 // prefer anti affinity label is part of
 // the selection
 func (s *selection) hasPreferAntiAffinityLabel() bool {
-	return s.hasPolicy(preferAntiAffinityLabelPolicy)
+  return s.hasPolicy(preferAntiAffinityLabelPolicy)
 }
 
 // hasAntiAffinityLabel determines if anti affinity
 // label is part of the selection
 func (s *selection) hasAntiAffinityLabel() bool {
-	return s.hasPolicy(antiAffinityLabelPolicy)
+  return s.hasPolicy(antiAffinityLabelPolicy)
 }
 
 // ExecutionMode sets the execution mode
 // against the provided selection instance
 func ExecutionMode(m executionMode) buildOption {
-	return func(s *selection) {
-		s.mode = m
-	}
+  return func(s *selection) {
+    s.mode = m
+  }
 }
 
 // PreferAntiAffinityLabel adds anti affinity label
 // as a preferred policy to be used during pool
 // selection
 func PreferAntiAffinityLabel(lbl string) buildOption {
-	return func(s *selection) {
-		p := preferAntiAffinityLabel{antiAffinityLabel{labelSelector: lbl, cvrList: defaultCVRList()}}
-		s.policies.add(p)
-	}
+  return func(s *selection) {
+    p := preferAntiAffinityLabel{antiAffinityLabel{labelSelector: lbl, cvrList: defaultCVRList()}}
+    s.policies.add(p)
+  }
 }
 
 // AntiAffinityLabel adds anti affinity label
 // as a policy to be used during pool selection
 func AntiAffinityLabel(lbl string) buildOption {
-	return func(s *selection) {
-		p := antiAffinityLabel{labelSelector: lbl, cvrList: defaultCVRList()}
-		s.policies.add(p)
-	}
+  return func(s *selection) {
+    p := antiAffinityLabel{labelSelector: lbl, cvrList: defaultCVRList()}
+    s.policies.add(p)
+  }
 }
 
 // PreferScheduleOnHostAnnotation adds preferScheduleOnHost
 // as a policy to be used during pool selection
 func PreferScheduleOnHostAnnotation(hostName string) buildOption {
-	return func(s *selection) {
-		p := preferScheduleOnHost{scheduleOnHost{hostName: hostName}}
-		s.policies.add(p)
-	}
-}
-
-// PrioritizeOverAllPrevious ingnores all previous
-// buildOptions during execution
-func PrioritizeOverAllPrevious(b buildOption) buildOption {
-	return func(s *selection) {
-		s.policies = []policy{}
-		b(s)
+  return func(s *selection) {
+    p := preferScheduleOnHost{scheduleOnHost{hostName: hostName}}
+    s.policies.add(p)
 	}
 }
 
