@@ -519,11 +519,11 @@ func FilterPoolIDs(originalpools *csp.CSPList, opts ...[]buildOption) ([]string,
 // TemplateFunctions exposes a few functions as
 // go template functions
 func TemplateFunctions() template.FuncMap {
-	return template.FuncMap{
-		"cspGetPolicies":              GetPolicies,
-		"cspFilter":                   FilterPoolsIDs,
-		"cspAntiAffinity":             AntiAffinityLabel,
-		"cspPreferAntiAffinity":       PreferAntiAffinityLabel,
-	}
+  return template.FuncMap{
+    "cspGetPolicies":         GetPolicies,
+    "cspFilterPoolIDs":       FilterPoolsIDs,
+    "cspAntiAffinity":        AntiAffinityLabel,
+    "cspPreferAntiAffinity":  PreferAntiAffinityLabel,
+  }
 }
 ```
