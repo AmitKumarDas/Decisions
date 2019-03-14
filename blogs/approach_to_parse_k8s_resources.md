@@ -21,4 +21,10 @@ post: |
   {{- $err | empty | not | verifyErr $err | saveIf "resizecstorvolume.verifyErr" .TaskResult | noop -}}
 ```
 
+```yaml
+post: |
+  {{- $err := .TaskResult.createpatchcv.error | default "" | toString -}}
+  {{- $err | empty | not | verifyErr $err | saveIf "createpatchcv.verifyErr" .TaskResult | noop -}}
+```
+
 ### Solution
