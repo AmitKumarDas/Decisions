@@ -48,3 +48,36 @@ in a static compiled language and can be saved & versioned then why not. Being d
 In other words, there would not have any `github actions` to begin with
 
 ### Prototype
+```yaml
+spec:
+  create this pod: 
+    construct:
+      cmd: create kube pod
+      with:
+        namespace: default
+        inCluster: false
+        output: ".spec.hostName"
+        yaml: blabh blah blah
+      if:
+        isRunning:
+        isLabel: "app=openebs"
+    options:
+      saveas: createit
+      audit: true
+      runif: noErrors
+  check this pod: 
+    construct:
+      cmd: get kube pod
+      with:
+        namespace: default
+        name: poddy
+        inCluster: false
+        output: ".spec.hostName"
+      if:
+        isRunning:
+        isLabel: "app=openebs"
+    options:
+      saveas: poddy
+      audit: true
+      runif: noErrors
+```
