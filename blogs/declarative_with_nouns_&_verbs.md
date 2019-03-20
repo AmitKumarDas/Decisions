@@ -97,29 +97,42 @@ spec:
 kind: RunTask
 spec:
   desc: do my work please
-  run:
+  runs:
+  - desc: get me a list of pods
+    id: pod101
+    cmd:
+      type: pod
+      action: create
+      options: 
+      - func: withYaml
+        args: |
+          kind: Pod
+          name: poddie
+          namespace: default
+      output: // optional
+      - alias: uuid
+        path: .metadata.uuid
   - desc: get me a list of pods
     id: pod123
     cmd:
       type: podList
+      action: list // or apiList, optional
       options: 
-      - name: withNamespace 
+      - func: withNamespace 
         args: 
         - default
-      - name: inCluster
+      - func: inCluster
       checks:
-      - name: isRunning
-      - name: isNamespace
+      - func: isRunning
+      - func: isNamespace
         args: 
         - default
-      output: 
-        name: list
   - desc: display the output
     id: display101
     cmd:
       type: display
       options: 
-      - name: withYaml 
+      - func: withYaml 
         args: |
           kind: PodList
           items:
