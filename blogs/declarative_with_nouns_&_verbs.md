@@ -91,25 +91,27 @@ spec:
 - Executor engine can unmarshal the runtask
   - Run a go template of first cmd in the array
   - Then unmarshal and save the result of cmd into global values
-  - Next cmd will be executed if no error occurred to previous cmd.
+  - Repeat with next cmd if no error occurred to previous cmd
 
 ```yaml
 kind: RunTask
 spec:
   desc: do my work please
-  runs:
+  run:
   - desc: get me a list of pods
     id: pod123
     cmd:
       type: podList
       options: 
       - name: withNamespace 
-        args: default
+        args: 
+        - default
       - name: inCluster
       checks:
       - name: isRunning
       - name: isNamespace
-        args: default
+        args: 
+        - default
       output: 
         name: list
   - desc: display the output
