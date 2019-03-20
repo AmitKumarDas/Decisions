@@ -1,5 +1,5 @@
 ### Meta Info
-- Version - 2
+- Version - 3
 - Last Updated On - 20-Mar-2019
 
 ### Motivation
@@ -98,7 +98,7 @@ kind: RunTask
 spec:
   desc: do my work please
   runs:
-  - desc: get me a list of pods
+  - desc: create this pod
     id: pod101
     cmd:
       type: pod
