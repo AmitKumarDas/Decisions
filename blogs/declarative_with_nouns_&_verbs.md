@@ -1,6 +1,6 @@
 ### Meta Info
-- Version - 1
-- Last Updated On - 16-Mar-2019
+- Version - 2
+- Last Updated On - 20-Mar-2019
 
 ### Motivation
 What things in software are most common? What is the most simplistic version of any software product. IMO it is its CLI.
@@ -80,4 +80,46 @@ spec:
       saveas: poddy
       audit: true
       runif: noErrors
+```
+
+### Prototype - 2
+- Yaml when unmarshaled gets the job done
+- Build and Run
+- Build options and run options
+- When marshaled returns the result of cmd in JSON bytes or error
+- Can be formed as a list of cmds
+- Executor engine can unmarshal the runtask
+  - Run a go template of first cmd in the array
+  - Then unmarshal and save the result of cmd into global values
+  - Next cmd will be executed if no error occurred to previous cmd.
+
+```yaml
+kind: RunTask
+spec:
+  desc: do my work please
+  runs:
+  - desc: get me a list of pods
+    id: pod123
+    cmd:
+      type: podList
+      options: 
+      - name: withNamespace 
+        args: default
+      - name: inCluster
+      checks:
+      - name: isRunning
+      - name: isNamespace
+        args: default
+      output: 
+        name: list
+  - desc: display the output
+    id: display101
+    cmd:
+      type: display
+      options: 
+      - name: withYaml 
+        args: |
+          kind: PodList
+          items:
+          - id: {{ .pod123.id[0] }}
 ```
