@@ -10,7 +10,7 @@ a declarative specification that can be saved, versioned and injected into workf
 
 The motivation of this article is to find a balance between action oriented CLI to specification driven yamls.
 
-### What all behaviours do we encounter in our day job (_ == Actions == Verbs_)
+### What all behaviours do we encounter in our day job (_i.e. Actions / Verbs_)
 I shall take the example of openebs storage as the software. What can be various actions related to openebs? We can think
 of below:
 - create
@@ -24,7 +24,7 @@ of below:
 - snapshot
 - etc...
 
-### What all nouns do we encounter in our day job (_ == Entities_)
+### What all nouns do we encounter in our day job (_i.e. Entities_)
 Lets think of various nouns used in openebs:
 - cstor volume, cstor volume list
 - cstor replica, cstor replica list
@@ -43,7 +43,7 @@ Lets think of various nouns used in openebs:
 - get cstor volume
 - etc...
 
-### When CLI camouflages as a declarative YAML (_== Devil_)
+### When CLI camouflages as a declarative YAML (_i.e. Devil_)
 This is considered as the devil by most fellow programmers. However, IMO if it helps users to get the requirement done
 in a static compiled language and can be saved & versioned then why not. Being declarative is not a option but a need.
 In other words, there would not have any `github actions` to begin with
