@@ -146,10 +146,13 @@ spec:
   - input, 
   - output
 - Can be formed as a list of cmds
-- Executor engine can unmarshal the runtask
-  - Run a go template of first cmd in the array
-  - Then unmarshal and save the result of cmd into global values
-  - Repeat with next cmd if no error occurred to previous cmd
+- Runtask Execute Steps:
+  - Go template the cmd
+  - Unmarshal Yaml
+  - // NOTE: Unmarshal will do everything
+- Unmarshal Steps:
+  - Delegate to respective kind & action
+  - Pass the input & output to above delegated object
 
 ```yaml
 kind: RunTask
