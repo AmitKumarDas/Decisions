@@ -10,7 +10,7 @@ a declarative specification that can be saved, versioned and injected into workf
 
 The motivation of this article is to find a balance between action oriented CLI to specification driven yamls.
 
-### Behaviours == Actions == Verbs
+### What all behaviours do we encounter in our day job (_ == Actions == Verbs_)
 I shall take the example of openebs storage as the software. What can be various actions related to openebs? We can think
 of below:
 - create
@@ -18,23 +18,24 @@ of below:
 - get
 - identify
 - list
+- filter
 - resize
 - backup
 - snapshot
 - etc...
 
-### Nouns == Entities
+### What all nouns do we encounter in our day job (_ == Entities_)
 Lets think of various nouns used in openebs:
-- cstor volume
-- cstor replica
-- cstor target
-- cstor pool
-- jiva volume
-- jiva target
-- jiva pool
+- cstor volume, cstor volume list
+- cstor replica, cstor replica list
+- cstor target, cstor target list
+- cstor pool, cstor pool list
+- jiva volume, jiva volume list
+- jiva target, jiva target list
+- jiva pool, jiva pool list
 - etc...
 
-### Mix them up == CLI
+### Mix them up (_typically seen in CLI_)
 - create cstor volume
 - delete cstor pool
 - resize cstor volume
@@ -42,7 +43,7 @@ Lets think of various nouns used in openebs:
 - get cstor volume
 - etc...
 
-### Devil == CLI in YAML
+### When CLI camouflages as a declarative YAML (_== Devil_)
 This is considered as the devil by most fellow programmers. However, IMO if it helps users to get the requirement done
 in a static compiled language and can be saved & versioned then why not. Being declarative is not a option but a need.
 In other words, there would not have any `github actions` to begin with
@@ -161,6 +162,7 @@ spec:
     id: pod101
     options:
       retry: 2, 1s # optional
+      isRun: true # optional
       action: Create
       kind: Pod
     input:
