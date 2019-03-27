@@ -141,7 +141,10 @@ spec:
 
 ### Prototype - 3
 - Yaml when unmarshaled gets the job done
-- options, input, output
+- Schema:
+  - options, 
+  - input, 
+  - output
 - Can be formed as a list of cmds
 - Executor engine can unmarshal the runtask
   - Run a go template of first cmd in the array
@@ -156,41 +159,20 @@ spec:
   - desc: create this pod
     id: pod101
     options:
-      retry:
-      action:
-      type:
+      retry: 2, 1s # optional
+      action: Create
+      kind: Pod
     input:
-      - func: withYaml
-        args: |
-          kind: Pod
-          name: poddie
-          namespace: default
-      output: // optional
-      - alias: uuid
-        path: .metadata.uuid
-  - desc: get me a list of pods
-    id: pod123
-    cmd:
-      type: podList
-      action: list // or apiList, optional
-      options: 
-      - func: withNamespace 
-        args: 
-        - default
-      - func: inCluster
-      checks:
-      - func: isRunning
-      - func: isNamespace
-        args: 
-        - default
-  - desc: display the output
-    id: display101
-    cmd:
-      type: display
-      options: 
-      - func: withYaml 
-        args: |
-          kind: PodList
-          items:
-          - id: {{ .pod123.id[0] }}
+    - type: withYaml
+      value: |
+        kind: Pod
+        name: poddie
+        namespace: default
+    output: # optional
+    - type: getPathValueString
+      value: .metadata.uuid
+      alias: uuid
+    - type: getPathValueInt
+      value: .metadata.generation
+      alias: generation
 ```
