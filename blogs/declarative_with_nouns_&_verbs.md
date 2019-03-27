@@ -149,7 +149,7 @@ spec:
 - Runtask Execute Steps:
   - Go template the cmd
   - Unmarshal Yaml
-  - // NOTE: Unmarshal will do everything
+  - _NOTE: Unmarshal will do everything_
 - Unmarshal Steps:
   - Delegate to respective kind & action
   - Pass the input & output to above delegated object
