@@ -138,3 +138,59 @@ spec:
           items:
           - id: {{ .pod123.id[0] }}
 ```
+
+### Prototype - 3
+- Yaml when unmarshaled gets the job done
+- options, input, output
+- Can be formed as a list of cmds
+- Executor engine can unmarshal the runtask
+  - Run a go template of first cmd in the array
+  - Then unmarshal and save the result of cmd into global values
+  - Repeat with next cmd if no error occurred to previous cmd
+
+```yaml
+kind: RunTask
+spec:
+  desc: do my work please
+  runs:
+  - desc: create this pod
+    id: pod101
+    options:
+      retry:
+      action:
+      type:
+    input:
+      - func: withYaml
+        args: |
+          kind: Pod
+          name: poddie
+          namespace: default
+      output: // optional
+      - alias: uuid
+        path: .metadata.uuid
+  - desc: get me a list of pods
+    id: pod123
+    cmd:
+      type: podList
+      action: list // or apiList, optional
+      options: 
+      - func: withNamespace 
+        args: 
+        - default
+      - func: inCluster
+      checks:
+      - func: isRunning
+      - func: isNamespace
+        args: 
+        - default
+  - desc: display the output
+    id: display101
+    cmd:
+      type: display
+      options: 
+      - func: withYaml 
+        args: |
+          kind: PodList
+          items:
+          - id: {{ .pod123.id[0] }}
+```
