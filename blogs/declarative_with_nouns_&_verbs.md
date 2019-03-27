@@ -83,15 +83,13 @@ spec:
 ```
 
 ### Prototype - 2
-- Yaml when unmarshaled gets the job done
+- Yaml when Unmarshaled gets the job done
 - Build and Run
 - Build options and run options
-- When marshaled returns the result of cmd in JSON bytes or error
-- Can be formed as a list of cmds
-- Executor engine can unmarshal the runtask
-  - Run a go template of first cmd in the array
-  - Then unmarshal and save the result of cmd into global values
-  - Repeat with next cmd if no error occurred to previous cmd
+- Runtask Execute Steps:
+  - Go template the cmd
+  - Unmarshal // Gets all the job done
+  - Repeat next cmd
 
 ```yaml
 kind: RunTask
