@@ -92,6 +92,8 @@ func (p *isNotInitialized) name() string {
 }
 
 func (p *isNotInitialized) promCounter() {
+  // do not run counter if
+  // check fails
   if !p.check() {
     return
   }
