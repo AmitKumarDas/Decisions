@@ -42,11 +42,11 @@ func IsNotInitialized() predicateFunc {
 // corresponding implementation(s)
 // if our requirement demands it
 type predicate interface {
-  check()      bool     // actual conditional logic
-  name()    string   // name of this condition
-  promCounter()      // some prometheus counter logic
-  pass() string      // success message when this condition passes
-  fail() string      // failure message when this condition fails
+  check()       bool     // actual conditional logic
+  name()        string   // name of this condition
+  promCounter()          // some prometheus counter logic
+  pass()        string   // success message when this condition passes
+  fail()        string   // failure message when this condition fails
 }
 
 type predicateList []predicate
