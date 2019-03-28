@@ -18,7 +18,7 @@ type zvol struct {
 
 // Usual Approach
 //
-// typical typed predicate function
+// typed predicate function
 // and corresponding implementations
 type predicateFunc func(*zvol) bool
 
