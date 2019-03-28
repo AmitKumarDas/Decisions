@@ -23,7 +23,7 @@ type zvol struct {
 type predicateFunc func(*zvol) bool
 
 func (z *zvol) IsNotInitialized() bool {
-  return p.zvol.state == "Online"
+  return p.zvol.state != "Init"
 }
 
 func IsNotInitialized() predicateFunc {
