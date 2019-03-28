@@ -42,7 +42,7 @@ func IsNotInitialized() predicateFunc {
 // corresponding implementation(s)
 // if our requirement demands it
 type predicate interface {
-  ok()      bool     // actual conditional logic
+  check()      bool     // actual conditional logic
   name()    string   // name of this condition
   promCounter()      // some prometheus counter logic
   pass() string      // success message when this condition passes
