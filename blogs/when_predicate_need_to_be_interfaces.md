@@ -22,8 +22,12 @@ type zvol struct {
 // and corresponding implementations
 type predicateFunc func(*zvol) bool
 
+func (z *zvol) IsInitialized() bool {
+  return p.zvol.state != "Init" && p.zvol.state != ""
+}
+
 func (z *zvol) IsNotInitialized() bool {
-  return p.zvol.state != "Init"
+  return !p.zvol.IsInitialized()
 }
 
 func IsNotInitialized() predicateFunc {
