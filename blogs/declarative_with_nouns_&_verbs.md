@@ -246,3 +246,36 @@ spec:
       - --check=IsOffline
     as: myDiskStatusInfo
 ```
+
+#### UseCase 4
+- I want following details from a PVC
+  - hostname from annotations
+  - replica anti affinity from labels
+  - preferred replica anti affinity from labels
+  - target affinity
+  - sts target affinity
+- I want to save this as myPVCInfo
+```yaml
+kind: RunTask
+spec:
+  meta:
+  task:
+  post:
+  - run: GetAnnotation
+    for:
+      - --kind=PersistentVolumeClaim
+      - --json-path=.taskresult.id101.pvc
+    withOutput:
+      - --annotation --key=volume.kubernetes.io/selected-node
+    as: myPVCInfo.selectNode
+  - run: GetLabelList
+    for:
+      - --kind=PersistentVolumeClaim
+      - --json-path=.taskresult.id101.pvc
+    withOutput:
+      - --label --key=openebs.io/replica-anti-affinity
+      - --label --key=openebs.io/preferred-replica-anti-affinity
+      - --label --key=openebs.io/target-affinity
+      - --label --key=openebs.io/sts-target-affinity
+    as: myPVCInfo.labels
+```
