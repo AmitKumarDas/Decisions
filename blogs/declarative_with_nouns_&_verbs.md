@@ -261,14 +261,14 @@ spec:
   meta:
   task:
   post:
-  - run: GetAnnotation
+  - run: GetAnnotations
     for:
       - --kind=PersistentVolumeClaim
       - --json-path=.taskresult.id101.pvc
     withOutput:
       - --annotation --key=volume.kubernetes.io/selected-node
     as: myPVCInfo.selectNode
-  - run: GetLabelList
+  - run: GetLabels
     for:
       - --kind=PersistentVolumeClaim
       - --json-path=.taskresult.id101.pvc
