@@ -215,7 +215,7 @@ spec:
       - --object-path=.taskresult.id101.pods
     withFilter:
       - --check=IsRunning
-      - --check=IsLabel --label=app=jiva
+      - --check=IsLabel --label=app:jiva
     withOutput:
       - --name
       - --namespace
@@ -241,8 +241,8 @@ spec:
       - --kind=CStorPoolList
       - --json-path=.taskresult.id101.csps
     withFilter:
-      - --check=IsLabel --label=openebs.io/version=0.9.0
-      - --check=IsLabel --label=app=jiva
+      - --check=IsLabel --label=openebs.io/version:0.9.0
+      - --check=IsLabel --label=app:jiva
       - --check=IsOffline
     as: myDiskStatusInfo
 ```
@@ -278,4 +278,29 @@ spec:
       - --label --key=openebs.io/target-affinity
       - --label --key=openebs.io/sts-target-affinity
     as: myPVCInfo.labels
+```
+
+#### UseCase 5
+- I want to create a pod with following details:
+  - name of the pod is `mypod`
+  - namespace of the pod is `default`
+  - pod should have label `app=jiva`
+  - pod image should be `openebs.io/m-apiserver:1.0.0`
+- Save this instance of pod as myPod
+
+```yaml
+kind: RunTask
+spec:
+  meta:
+  task:
+  post:
+  - run: Build
+    for: 
+      - --kind=Pod
+    withOptions: 
+      - --label=app:jiva
+      - --name=mypod
+      - --namespace=default
+      - --image=openebs.io/m-apiserver:1.0.0
+    as: myPod
 ```
