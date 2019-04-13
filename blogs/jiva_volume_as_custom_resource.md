@@ -14,6 +14,7 @@ casConfig:
 target:
 replica:
 references:
+  persistentVolume:
   persistenVolumeClaim:
   storageClass:
 status:
