@@ -267,7 +267,7 @@ spec:
       - --json-path=.taskresult.id101.pvc
     withOutput:
       - --annotation --key=volume.kubernetes.io/selected-node
-    as: myPVCInfo.selectNode
+    as: myPVCInfo.anns
   - run: GetLabels
     for:
       - --kind=PersistentVolumeClaim
