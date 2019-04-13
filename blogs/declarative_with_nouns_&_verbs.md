@@ -179,3 +179,70 @@ spec:
       value: .metadata.generation
       alias: generation
 ```
+
+### Prototype - 4
+#### UseCase 1
+- I want to get a list of namespaces of running pods from a given pod list
+- I want to save this list as `myNS`
+```yaml
+kind: RunTask
+spec:
+  meta:
+  task:
+  post:
+  - run: GetNamespaceList
+    for:
+      - --kind=PodList
+      - --object-path=.taskresult.id101.pods
+    withFilter:
+      - --check=IsRunning
+    as: myNS
+```
+
+#### UseCase 2
+- I want to get a list of name, namespace, uuid of running pods from a given pod list
+- I want to also filter this for pods with label app=jiva
+- I want to save this list as myPodInfo
+```yaml
+kind: RunTask
+spec:
+  meta:
+  task:
+  post:
+  - run: GetTupleList
+    for:
+      - --kind=PodList
+      - --object-path=.taskresult.id101.pods
+    withFilter:
+      - --check=IsRunning
+      - --check=IsLabel --label=app=jiva
+    withOutput:
+      - --name
+      - --namespace
+      - --uuid
+    as: myPodInfo
+```
+
+#### UseCase 3
+- I want to get a map of disk name & disk status from a given list of CSPs
+- I want to filter this for CSPs with following labels:
+  - openebs.io/version=0.9.0
+  - app=jiva
+- I want to additionally filter CSPs with Offline state
+- I want to save this list as myDiskStatusInfo
+```yaml
+kind: RunTask
+spec:
+  meta:
+  task:
+  post:
+  - run: GetDiskStatusMap
+    for:
+      - --kind=CStorPoolList
+      - --json-path=.taskresult.id101.csps
+    withFilter:
+      - --check=IsLabel --label=openebs.io/version=0.9.0
+      - --check=IsLabel --label=app=jiva
+      - --check=IsOffline
+    as: myDiskStatusInfo
+```
