@@ -1,16 +1,20 @@
 ```yaml
 kind: JivaVolume
 metadata:
+  namespace:
   name:
   annotations:
   labels:
 spec:
   capacity:
   casType:
+  fsType:
+  lun:
 iscsi:
   iqn:
   targetPortal:
 casConfig:
+service:
 target:
 replica:
 references:
