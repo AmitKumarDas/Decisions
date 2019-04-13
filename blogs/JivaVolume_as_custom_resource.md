@@ -1,0 +1,20 @@
+```yaml
+kind: JivaVolume
+metadata:
+  name:
+  annotations:
+  labels:
+spec:
+  capacity:
+  casType:
+iscsi:
+  iqn:
+  targetPortal:
+casConfig:
+target:
+replica:
+references:
+  persistenVolumeClaim:
+  storageClass:
+status:
+```
