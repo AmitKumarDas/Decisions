@@ -54,21 +54,21 @@ spec:
 iscsi:
   iqn:
   targetPortal:
-config:
+config: # common config applicable to service, target & replica
   envs:
   labels:
-    openebs.io/match-name: # cann be pv name if metadata.name != pv name
+    openebs.io/match-name: # can be pv name if metadata.name != pv name
   annotations:
 service:
-  config:
+  config: # service specific config; can override common config
   name: pv-name # can be pv name or anything 
   generateName: pv-name # can be pv name or anything
 target:
-  config:
+  config: # target specific config; can override common config
   name: pv-name # can be pv name or anything;
   generateName: pv-name # can be pv name or anything;
 replica:
-  config:
+  config: # replica specific config; can override common config
   name: pv-name # can be pv name or anything;
   generateName: pv-name # can be pv name or anything
 status:
