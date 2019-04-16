@@ -48,4 +48,14 @@ spec:
     cacheFile: ""
     overProvisioning: false
     type: striped
+status:
+  phase:
+  conditions:
+  - type: DiskReplaceFailed # DiskReplaceInit, DiskReplaceInProgress, DiskReplacePassed
+    old:
+    new:
+    reason:
+    desc:
+    count:
+    lastUpdatedTimestamp:
 ```
