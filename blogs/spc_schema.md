@@ -2,7 +2,7 @@
 apiVersion: openebs.io/v1alpha1
 kind: StoragePoolClaim
 metadata:
-  name: cstor-sparse-pool-striped
+  name: my-cstor-pool-striped
 spec:
   nodeList:
   - name: node-xyz
