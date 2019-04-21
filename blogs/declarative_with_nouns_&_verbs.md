@@ -315,7 +315,8 @@ spec:
   meta:
   task:
   post:
-  - run: Build
+  - it: should save pod yaml as pod instance
+    run: Build
     for:
       - --kind=Pod
       - |
