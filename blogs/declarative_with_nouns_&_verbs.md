@@ -304,3 +304,28 @@ spec:
       - --image=openebs.io/m-apiserver:1.0.0
     as: myPod
 ```
+
+#### UseCase 6
+- I should be able to specify a pod yaml
+- I woul like to save this as myPodie
+
+```yaml
+kind: RunTask
+spec:
+  meta:
+  task:
+  post:
+  - run: Build
+    for:
+      - --kind=Pod
+      - |
+        --yaml=
+        kind: Pod
+        apiVersion: v1
+        metadata:
+          name: myPoddy
+          namespace: default
+        spec:
+          image: openebs.io/m-apiserver:ci
+    as: myPodie
+```
