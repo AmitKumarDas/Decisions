@@ -54,18 +54,27 @@ func NewRegistrarBuilder() *RegistrarBuilder {
 
 func (b *RegistrarBuilder) WithName(name string) *RegistrarBuilder {
   if name == "" {
-    b.errs = b.errs()
+    b.errs = append(b.errs, errors.New("failed to register: missing component name"))
+    return b
   }
   b.name = name
   return b
 }
 
 func (b *RegistrarBuilder) WithObject(obj Component) *RegistrarBuilder {
+  if obj == nil {
+    b.errs = append(b.errs, errors.New("failed to register: nil component instance"))
+    return b
+  }
   b.object = obj
   return b
 }
 
 func (b *RegistrarBuilder) WithCapabilities(c CapabilityList) *RegistrarBuilder {
+  if c == nil {
+    b.errs = append(b.errs, errors.New("failed to register: nil component capabilities"))
+    return b
+  }
   b.capabilities = c
   return b
 }
