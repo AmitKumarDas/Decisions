@@ -1,5 +1,9 @@
 ### UseCase 1
-- I want to build a registration feature where individual components or plugins can register themselves
+- I want to build a **Component Registration** feature
+- Individual components should be able to register themselves
+- Each component can register their capabilities
+- Registrar is not tightly coupled with every component
+- Each component implementation adheres to contracts exposed by Component interface
 
 ```go
 // in github.com/openebs/maya/pkg/component/v1alpha1/interface.go
