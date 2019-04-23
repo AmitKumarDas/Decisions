@@ -33,9 +33,55 @@ type Component interface {
 
 ```go
 // in pkg/component/v1alpha1/component.go
+
 type Capability func(*Config) error
 type CapabilityList []Capability
 type IsConfig func(*Config) bool
-var ComponentRegistrar map[string]Component
-var CapabilityListRegistrar map[string]CapabilityList
+
+var componentRegistrar map[string]Component
+var capabilityListRegistrar map[string]CapabilityList
+
+type RegistrarBuilder struct {
+  name string
+  object Component
+  capabilities CapabilityList
+  errs []error
+}
+
+func NewRegistrarBuilder() *RegistrarBuilder {
+  return &RegistrarBuilder{}
+}
+
+func (b *RegistrarBuilder) WithName(name string) *RegistrarBuilder {
+  if name == "" {
+    b.errs = b.errs()
+  }
+  b.name = name
+  return b
+}
+
+func (b *RegistrarBuilder) WithObject(obj Component) *RegistrarBuilder {
+  b.object = obj
+  return b
+}
+
+func (b *RegistrarBuilder) WithCapabilities(c CapabilityList) *RegistrarBuilder {
+  b.capabilities = c
+  return b
+}
+
+func (b *RegistrarBuilder) Build() error {
+  if len(b.errs) > 0 {
+    return errors.Errorf("%v", b.errs)
+  }
+
+  if componentRegistrar[b.name] != nil {
+    return errors.Errorf("failed to register: component '%s' already registered", b.name)
+  }
+
+  componentRegistrar[b.name] = b.object
+  capabilityListRegistrar[b.name] = b.capabilities
+
+  return nil
+}
 ```
