@@ -1,4 +1,21 @@
 ### 23 Apr 2019
+#### Maya Query Language - MayaQL
+- A declarative workflow
+- Understands kubernetes
+- A k8s controller/watcher
+- MayaQL & MayaQLResult
+- Capabilities
+  - can get one or more properties from a resource
+  - can get one or more properties from a list of resources
+  - can create a k8s resource
+  - can delete a k8s resource
+  - can build a k8s resource before creating it
+  - can update a k8s resource
+  - can pod exec a k8s pod
+  - can grab log tails from a container
+  - can display result in any desired format
+
+### 23 Apr 2019
 #### component
 - catalog can be renamed to component
 - a component represents a set of resources
