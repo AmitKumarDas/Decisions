@@ -18,8 +18,8 @@ pub enum NvmeError {
 }
 
 // implement an enum -- powerful
-// does this implement the macro
-// can macro be modeled as an interface
+// does this implement the macro of NvmeError?
+// can macro be modeled as an interface?
 impl From<io::Error> for NvmeError {
   fn from(err: io::Error) -> NvmeError {
     NvmeError::IoError {
