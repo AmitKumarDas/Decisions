@@ -212,7 +212,7 @@ type Operation struct {
 	// For declares the resource against
 	// whom this operation will get
 	// executed
-	For        []string `json:"for"`
+	For        []ForOption `json:"for"`
 	
 	// 
 	WithFilter []string `json:"withFilter"`
