@@ -153,21 +153,8 @@ spec:
     as: myPodie
 ```
 
-### Low Level Impl
-```go
-// pkg/apis/openebs.io/runtask/v1beta2/post.go
-
-// Post represents the desired specifications for the
-// post field of runtask. It specifies the action or the
-// commands that need to be executed post executing a
-// runtask i.e. save the status or name of the current
-// resource so that the next runtask can make use of it.
-type Post struct {
-	Operations []Operation `json:"operations"`
-}
-```
-
-### Sample RunTask with new `Post` schema
+### Standards & Best Practices
+#### Sample RunTask with new `Post` schema
 ```yaml
 apiVersion: openebs.io/v1alpha1
 kind: RunTask
@@ -183,16 +170,31 @@ spec:
     runNamespace: default
   post: |-
     operations:
-    - run: getTupleList
+    - run: GetTupleList # GetTupleList is a keyword - hence CapitalCased
       for:
-      - --kind=deploymentList
-      - --objectPath=RuntimeObject
+      - --kind=DeploymentList # DeploymentList is a keyword - hence CapitalCased
+      - --object-path=.task.runtimeObj # object-path is right - objectPath is wrong
       withFilter:
-      - --isLabel=app:nginx
+      - --check=IsLabel --label=app:nginx # IsLabel is a keyword - hence CapitalCased
       withOutput:
-      - --name
+      - --name # name is right; while Name is wrong; adhere to flag arg naming standards
       - --namespace
       as: taskResult.tupleList
+```
+
+
+### Low Level Impl
+```go
+// pkg/apis/openebs.io/runtask/v1beta2/post.go
+
+// Post represents the desired specifications for the
+// post field of runtask. It specifies the action or the
+// commands that need to be executed post executing a
+// runtask i.e. save the status or name of the current
+// resource so that the next runtask can make use of it.
+type Post struct {
+	Operations []Operation `json:"operations"`
+}
 ```
 
 ```go
