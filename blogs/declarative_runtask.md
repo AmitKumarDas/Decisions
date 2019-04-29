@@ -198,13 +198,27 @@ spec:
 // runtask i.e. save the status or name of the current
 // resource so that the next runtask can make use of it.
 type Post struct {
-	Operations []Operation `json:"operations"`
+	Operations []PostOperation `json:"operations"`
+}
+
+type PostOperation struct {
+	// embed the operation
+	Operation
+
+	// As declares the path that will
+	// store the result of this
+	// operation
+	As         string   `json:"as"`
 }
 ```
 
 ```go
 // Operation defines a particular operation to be
 // executed against a particular resource
+//
+// It provides a declarative approach to:
+//   1. build
+//   2. execute
 type Operation struct {
 	// Run declares the operation name
 	Run        string   `json:"run"`
@@ -214,14 +228,16 @@ type Operation struct {
 	// executed
 	For        []ForOption `json:"for"`
 	
-	// WithFilter declares the filters
-	// that should be considered to build
-	// this operation
+	// WithFilter declares filters to be 
+	// applied against the resource
+	//
+	// Used to build this operation
 	WithFilter []FilterOption `json:"withFilter"`
 	
-	// WithOutput declares
+	// WithOutput declares outputs to be
+	// parsed from the resource after executing 
+	// this operation
 	WithOutput []OutputOption `json:"withOutput"`
-	As         string   `json:"as"`
 }
 
 // TopLevelProperty represents the top level property that
