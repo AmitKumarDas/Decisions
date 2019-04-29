@@ -214,9 +214,13 @@ type Operation struct {
 	// executed
 	For        []ForOption `json:"for"`
 	
-	// 
-	WithFilter []string `json:"withFilter"`
-	WithOutput []string `json:"withOutput"`
+	// WithFilter declares the filters
+	// that should be considered to build
+	// this operation
+	WithFilter []FilterOption `json:"withFilter"`
+	
+	// WithOutput declares
+	WithOutput []OutputOption `json:"withOutput"`
 	As         string   `json:"as"`
 }
 
