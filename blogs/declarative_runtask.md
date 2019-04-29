@@ -203,12 +203,18 @@ type Post struct {
 ```
 
 ```go
-// Operation represents the desired details of a
-// particular operation to be executed against a
-// particular resource
+// Operation defines a particular operation to be
+// executed against a particular resource
 type Operation struct {
+	// Run declares the operation name
 	Run        string   `json:"run"`
+	
+	// For declares the resource against
+	// whom this operation will get
+	// executed
 	For        []string `json:"for"`
+	
+	// 
 	WithFilter []string `json:"withFilter"`
 	WithOutput []string `json:"withOutput"`
 	As         string   `json:"as"`
