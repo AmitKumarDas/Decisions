@@ -154,6 +154,11 @@ spec:
 ```
 
 ### Standards & Best Practices
+- Some of the values used in post field are keywords
+- A keyword is better expressed as CapitalCased
+- However, logic should be able to handle keywords that are not specified as CapitalCased
+
+
 #### Sample RunTask with new `Post` schema
 ```yaml
 apiVersion: openebs.io/v1alpha1
