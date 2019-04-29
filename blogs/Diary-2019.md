@@ -1,3 +1,17 @@
+### 29 Apr 2019
+#### MayaQL to RunTask
+- Keep the legacy of RunTask
+- Also thought of MayaActions
+  - However, how to manage the plural
+- Probably `RunTask` makes use of `Action`
+```yaml
+kind: RunTask
+spec:
+  actions:
+  - run: GetPodName
+    desc: It gets the name of a Pod
+```
+
 ### 23 Apr 2019
 #### Maya Query Language - MayaQL
 - A declarative workflow
@@ -17,15 +31,16 @@
 
 ### 23 Apr 2019
 #### component
-- catalog can be renamed to component
-- a component represents a set of resources
-- component will be built programatically
+- Catalog can be renamed to Component
+- A component represents a set of resources
+- Component will be built programatically
 - No YAML
-- pkg/component/v1alpha1/
-- pkg/component/maya-apiserver/v1alpha1/
-- pkg/component/openebs-provisioner/v1alpha1/
-- BDD can make use of above
-- openebs operator can make use of above
+- Code as be structured as follows:
+  - pkg/component/v1alpha1/
+  - pkg/component/maya-apiserver/v1alpha1/
+  - pkg/component/openebs-provisioner/v1alpha1/
+- BDD can make use of above if & when required to install
+- Openebs operator can make use of above as well
 
 #### cas config
 - casconfig represent the configurations that can be injected
