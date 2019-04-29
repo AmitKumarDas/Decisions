@@ -165,7 +165,37 @@ spec:
 type Post struct {
 	Operations []Operation `json:"operations"`
 }
+```
 
+### Sample RunTask with new `Post` schema
+```yaml
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: list-ctrl-deployment
+  namespace: default
+spec:
+  meta: |
+    id: listctrldeployment
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: list
+    runNamespace: default
+  post: |-
+    operations:
+    - run: getTupleList
+      for:
+      - --kind=deploymentList
+      - --objectPath=RuntimeObject
+      withFilter:
+      - --isLabel=app:nginx
+      withOutput:
+      - --name
+      - --namespace
+      as: taskResult.tupleList
+```
+
+```go
 // Operation represents the desired details of a
 // particular operation to be executed against a
 // particular resource
