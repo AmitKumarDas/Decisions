@@ -229,39 +229,32 @@ type Operation struct {
 	// For declares the resource against
 	// whom this operation will get
 	// executed
-	For        []ForOption `json:"for"`
+	For        ForOption `json:"for"`
 
 	// WithFilter declares filters to be 
 	// applied against the resource during
 	// execution of this operation
-	WithFilter []FilterOption `json:"withFilter"`
+	WithFilter FilterOptionList `json:"withFilter"`
 
 	// WithOutput declares the outputs to be
 	// parsed from the resource after executing 
 	// this operation
-	WithOutput []OutputOption `json:"withOutput"`
+	WithOutput OutputOptionList `json:"withOutput"`
 }
 
-// TopLevelProperty represents the top level property that
-// is a starting point to represent a hierarchical chain of
-// properties.
-//
-// e.g.
-// Config.prop1.subprop1 = val1
-// Config.prop1.subprop2 = val2
-// In above example Config is a top level object
-//
-// NOTE:
-//  The value of any hierarchical chain of properties
-// can be parsed via dot notation
-type TopLevelProperty string
+type ForOption struct {
+  Kind OperationKind
+  ObjectPath string
+}
 
-const (
-	// CurrentRuntimeObjectTLP is a top level property supported by CAS template engine
-	// The runtime object of the current task's execution is stored in this top
-	// level property.
-	CurrentRuntimeObjectTLP TopLevelProperty = "RuntimeObject"
-)
+type FilterOption struct {
+  Func string
+  Args map[string]string
+}
+
+type OutputOption struct {
+
+}
 ```
 
 ```go
