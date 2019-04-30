@@ -187,20 +187,21 @@ spec:
       as: taskResult.tupleList
 ```
 
-
 ### Low Level Impl
 ```go
-// pkg/apis/openebs.io/runtask/v1beta2/post.go
+// pkg/apis/task.openebs.io/v1beta2/post.go
 
-// Post represents the desired specifications for the
-// post field of runtask. It specifies the action or the
-// commands that need to be executed post executing a
-// runtask i.e. save the status or name of the current
-// resource so that the next runtask can make use of it.
+// Post represents the desired specifications of
+// post field of RunTask. It specifies the operations
+// that need to be executed after executing the
+// RunTask i.e. post execute
 type Post struct {
 	Operations []PostOperation `json:"operations"`
 }
 
+// PostOperation modifies Operation to suit
+// its need to execute the operation and
+// save the result as well
 type PostOperation struct {
 	// embed the operation
 	Operation
@@ -213,6 +214,8 @@ type PostOperation struct {
 ```
 
 ```go
+// pkg/apis/task.openebs.io/v1beta2/operation.go
+
 // Operation defines a particular operation to be
 // executed against a particular resource
 //
@@ -222,19 +225,18 @@ type PostOperation struct {
 type Operation struct {
 	// Run declares the operation name
 	Run        string   `json:"run"`
-	
+
 	// For declares the resource against
 	// whom this operation will get
 	// executed
 	For        []ForOption `json:"for"`
-	
+
 	// WithFilter declares filters to be 
-	// applied against the resource
-	//
-	// Used to build this operation
+	// applied against the resource during
+	// execution of this operation
 	WithFilter []FilterOption `json:"withFilter"`
-	
-	// WithOutput declares outputs to be
+
+	// WithOutput declares the outputs to be
 	// parsed from the resource after executing 
 	// this operation
 	WithOutput []OutputOption `json:"withOutput"`
@@ -260,266 +262,6 @@ const (
 	// level property.
 	CurrentRuntimeObjectTLP TopLevelProperty = "RuntimeObject"
 )
-```
-
-```go
-// DeployList is the list of deployments
-type DeployList struct {
-	items []*Deploy
-}
-
-// ListBuilder enables building an instance of
-// deploymentList
-type ListBuilder struct {
-	list *DeployList
-	//output []map[string]interface{}
-	output  outputMap
-	filters filterList
-	errors  []error
-}
-
-// filterList is a list of filters
-type filterList []Filter
-
-// outputMap is a map of desired output function
-// and their reference key
-type outputMap map[*Output]string
-
-// Filter abstracts filtering logic w.r.t the
-// deployment list instance
-type Filter func(*Deploy) bool
-
-// Output represents the desired output to
-// be given against a deployment instance
-type Output func(*Deploy) interface{}
-
-// NewListBuilder returns an instance of
-// list builder
-func NewListBuilder() *ListBuilder {
-	return &ListBuilder{
-		list:   &DeployList{},
-		output: outputMap{},
-	}
-}
-
-// ListBuilderForRuntimeObject returns a list builder instance
-// for deployment list
-func ListBuilderForRuntimeObject(obj runtime.Object) *ListBuilder {
-	var (
-		dl *extn_v1_beta1.DeploymentList
-		ok bool
-	)
-	lb := NewListBuilder()
-	if obj == nil {
-		lb.errors = append(lb.errors, errors.New("failed to build instance: nil runtime.Object given"))
-		return lb
-	}
-	// Convert the runtime.Object to its desired type i.e.
-	// DeploymentList here
-	if dl, ok = obj.(*extn_v1_beta1.DeploymentList); !ok {
-		lb.errors = append(lb.errors, errors.New(
-			"failed to build instance: unable to typecast given object to deployment list"))
-		return lb
-	}
-	// Iterate over deployment list objects and
-	// insert it into the ListBuilder instance
-	for _, d := range dl.Items {
-		d := d
-		deploy := &Deploy{}
-		deploy.object = &d
-		lb.list.items = append(lb.list.items, deploy)
-	}
-	return lb
-}
-
-// List returns a list of deployments after doing
-// all the filtering and validations
-func (lb *ListBuilder) List() (*DeployList, error) {
-	if len(lb.errors) != 0 {
-		return nil, errors.Errorf("%v", lb.errors)
-	}
-	if lb.filters == nil || len(lb.filters) == 0 {
-		return lb.list, nil
-	}
-	filtered := &DeployList{}
-	for _, d := range lb.list.items {
-		d := d
-		if lb.filters.all(d) {
-			filtered.items = append(filtered.items, d)
-		}
-	}
-	return filtered, nil
-}
-
-// all returns true if all the predicates
-// succeed against the provided deployment
-// instance
-func (f filterList) all(d *Deploy) bool {
-	for _, filter := range f {
-		filter := filter
-		if !filter(d) {
-			return false
-		}
-	}
-	return true
-}
-
-// AddFilter adds the filter to be applied against the
-// deployment instance
-func (lb *ListBuilder) AddFilter(f Filter) *ListBuilder {
-	lb.filters = append(lb.filters, f)
-	return lb
-}
-
-// AddFilters adds the provided filters to be applied against
-// the deployment instance
-func (lb *ListBuilder) AddFilters(filters ...Filter) *ListBuilder {
-	for _, filter := range filters {
-		filter := filter
-		lb.AddFilter(filter)
-	}
-	return lb
-}
-
-// HasLabel returns HasLabel filter for
-// the given label
-func HasLabel(label string) Filter {
-	return func(d *Deploy) bool {
-		return d.HasLabel(label)
-	}
-}
-
-// HasLabel checks if the given label is
-// present or not for a particular deployment
-// object
-func (d *Deploy) HasLabel(label string) bool {
-	labels := d.object.GetLabels()
-	if _, exist := labels[label]; exist {
-		return true
-	}
-	return false
-}
-
-// HasLabels returns IsLabel filter for
-// the given label
-func HasLabels(labels ...string) Filter {
-	return func(d *Deploy) bool {
-		return d.HasLabels(labels...)
-	}
-}
-
-// HasLabels checks if the given labels are
-// present or not for a particular deployment
-// object
-func (d *Deploy) HasLabels(labels ...string) bool {
-	const (
-		keyIndex   = 0
-		valueIndex = 1
-	)
-	gotLabels := d.object.GetLabels()
-	for _, label := range labels {
-		label := label
-		var labelDetails []string
-		// get the label key and value by splitting
-		// it based on delimiter '=' or ':'
-		if strings.Contains(label, "=") {
-			labelDetails = strings.Split(label, "=")
-		} else {
-			labelDetails = strings.Split(label, ":")
-		}
-		if lValue, exist := gotLabels[labelDetails[keyIndex]]; exist {
-			if lValue != labelDetails[valueIndex] {
-				return false
-			}
-		} else {
-			return false
-		}
-	}
-	return true
-}
-
-// Name returns an output instance
-// for getting name of a deployment
-func Name() Output {
-	return func(d *Deploy) interface{} {
-		return d.Name()
-	}
-}
-
-// Name returns the name of the given deployment
-func (d *Deploy) Name() interface{} {
-	return d.object.GetName()
-}
-
-// Namespace returns an output instance
-// for getting namespace of a deployment
-func Namespace() Output {
-	return func(d *Deploy) interface{} {
-		return d.Namespace()
-	}
-}
-
-// Namespace returns the namespace of the given deployment
-func (d *Deploy) Namespace() interface{} {
-	return d.object.GetNamespace()
-}
-
-// Labels returns an output instance
-// for getting labels of a deployment
-func Labels() Output {
-	return func(d *Deploy) interface{} {
-		return d.Labels()
-	}
-}
-
-// Labels returns the labels of the given deployment
-func (d *Deploy) Labels() interface{} {
-	return d.object.GetLabels()
-}
-
-// WithOutput returns a listBuilder instance having
-// the desired output key added
-func (lb *ListBuilder) WithOutput(o Output, referenceKey string) *ListBuilder {
-	if o == nil || referenceKey == "" {
-		lb.errors = append(lb.errors, errors.Errorf(
-			"nil reference key given for output %v", o))
-		return lb
-	}
-	lb.output[&o] = referenceKey
-	return lb
-}
-
-// TupleList enables building a tuple list instance
-// against a deployment list
-type TupleList []map[string]interface{}
-
-// GetTupleList returns a tuple list based on the desired
-// outputs provided
-func (lb *ListBuilder) GetTupleList() (TupleList, error) {
-	tList := TupleList{}
-	dList, err := lb.List()
-	if err != nil {
-		return nil, errors.Errorf(
-			"failed to get tuple list: error: %v", err)
-	}
-	for _, d := range dList.items {
-		d := d
-		deployDetails := d.getDesiredDetails(lb.output)
-		tList = append(tList, deployDetails)
-	}
-	return tList, nil
-}
-
-func (d *Deploy) getDesiredDetails(desiredDetails outputMap) map[string]interface{} {
-	deployDetails := make(map[string]interface{})
-	for out, refKey := range desiredDetails {
-		out := out
-		refKey := refKey
-		i := (*out)(d)
-		deployDetails[refKey] = i
-	}
-	return deployDetails
-}
 ```
 
 ```go
@@ -962,5 +704,267 @@ func registerAndParseForFlags(For []string) error {
 		return errors.Errorf("failed to parse post forFlags: given forFlags: %s, error: %v", For, err)
 	}
 	return nil
+}
+```
+
+```go
+// pkg/kubernetes/deployment/extnv1beta1/deployment.go
+
+// DeployList is the list of deployments
+type DeployList struct {
+	items []*Deploy
+}
+
+// ListBuilder enables building an instance of
+// deploymentList
+type ListBuilder struct {
+	list *DeployList
+	//output []map[string]interface{}
+	output  outputMap
+	filters filterList
+	errors  []error
+}
+
+// filterList is a list of filters
+type filterList []Filter
+
+// outputMap is a map of desired output function
+// and their reference key
+type outputMap map[*Output]string
+
+// Filter abstracts filtering logic w.r.t the
+// deployment list instance
+type Filter func(*Deploy) bool
+
+// Output represents the desired output to
+// be given against a deployment instance
+type Output func(*Deploy) interface{}
+
+// NewListBuilder returns an instance of
+// list builder
+func NewListBuilder() *ListBuilder {
+	return &ListBuilder{
+		list:   &DeployList{},
+		output: outputMap{},
+	}
+}
+
+// ListBuilderForRuntimeObject returns a list builder instance
+// for deployment list
+func ListBuilderForRuntimeObject(obj runtime.Object) *ListBuilder {
+	var (
+		dl *extn_v1_beta1.DeploymentList
+		ok bool
+	)
+	lb := NewListBuilder()
+	if obj == nil {
+		lb.errors = append(lb.errors, errors.New("failed to build instance: nil runtime.Object given"))
+		return lb
+	}
+	// Convert the runtime.Object to its desired type i.e.
+	// DeploymentList here
+	if dl, ok = obj.(*extn_v1_beta1.DeploymentList); !ok {
+		lb.errors = append(lb.errors, errors.New(
+			"failed to build instance: unable to typecast given object to deployment list"))
+		return lb
+	}
+	// Iterate over deployment list objects and
+	// insert it into the ListBuilder instance
+	for _, d := range dl.Items {
+		d := d
+		deploy := &Deploy{}
+		deploy.object = &d
+		lb.list.items = append(lb.list.items, deploy)
+	}
+	return lb
+}
+
+// List returns a list of deployments after doing
+// all the filtering and validations
+func (lb *ListBuilder) List() (*DeployList, error) {
+	if len(lb.errors) != 0 {
+		return nil, errors.Errorf("%v", lb.errors)
+	}
+	if lb.filters == nil || len(lb.filters) == 0 {
+		return lb.list, nil
+	}
+	filtered := &DeployList{}
+	for _, d := range lb.list.items {
+		d := d
+		if lb.filters.all(d) {
+			filtered.items = append(filtered.items, d)
+		}
+	}
+	return filtered, nil
+}
+
+// all returns true if all the predicates
+// succeed against the provided deployment
+// instance
+func (f filterList) all(d *Deploy) bool {
+	for _, filter := range f {
+		filter := filter
+		if !filter(d) {
+			return false
+		}
+	}
+	return true
+}
+
+// AddFilter adds the filter to be applied against the
+// deployment instance
+func (lb *ListBuilder) AddFilter(f Filter) *ListBuilder {
+	lb.filters = append(lb.filters, f)
+	return lb
+}
+
+// AddFilters adds the provided filters to be applied against
+// the deployment instance
+func (lb *ListBuilder) AddFilters(filters ...Filter) *ListBuilder {
+	for _, filter := range filters {
+		filter := filter
+		lb.AddFilter(filter)
+	}
+	return lb
+}
+
+// HasLabel returns HasLabel filter for
+// the given label
+func HasLabel(label string) Filter {
+	return func(d *Deploy) bool {
+		return d.HasLabel(label)
+	}
+}
+
+// HasLabel checks if the given label is
+// present or not for a particular deployment
+// object
+func (d *Deploy) HasLabel(label string) bool {
+	labels := d.object.GetLabels()
+	if _, exist := labels[label]; exist {
+		return true
+	}
+	return false
+}
+
+// HasLabels returns IsLabel filter for
+// the given label
+func HasLabels(labels ...string) Filter {
+	return func(d *Deploy) bool {
+		return d.HasLabels(labels...)
+	}
+}
+
+// HasLabels checks if the given labels are
+// present or not for a particular deployment
+// object
+func (d *Deploy) HasLabels(labels ...string) bool {
+	const (
+		keyIndex   = 0
+		valueIndex = 1
+	)
+	gotLabels := d.object.GetLabels()
+	for _, label := range labels {
+		label := label
+		var labelDetails []string
+		// get the label key and value by splitting
+		// it based on delimiter '=' or ':'
+		if strings.Contains(label, "=") {
+			labelDetails = strings.Split(label, "=")
+		} else {
+			labelDetails = strings.Split(label, ":")
+		}
+		if lValue, exist := gotLabels[labelDetails[keyIndex]]; exist {
+			if lValue != labelDetails[valueIndex] {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
+// Name returns an output instance
+// for getting name of a deployment
+func Name() Output {
+	return func(d *Deploy) interface{} {
+		return d.Name()
+	}
+}
+
+// Name returns the name of the given deployment
+func (d *Deploy) Name() interface{} {
+	return d.object.GetName()
+}
+
+// Namespace returns an output instance
+// for getting namespace of a deployment
+func Namespace() Output {
+	return func(d *Deploy) interface{} {
+		return d.Namespace()
+	}
+}
+
+// Namespace returns the namespace of the given deployment
+func (d *Deploy) Namespace() interface{} {
+	return d.object.GetNamespace()
+}
+
+// Labels returns an output instance
+// for getting labels of a deployment
+func Labels() Output {
+	return func(d *Deploy) interface{} {
+		return d.Labels()
+	}
+}
+
+// Labels returns the labels of the given deployment
+func (d *Deploy) Labels() interface{} {
+	return d.object.GetLabels()
+}
+
+// WithOutput returns a listBuilder instance having
+// the desired output key added
+func (lb *ListBuilder) WithOutput(o Output, referenceKey string) *ListBuilder {
+	if o == nil || referenceKey == "" {
+		lb.errors = append(lb.errors, errors.Errorf(
+			"nil reference key given for output %v", o))
+		return lb
+	}
+	lb.output[&o] = referenceKey
+	return lb
+}
+
+// TupleList enables building a tuple list instance
+// against a deployment list
+type TupleList []map[string]interface{}
+
+// GetTupleList returns a tuple list based on the desired
+// outputs provided
+func (lb *ListBuilder) GetTupleList() (TupleList, error) {
+	tList := TupleList{}
+	dList, err := lb.List()
+	if err != nil {
+		return nil, errors.Errorf(
+			"failed to get tuple list: error: %v", err)
+	}
+	for _, d := range dList.items {
+		d := d
+		deployDetails := d.getDesiredDetails(lb.output)
+		tList = append(tList, deployDetails)
+	}
+	return tList, nil
+}
+
+func (d *Deploy) getDesiredDetails(desiredDetails outputMap) map[string]interface{} {
+	deployDetails := make(map[string]interface{})
+	for out, refKey := range desiredDetails {
+		out := out
+		refKey := refKey
+		i := (*out)(d)
+		deployDetails[refKey] = i
+	}
+	return deployDetails
 }
 ```
