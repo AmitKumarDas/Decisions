@@ -1,3 +1,9 @@
+### 30 Apr 2019
+#### Group & Version
+- openebs.io:v1alpha1, openebs.io:v1alpha2
+- pool.openebs.io:v1alpha1, pool.openebs.io:v1beta1
+- task.openebs.io:v1alpha1
+
 ### 29 Apr 2019
 #### MayaQL to RunTask
 - Keep the legacy of RunTask
