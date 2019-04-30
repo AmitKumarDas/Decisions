@@ -248,12 +248,29 @@ type ForOption struct {
 }
 
 type FilterOption struct {
+  // Func name that will be used
+  // as a filter while executing
+  // the operation
   Func string
+
+  // Args of the filter func
   Args map[string]string
 }
 
 type OutputOption struct {
-
+  // Name of the field of the resource
+  // whose value should be extracted
+  Name string
+  
+  // Path to the field of the resource
+  // whose value should be extracted
+  //
+  // NOTE:
+  //  Path can be dot separated to point
+  // to the exact field location in the
+  // resource. For example, namespace path
+  // can be 'spec.metadata.namespace'
+  Path string
 }
 ```
 
