@@ -196,20 +196,20 @@ spec:
 // that need to be executed after executing the
 // RunTask i.e. post execute
 type Post struct {
-	Operations []PostOperation `json:"operations"`
+  Operations []PostOperation `json:"operations"`
 }
 
 // PostOperation modifies Operation to suit
 // its need to execute the operation and
 // save the result as well
 type PostOperation struct {
-	// embed the operation
-	Operation
+  // embed the operation
+  Operation
 
-	// As declares the path that will
-	// store the result of this
-	// operation
-	As         string   `json:"as"`
+  // As declares the path that will
+  // store the result of this
+  // operation
+  As         string   `json:"as"`
 }
 ```
 
@@ -223,23 +223,23 @@ type PostOperation struct {
 //   1. build
 //   2. execute
 type Operation struct {
-	// Run declares the operation name
-	Run        string   `json:"run"`
+  // Run declares the operation name
+  Run        string   `json:"run"`
 
-	// For declares the resource against
-	// whom this operation will get
-	// executed
-	For        ForOption `json:"for"`
+  // For declares the resource against
+  // whom this operation will get
+  // executed
+  For        ForOption `json:"for"`
 
-	// WithFilter declares filters to be 
-	// applied against the resource during
-	// execution of this operation
-	WithFilter FilterOptionList `json:"withFilter"`
+  // WithFilter declares filters to be 
+  // applied against the resource during
+  // execution of this operation
+  WithFilter FilterOptionList `json:"withFilter"`
 
-	// WithOutput declares the outputs to be
-	// parsed from the resource after executing 
-	// this operation
-	WithOutput OutputOptionList `json:"withOutput"`
+  // WithOutput declares the outputs to be
+  // parsed from the resource after executing 
+  // this operation
+  WithOutput OutputOptionList `json:"withOutput"`
 }
 
 type ForOption struct {
@@ -282,139 +282,128 @@ const (
   GetTupleList OperationName = "gettuplelist"
 )
 
-// pkg/task/operations/v1beta2/flags.go 
+// pkg/task/operations/v1beta2/filter.go 
 
+// IsLabel defines checks against
+// the resource annotations
+type IsLabel struct {
+  Labels []string
+}
 
+func (i *IsLabel) String() string {
+  return fmt.Sprint(i.Labels)
+}
+
+func (i *IsLabel) Set(value string) error {
+  if value == "" {
+    return nil
+  }
+  i.Labels = append(i.Labels, value)
+  return nil
+}
+
+func (i *IsLabel) Type() string {
+  return "isLabel"
+}
+
+// IsAnnotation defines checks against
+// the resource annotations
+type IsAnnotation struct {
+  Anns []string
+}
+
+func (i *IsAnnotation) String() string {
+  return fmt.Sprint(i.Anns)
+}
+
+func (i *IsAnnotation) Set(value string) error {
+  if value == "" {
+    return nil
+  }
+  i.Anns = append(i.Anns, value)
+  return nil
+}
+
+func (i *IsAnnotation) Type() string {
+  return "isAnnotation"
+}
 
 // pkg/task/operations/v1beta2/deploymentlist.go 
 
-// DeploymentList has the details to execute
-// a operation against DeploymentList object
-type DeploymentList struct {
+// DeploymentListOperation has the details to
+// execute a operation against DeploymentList object
+type DeploymentListOperation struct {
   Run          OperationName
   DataPath     string
   Values       map[string]interface{}
-  WithFilterFs *DeploymentListFilter
-  WithOutputFs *DeploymentListOutput
+  Filter *DeploymentListFilter
+  Output *DeploymentListOutput
 }
 
-// DeploymentListBuilder enables building an 
-// instance of DeploymentList
-type DeploymentListBuilder struct {
-  DeploymentList *DeploymentList
-  errors         []error
+type DeploymentListOperationOutput struct {
+  Name      bool
+  Namespace bool
 }
 
-type DeploymentListOutput struct {
-  name      bool
-  namespace bool
+type DeploymentListOperationFilter struct {
+  IsLabel IsLabel
+  IsAnnotation IsAnnotation
 }
 
-type DeploymentListFilter struct {
-  isLabel isLabels
+// DeploymentListOperationBuilder enables building
+// an instance of DeploymentListOperation
+type DeploymentListOperationBuilder struct {
+  list *DeploymentListOperation
+  errors []error
 }
 
-type isLabels struct {
-  labels []string
-}
+// NewDeploymentListOperationBuilder returns a new instance
+// of DeploymentListOperationBuilder
+func NewDeploymentListOperationBuilder() *DeploymentListOperationBuilder {
+  f := &DeploymentListOperationFilter{},
+  op := &DeploymentListOperationOutput{},
 
-func (labelArr *isLabels) String() string {
-  return fmt.Sprint(labelArr.labels)
-}
-
-func (labelArr *isLabels) Set(value string) error {
-	if value == "" {
-		return nil
-	}
-	labelArr.labels = append(labelArr.labels, value)
-	return nil
-}
-
-func (labelArr *isLabels) Type() string {
-	return "isLabels"
-}
-
-// NewBuilder returns a new instance of 
-// DeploymentListBuilder
-func NewDeploymentListBuilder() *DeploymentListBuilder {
-  return &Builder{
-    DeploymentList: &DeploymentList{
-      Values:       make(map[string]interface{}),
-      WithFilterFs: &filter{},
-      WithOutputFs: &output{},
+  return &DeploymentListOperationBuilder{
+    list: &DeploymentListOperation{
+      Filter: f,
+      Output: op,
     },
   }
 }
 
-// BuilderForPostValues returns a builder instance
-// after filling the required post values
-func BuilderForPostValues(run string,
-	withFilter []string, withOutput []string) *Builder {
-	b := NewBuilder()
-	f := &filter{}
-	o := &output{}
-
-	// withFilter is the flagset having all the flags defined for "withFilter" field
-	// of post operations
-	withFilterFs := flag.NewFlagSet("withFilter", flag.ExitOnError)
-	withFilterFs.Var(&f.isLabel, "isLabel", "checks for given labels against a resource")
-
-	// withOutput is the flagset having all the flags defined for "withOutput" field
-	// of post operations
-	withOutputFs := flag.NewFlagSet("withOutput", flag.ExitOnError)
-	withOutputFs.BoolVar(&o.name, "name", false, "set if output should contain resource name")
-	withOutputFs.BoolVar(&o.namespace, "namespace", false, "set if output should contain resource namespace")
-
-	if err := withFilterFs.Parse(withFilter); err != nil {
-		b.errors = append(b.errors, errors.Errorf("error parsing withFilter flags, error: %v", err))
-	}
-	if err := withOutputFs.Parse(withOutput); err != nil {
-		b.errors = append(b.errors, errors.Errorf("error parsing withOutput flags, error: %v", err))
-	}
-	b.DeploymentList.WithFilterFs = f
-	b.DeploymentList.WithOutputFs = o
-	b.DeploymentList.Run = run
-	return b
+func (b *DeploymentListOperationBuilder) WithRun(run string) *DeploymentListOperationBuilder {
+  b.list.Run = run
+  return b
 }
 
-// WithDataPath returns a builder instance with
-// objectPath/jsonPath of the saved result
-func (b *Builder) WithDataPath(path string) *Builder {
-	// Trim unnecessary spaces or dots
-	path = strings.Trim(strings.TrimSpace(path), ".")
-	b.DeploymentList.DataPath = path
-	return b
+func (b *DeploymentListOperationBuilder) Islabel(labels ...string) *DeploymentListOperationBuilder {
+  b.list.Filter.IsLabel.Labels = append(b.list.Filter.IsLabel.Labels, labels...)
+  return b
 }
 
-// WithTemplateValues returns a builder instance with
-// templateValues map
-func (b *Builder) WithTemplateValues(values map[string]interface{}) *Builder {
-	b.DeploymentList.Values = values
-	return b
+func (b *DeploymentListOperationBuilder) IsAnnotation(anns ...string) *DeploymentListOperationBuilder {
+  b.list.Filter.IsAnnotation.Anns = append(b.list.Filter.IsAnnotation.Anns, anns...)
+  return b
 }
 
-// Build returns the final instance of post
-func (b *Builder) Build() (*DeploymentList, error) {
-	if len(b.errors) != 0 {
-		return nil, errors.Errorf("%v", b.errors)
-	}
-	return b.DeploymentList, nil
+// Build returns the final instance of 
+// DeploymentList
+func (b *Builder) Build() *DeploymentListOperation {
+  return b.list
 }
 
-// ExecuteOp executes the post operation on a
-// deploymentList instance
-func (d *DeploymentList) ExecuteOp() (result interface{}, err error) {
-	switch d.Run {
-	case getTupleList:
-		result, err = d.getTupleList()
-	default:
-		return result, errors.Errorf(
-			"unsupported runtask post operation, `%s` for deploymentList", d.Run)
-	}
-	if err != nil {
-		return result, err
-	}
-	return result, nil
+// Operate executes the operation
+func (d *DeploymentListOperation) Operate() (result interface{}, err error) {
+  switch d.Run {
+  case GetTupleList:
+    result, err = d.getTupleList()
+  default:
+    return nil, errors.Errorf(
+      "failed to operate on deploymentlist: unsupported operation {%s}",
+      d.Run
+    )
+  }
+  return result, nil
 }
 
 func (d *DeploymentList) getTupleList() (tList []map[string]interface{}, err error) {
