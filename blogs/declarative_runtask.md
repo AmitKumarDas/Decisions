@@ -275,44 +275,51 @@ type OutputOption struct {
 ```
 
 ```go
-// pkg/task/post/operations/v1beta2/deploymentlist.go 
+// pkg/task/operations/v1beta2/names.go
 
+type OperationName string
 const (
-	getTupleList = "gettuplelist"
+  GetTupleList OperationName = "gettuplelist"
 )
 
-// DeploymentList represents the details for fetching
-// the desired values from a deployment list object
+// pkg/task/operations/v1beta2/flags.go 
+
+
+
+// pkg/task/operations/v1beta2/deploymentlist.go 
+
+// DeploymentList has the details to execute
+// a operation against DeploymentList object
 type DeploymentList struct {
-	Run          string
-	DataPath     string
-	Values       map[string]interface{}
-	WithFilterFs *filter
-	WithOutputFs *output
+  Run          OperationName
+  DataPath     string
+  Values       map[string]interface{}
+  WithFilterFs *DeploymentListFilter
+  WithOutputFs *DeploymentListOutput
 }
 
-// Builder enables building an instance of
-// DeploymentList
-type Builder struct {
-	DeploymentList *DeploymentList
-	errors         []error
+// DeploymentListBuilder enables building an 
+// instance of DeploymentList
+type DeploymentListBuilder struct {
+  DeploymentList *DeploymentList
+  errors         []error
 }
 
-type output struct {
-	name      bool
-	namespace bool
+type DeploymentListOutput struct {
+  name      bool
+  namespace bool
 }
 
-type filter struct {
-	isLabel isLabels
+type DeploymentListFilter struct {
+  isLabel isLabels
 }
 
 type isLabels struct {
-	labels []string
+  labels []string
 }
 
 func (labelArr *isLabels) String() string {
-	return fmt.Sprint(labelArr.labels)
+  return fmt.Sprint(labelArr.labels)
 }
 
 func (labelArr *isLabels) Set(value string) error {
@@ -327,15 +334,16 @@ func (labelArr *isLabels) Type() string {
 	return "isLabels"
 }
 
-// NewBuilder returns a new instance of Builder
-func NewBuilder() *Builder {
-	return &Builder{
-		DeploymentList: &DeploymentList{
-			Values:       make(map[string]interface{}),
-			WithFilterFs: &filter{},
-			WithOutputFs: &output{},
-		},
-	}
+// NewBuilder returns a new instance of 
+// DeploymentListBuilder
+func NewDeploymentListBuilder() *DeploymentListBuilder {
+  return &Builder{
+    DeploymentList: &DeploymentList{
+      Values:       make(map[string]interface{}),
+      WithFilterFs: &filter{},
+      WithOutputFs: &output{},
+    },
+  }
 }
 
 // BuilderForPostValues returns a builder instance
