@@ -13,6 +13,7 @@ much into programmatic versus declarative approach, let us list down the feature
 - [ ] Simple way to code operations supported by Maya
 - [ ] Provide proper error messages for invalid operations
 - [ ] Ability to package operations to be used by Upgrade Executor
+- [ ] Ability to package operations to be used as a replacement for RunTask(s)
 - [ ] Ability to package operations to be used inside Ginkgo & Gomega code
 - [ ] Ability to package operations as a Docker image
 - [ ] Ability to package operations as a Kubernetes Job
