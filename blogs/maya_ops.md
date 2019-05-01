@@ -51,15 +51,17 @@ type PodInitOption func(*PodOps)
 type PodBuildOption func(*PodOps)
 
 // Ops returns a new instance of PodOps
-func Ops(opts ...PodBuildOption) *PodOps {
+func Ops(inits ...PodInitOption) *PodOps {
   p := &PodOps{}
-  p.BuildOptions = append(p.BuildOptions, opts...)
+  p.InitOptions = append(p.InitOptions, inits...)
   return p
 }
 
-func (o *PodOps) WithInit(inits ...PodInitOption) *PodOps {
-  o.InitOptions = append(o.InitOptions, inits...)
-  return o
+// Options sets PodOps instance with the
+// provided build options
+func (p *PodOps) Options(opts ...PodBuildOption) *PodOps {
+  p.BuildOptions = append(p.BuildOptions, opts...)
+  return p
 }
 
 // Init runs the initialization options
@@ -67,12 +69,12 @@ func (o *PodOps) WithInit(inits ...PodInitOption) *PodOps {
 //
 // NOTE:
 //  Init is an implementation of Ops interface
-func (o *PodOps) Init() error {
+func (p *PodOps) Init() error {
   for _, i := range o.InitOptions {
-    if len(o.Errors) > 0 {
-      return errors.New("%v", o.Errors)
+    if len(p.Errors) > 0 {
+      return errors.New("%v", p.Errors)
     }
-    i(o)
+    i(p)
   }
   return nil
 }
@@ -83,12 +85,12 @@ func (o *PodOps) Init() error {
 //
 // NOTE:
 //  Run is an implementation of Ops interface
-func (o *PodOps) Run() error {
+func (p *PodOps) Run() error {
   for _, b := range o.BuildOptions {
-    if len(o.Errors) > 0 {
-      return errors.New("%v", o.Errors)
+    if len(p.Errors) > 0 {
+      return errors.New("%v", p.Errors)
     }
-    b(o)
+    b(p)
   }
   return nil
 }
