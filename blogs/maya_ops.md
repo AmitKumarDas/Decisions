@@ -1,13 +1,13 @@
 ### Motivation
-It has been my strong desire to let `Maya` i.e. control plane for openebs provide a workflow or pipeline to run an ordered set of
-tasks. Maya has so far strived to provide this in form of CASTemplates & RunTasks. While this is convenient it has lot of 
-drawbacks. CASTemplates & RunTasks are provided as a declarative YAML. Finally, when higher order logic is required it resorts
-to golang based templating. One needs to understand the fact that `templating` cannot replace a programming language and is 
-never turing complete.
+It has been my strong desire to let `Maya` i.e. control plane for openebs provide a workflow or pipeline to run an ordered
+set of tasks. Maya has so far strived to provide this in form of CASTemplates & RunTasks. While this is convenient it has 
+lot of drawbacks. CASTemplates & RunTasks are provided as a declarative YAML. Finally, when higher order logic is required 
+it resorts to golang based templating. One needs to understand the fact that `templating` cannot replace a programming 
+language and is never turing complete.
 
-Hence, this proof of concept is yet another attempt to provide MayaOps _(similar in spirit to GitOps or Github actions or so 
-on)_. As one might have already guessed, this attempt will avoid declarative approach. However, without getting too much into
-programmatic versus declarative approach, let us list down the features of `MayaOps`.
+Hence, this proof of concept is yet another attempt to provide **MayaOps** _(similar in spirit to GitOps or Github actions 
+or so on)_. As one might have already guessed, this attempt will avoid declarative approach. However, without getting too 
+much into programmatic versus declarative approach, let us list down the features of `MayaOps`.
 
 #### What MayaOps should provide
 - [ ] Simple way to code operations supported by Maya
