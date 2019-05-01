@@ -29,6 +29,11 @@ much into programmatic versus declarative approach, let us list down the feature
 #### Core
 ```go
 // pkg/ops/v1alpha1/ops.go
+
+type Interface interface {
+  Init() error
+  Run() error
+}
 ```
 
 ```go
@@ -45,23 +50,48 @@ type PodOps struct {
 type PodInitOption func(*PodOps)
 type PodBuildOption func(*PodOps)
 
-func WithOpsNamespace(namespace string) PodInitOption {
-  return func(o *PodOps) {
-    o.Namespace = namespace
-  }
-}
-
-func (o *PodOps) Init(inits ...PodInitOption) *PodOps {
-  
-}
-
-func NewPodOps(opts ...PodBuildOption) *PodOps {
+// Ops returns a new instance of PodOps
+func Ops(opts ...PodBuildOption) *PodOps {
   p := &PodOps{}
   p.BuildOptions = append(p.BuildOptions, opts...)
   return p
 }
 
-func (o *PodOps) Run() error {}
+func (o *PodOps) WithInit(inits ...PodInitOption) *PodOps {
+  o.InitOptions = append(o.InitOptions, inits...)
+  return o
+}
+
+// Init runs the initialization options
+// for this pod ops instance
+//
+// NOTE:
+//  Init is an implementation of Ops interface
+func (o *PodOps) Init() error {
+  for _, i := range o.InitOptions {
+    if len(o.Errors) > 0 {
+      return errors.New("%v", o.Errors)
+    }
+    i(o)
+  }
+  return nil
+}
+
+// Run executes the build options in a ordered
+// manner. The order that was used while creating
+// this pod ops instance is used to execute as well.
+//
+// NOTE:
+//  Run is an implementation of Ops interface
+func (o *PodOps) Run() error {
+  for _, b := range o.BuildOptions {
+    if len(o.Errors) > 0 {
+      return errors.New("%v", o.Errors)
+    }
+    b(o)
+  }
+  return nil
+}
 ```
 
 ```go
