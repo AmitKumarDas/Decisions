@@ -1,5 +1,5 @@
 ### Motivation
-It has been my strong desire to let `Maya` i.e. control plane for openebs provide a workflow or pipeline to run an ordered
+It has been my strongest desire to let `Maya` i.e. control plane for openebs provide a workflow or pipeline to run an ordered
 set of tasks. Maya has so far strived to provide this in form of CASTemplates & RunTasks. While this is convenient it has 
 lot of drawbacks. CASTemplates & RunTasks are provided as a declarative YAML. Finally, when higher order logic is required 
 it resorts to golang based templating. One needs to understand the fact that `templating` cannot replace a programming 
@@ -23,3 +23,34 @@ much into programmatic versus declarative approach, let us list down the feature
 - Users of MayaOps need to learn MayaOps syntax
 - MayaOps is Go code and will be written inside a .go file
 - MayaOps syntax will expose one or more hooks that needs to be filled in
+
+### High Level Design
+
+#### Core
+```go
+// pkg/ops/v1alpha1/ops.go
+```
+
+```go
+// pkg/kubernetes/pod/v1alpha1/podops.go
+```
+
+```go
+// pkg/kubernetes/pod/v1alpha1/podlistops.go
+```
+
+#### Usage
+```go
+// cmd/upgrade/execute.go
+```
+
+```go
+// cmd/upgrade/registrar.go
+```
+
+```go
+// cmd/upgrade/0.8.0-0.9.0/pool/registrar.go
+// cmd/upgrade/0.8.0-0.9.0/pool/is_healthy.go
+// cmd/upgrade/0.8.0-0.9.0/pool/is_replica_count.go
+// cmd/upgrade/0.8.0-0.9.0/pool/upgrade.go
+```
