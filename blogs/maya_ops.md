@@ -144,7 +144,7 @@ func NewIsHealthy(store map[string]interface{}) *IsHealthy {
 func (i *IsHealthy) Instance() Ops {
   return pod.Ops(
     pod.WithOpsStore(i.Store),
-    pod.WithOpsID("is-healthy"),
+    pod.WithOpsID("op-is-pod-healthy"),
   ).Steps(
     pod.WithOpsStoreObject("taskResult.pod101.object"),
     pod.SaveTuple("name", "namespace"),
