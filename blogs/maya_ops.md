@@ -30,7 +30,11 @@ much into programmatic versus declarative approach, let us list down the feature
 ```go
 // pkg/ops/v1alpha1/ops.go
 
-type Interface interface {
+type Register interface {
+  Instance() Ops
+}
+
+type Ops interface {
   Init() error
   Run() error
 }
@@ -39,16 +43,27 @@ type Interface interface {
 ```go
 // pkg/kubernetes/pod/v1alpha1/podops.go
 
+type GetStoreFunc func() map[string]interface{}
+
 type PodOps struct {
   Namespace    string
   Pod          *Pod
   Errors       []error
   InitOptions  []PodInitOption
   BuildOptions []PodBuildOption
+  GetStore     GetStoreFunc
 }
 
 type PodInitOption func(*PodOps)
 type PodBuildOption func(*PodOps)
+
+func WithGetStore(store map[string]interface{}) PodInitOption {
+  return func(p *PodOps) {
+    p.GetStore = func() map[string]interface{} {
+      return store
+    }
+  }
+}
 
 // Ops returns a new instance of PodOps
 func Ops(inits ...PodInitOption) *PodOps {
@@ -110,8 +125,35 @@ func (p *PodOps) Run() error {
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pool/registrar.go
-// cmd/upgrade/0.8.0-0.9.0/pool/is_healthy.go
-// cmd/upgrade/0.8.0-0.9.0/pool/is_replica_count.go
-// cmd/upgrade/0.8.0-0.9.0/pool/upgrade.go
+// cmd/upgrade/0.8.0-0.9.0/pod/registrar.go
+```
+
+```go
+// cmd/upgrade/0.8.0-0.9.0/pod/is_healthy.go
+
+type IsHealthy struct {
+  Store map[string]interface{}
+}
+
+func NewIsHealthy(store map[string]interface{}) *IsHealthy {
+  return &IsHealthy{Store: store}
+}
+
+// Instance implements ops.Register interface
+func (i *IsHealthy) Instance() Ops {
+  return pod.Ops(
+    pod.WithGetStore(i.Store),
+  ).Options(
+    pod.WithObjectFromPath("taskResult.pod101.object"),
+    pod.IsHealthy(),
+  )
+}
+```
+
+```go
+// cmd/upgrade/0.8.0-0.9.0/pod/is_replica_count.go
+```
+
+```go
+// cmd/upgrade/0.8.0-0.9.0/pod/upgrade.go
 ```
