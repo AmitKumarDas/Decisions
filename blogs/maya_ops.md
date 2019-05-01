@@ -33,6 +33,16 @@ much into programmatic versus declarative approach, let us list down the feature
 
 ```go
 // pkg/kubernetes/pod/v1alpha1/podops.go
+
+type PodOps struct {
+  Errors       []error
+  InitOptions  []PodInitOption
+  BuildOptions []PodBuildOption
+}
+
+func NewPodOps() *PodOps {}
+
+func (o *PodOps) Run() error {}
 ```
 
 ```go
