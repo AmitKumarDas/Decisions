@@ -35,12 +35,31 @@ much into programmatic versus declarative approach, let us list down the feature
 // pkg/kubernetes/pod/v1alpha1/podops.go
 
 type PodOps struct {
+  Namespace    string
+  Pod          *Pod
   Errors       []error
   InitOptions  []PodInitOption
   BuildOptions []PodBuildOption
 }
 
-func NewPodOps() *PodOps {}
+type PodInitOption func(*PodOps)
+type PodBuildOption func(*PodOps)
+
+func WithOpsNamespace(namespace string) PodInitOption {
+  return func(o *PodOps) {
+    o.Namespace = namespace
+  }
+}
+
+func (o *PodOps) Init(inits ...PodInitOption) *PodOps {
+  
+}
+
+func NewPodOps(opts ...PodBuildOption) *PodOps {
+  p := &PodOps{}
+  p.BuildOptions = append(p.BuildOptions, opts...)
+  return p
+}
 
 func (o *PodOps) Run() error {}
 ```
