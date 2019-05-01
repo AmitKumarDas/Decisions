@@ -46,6 +46,7 @@ type Ops interface {
 type GetStoreFunc func() map[string]interface{}
 
 type PodOps struct {
+  ID           string
   Namespace    string
   Pod          *Pod
   Errors       []error
@@ -57,7 +58,7 @@ type PodOps struct {
 type PodInitOption func(*PodOps)
 type PodBuildOption func(*PodOps)
 
-func WithGetStore(store map[string]interface{}) PodInitOption {
+func WithOpsStore(store map[string]interface{}) PodInitOption {
   return func(p *PodOps) {
     p.GetStore = func() map[string]interface{} {
       return store
@@ -72,9 +73,9 @@ func Ops(inits ...PodInitOption) *PodOps {
   return p
 }
 
-// Options sets PodOps instance with the
-// provided build options
-func (p *PodOps) Options(opts ...PodBuildOption) *PodOps {
+// Steps sets PodOps instance with the
+// provided steps that will be run later
+func (p *PodOps) Steps(opts ...PodBuildOption) *PodOps {
   p.BuildOptions = append(p.BuildOptions, opts...)
   return p
 }
@@ -142,10 +143,11 @@ func NewIsHealthy(store map[string]interface{}) *IsHealthy {
 // Instance implements ops.Register interface
 func (i *IsHealthy) Instance() Ops {
   return pod.Ops(
-    pod.WithGetStore(i.Store),
-  ).Options(
-    pod.WithObjectFromPath("taskResult.pod101.object"),
-    pod.IsHealthy(),
+    pod.WithOpsStore(i.Store),
+    pod.WithOpsID("is-healthy"),
+  ).Steps(
+    pod.WithOpsStoreObject("taskResult.pod101.object"),
+    pod.SaveTuple("name", "namespace"),
   )
 }
 ```
