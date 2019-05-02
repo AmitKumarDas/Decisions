@@ -75,6 +75,10 @@ func Ops(inits ...PodInitOption) *PodOps {
 
 // Steps sets PodOps instance with the
 // provided steps that will be run later
+//
+// NOTE:
+//  These steps form the core of pod 
+// operations
 func (p *PodOps) Steps(opts ...PodBuildOption) *PodOps {
   p.BuildOptions = append(p.BuildOptions, opts...)
   return p
@@ -130,23 +134,24 @@ func (p *PodOps) Run() error {
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pod/is_healthy.go
+// cmd/upgrade/0.8.0-0.9.0/pod/should_be_healthy.go
 
-type IsHealthy struct {
+type ShouldBeHealthy struct {
   Store map[string]interface{}
 }
 
-func NewIsHealthy(store map[string]interface{}) *IsHealthy {
-  return &IsHealthy{Store: store}
+func NewShouldBeHealthy(store map[string]interface{}) *ShouldBeHealthy {
+  return &ShouldBeHealthy{Store: store}
 }
 
 // Instance implements ops.Register interface
-func (i *IsHealthy) Instance() Ops {
+func (i *ShouldBeHealthy) Instance() Ops {
   return pod.Ops(
     pod.WithOpsStore(i.Store),
-    pod.WithOpsID("op-is-pod-healthy"),
+    pod.WithOpsID("op-pod-should-be-healthy"),
   ).Steps(
     pod.WithOpsStoreObject("taskResult.pod101.object"),
+    pod.ShouldBeRunning(),
     pod.SaveTuple("name", "namespace"),
   )
 }
