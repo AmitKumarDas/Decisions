@@ -131,27 +131,33 @@ func (p *PodOps) Run() error {
 
 ```go
 // cmd/upgrade/0.8.0-0.9.0/pod/registrar.go
+
+type Base struct {
+  ID string
+  Desc string
+  Store map[string]interface{}
+}
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pod/should_be_healthy.go
+// cmd/upgrade/0.8.0-0.9.0/pod/should_be_running.go
 
-type ShouldBeHealthy struct {
-  Store map[string]interface{}
+type ShouldBeRunning struct {
+  Base
 }
 
-func NewShouldBeHealthy(store map[string]interface{}) *ShouldBeHealthy {
-  return &ShouldBeHealthy{Store: store}
+func NewShouldBeRunning(id, desc string, store map[string]interface{}) *ShouldBeRunning {
+  return &ShouldBeRunning{ID: id, Desc: desc, Store: store}
 }
 
 // Instance implements ops.Register interface
-func (i *ShouldBeHealthy) Instance() Ops {
+func (i *ShouldBeRunning) Instance() Ops {
   return pod.Ops(
     pod.WithOpsStore(i.Store),
-    pod.WithOpsID("healthyPod"),
-    pod.WithOpsDesc("op-pod-should-be-healthy"),
+    pod.WithOpsID(i.ID),
+    pod.WithOpsDesc(i.Desc),
   ).Steps(
-    pod.WithOpsStoreObject("taskResult.pod101.object"),
+    pod.WithOpsStoreObject("taskResult.podInfo.object"),
     pod.ShouldBeRunning(),
     pod.SaveTuple("name", "namespace"),
   )
@@ -159,9 +165,26 @@ func (i *ShouldBeHealthy) Instance() Ops {
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pod/is_replica_count.go
-```
+// cmd/upgrade/0.8.0-0.9.0/pod/update_image.go
 
-```go
-// cmd/upgrade/0.8.0-0.9.0/pod/upgrade.go
+type UpdateImage struct {
+  Base
+}
+
+func NewUpdateImage(id, desc string, store map[string]interface{}) *UpdateImage {
+  return &UpdateImage{ID: id, Desc: desc, Store: store}
+}
+
+// Instance implements ops.Register interface
+func (i *UpdateImage) Instance() Ops {
+  return pod.Ops(
+    pod.WithOpsStore(i.Store),
+    pod.WithOpsID(i.ID),
+    pod.WithOpsDesc(i.Desc),
+  ).Steps(
+    pod.WithOpsStoreObject("taskResult.podInfo.object"),
+    pod.SetImage("openebs.io/cstor-pool:0.12.1"),
+    pod.Update(),
+  )
+}
 ```
