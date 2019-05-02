@@ -148,7 +148,8 @@ func NewShouldBeHealthy(store map[string]interface{}) *ShouldBeHealthy {
 func (i *ShouldBeHealthy) Instance() Ops {
   return pod.Ops(
     pod.WithOpsStore(i.Store),
-    pod.WithOpsID("op-pod-should-be-healthy"),
+    pod.WithOpsID("healthyPod"),
+    pod.WithOpsDesc("op-pod-should-be-healthy"),
   ).Steps(
     pod.WithOpsStoreObject("taskResult.pod101.object"),
     pod.ShouldBeRunning(),
