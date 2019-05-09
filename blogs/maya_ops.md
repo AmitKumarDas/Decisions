@@ -60,58 +60,58 @@ type Ops interface {
 // of an operation
 type GetStoreFunc func() map[string]interface{}
 
-type PodOps struct {
+type Ops struct {
   ID           string
   Namespace    string
   Pod          *Pod
   Errors       []error
-  InitList     []PodInitOption
-  Steps        []PodBuildOption
+  InitList     []OpsInit
+  RunSteps     []OpsStep
   GetStore     GetStoreFunc
 }
 
-// PodInitOption abstracts the implementation
-// of initializing a PodOps instance
-type PodInitOption func(*PodOps)
+// OpsInit abstracts implementation
+// of initializing an instance of Ops
+type OpsInit func(*Ops)
 
-// PodBuildOption abstract the implementation
-// of building a PodOps instance
-type PodBuildOption func(*PodOps)
+// OpsStep abstracts implementation
+// of an Ops step
+type OpsStep func(*Ops)
 
-// WithOpsStore is a PodOps init option to
+// WithOpsStore is a Ops init option to
 // provide in-memory storage
-func WithOpsStore(store map[string]interface{}) PodInitOption {
-  return func(p *PodOps) {
+func WithOpsStore(store map[string]interface{}) OpsInit {
+  return func(p *Ops) {
     p.GetStore = func() map[string]interface{} {
       return store
     }
   }
 }
 
-// Ops returns a new instance of PodOps
-func Ops(inits ...PodInitOption) *PodOps {
-  p := &PodOps{}
+// NewOps returns a new instance of Ops
+func NewOps(inits ...OpsInit) *Ops {
+  p := &Ops{}
   p.InitList = append(p.InitList, inits...)
   return p
 }
 
-// WithSteps sets PodOps instance with the
+// Steps sets Ops instance with the
 // provided steps that will be run later
 //
 // NOTE:
 //  These steps form the core of pod 
 // operations
-func (p *PodOps) WithSteps(opts ...PodBuildOption) *PodOps {
-  p.Steps = append(p.Steps, opts...)
+func (p *Ops) Steps(opts ...OpsStep) *Ops {
+  p.RunSteps = append(p.RunSteps, opts...)
   return p
 }
 
 // Init runs the initialization options
-// for this pod ops instance
+// for this ops instance
 //
 // NOTE:
 //  Init is an implementation of Ops interface
-func (p *PodOps) Init() error {
+func (p *Ops) Init() error {
   for _, init := range p.InitList {
     if len(p.Errors) > 0 {
       return errors.New("%v", p.Errors)
@@ -123,12 +123,12 @@ func (p *PodOps) Init() error {
 
 // Run executes the operations as steps in an ordered
 // manner. The order that was used while creating
-// this pod ops instance is used to execute as well.
+// this ops instance is used to execute as well.
 //
 // NOTE:
 //  Run is an implementation of Ops interface
-func (p *PodOps) Run() error {
-  for _, step := range p.Steps {
+func (p *Ops) Run() error {
+  for _, step := range p.RunSteps {
     if len(p.Errors) > 0 {
       return errors.New("%v", p.Errors)
     }
@@ -178,7 +178,7 @@ func (i *ShouldBeRunning) Instance() Ops {
     pod.WithOpsStore(i.Store),
     pod.WithOpsID(i.ID),
     pod.WithOpsDesc(i.Desc),
-  ).WithSteps(
+  ).Steps(
     pod.WithOpsStoreObject("taskResult.podInfo.object"),
     pod.ShouldBeRunning(),
     pod.SaveTuple("name", "namespace"),
