@@ -12,6 +12,7 @@ much into programmatic versus declarative approach, let us list down the feature
 #### What MayaOps should provide
 - [ ] Simple way to code operations supported by Maya
 - [ ] Provide proper error messages for invalid operations
+- [ ] Operation steps can be ordered
 - [ ] Ability to package operations to be used by Upgrade Executor
 - [ ] Ability to package operations to be used as a replacement for RunTask(s)
 - [ ] Ability to package operations to be used inside Ginkgo & Gomega code
@@ -23,6 +24,7 @@ much into programmatic versus declarative approach, let us list down the feature
 - Users of MayaOps need to learn MayaOps syntax
 - MayaOps is Go code and will be written inside a .go file
 - MayaOps syntax will expose one or more hooks that needs to be filled in
+- MayaOps SDK can packaged Maya Ops library as well as hooks as a single Docker image
 
 ### High Level Design
 
@@ -30,12 +32,22 @@ much into programmatic versus declarative approach, let us list down the feature
 ```go
 // pkg/ops/v1alpha1/ops.go
 
+// Register exposes contract to enable any
+// structure to get itself registered as
+// an Ops interface
 type Register interface {
   Instance() Ops
 }
 
+// Ops exposes all contracts necessary to
+// participate in operation based workflow(s)
 type Ops interface {
+  // Init sets initialization options if any
+  // before running the operations
   Init() error
+  
+  // Run does the actual execution of 
+  // operations
   Run() error
 }
 ```
@@ -43,6 +55,9 @@ type Ops interface {
 ```go
 // pkg/kubernetes/pod/v1alpha1/podops.go
 
+// GetStoreFunc abstracts fetching the in-memory
+// storage required while executing various steps
+// of an operation
 type GetStoreFunc func() map[string]interface{}
 
 type PodOps struct {
@@ -50,14 +65,21 @@ type PodOps struct {
   Namespace    string
   Pod          *Pod
   Errors       []error
-  InitOptions  []PodInitOption
-  BuildOptions []PodBuildOption
+  InitList     []PodInitOption
+  Steps        []PodBuildOption
   GetStore     GetStoreFunc
 }
 
+// PodInitOption abstracts the implementation
+// of initializing a PodOps instance
 type PodInitOption func(*PodOps)
+
+// PodBuildOption abstract the implementation
+// of building a PodOps instance
 type PodBuildOption func(*PodOps)
 
+// WithOpsStore is a PodOps init option to
+// provide in-memory storage
 func WithOpsStore(store map[string]interface{}) PodInitOption {
   return func(p *PodOps) {
     p.GetStore = func() map[string]interface{} {
@@ -69,18 +91,18 @@ func WithOpsStore(store map[string]interface{}) PodInitOption {
 // Ops returns a new instance of PodOps
 func Ops(inits ...PodInitOption) *PodOps {
   p := &PodOps{}
-  p.InitOptions = append(p.InitOptions, inits...)
+  p.InitList = append(p.InitList, inits...)
   return p
 }
 
-// Steps sets PodOps instance with the
+// WithSteps sets PodOps instance with the
 // provided steps that will be run later
 //
 // NOTE:
 //  These steps form the core of pod 
 // operations
-func (p *PodOps) Steps(opts ...PodBuildOption) *PodOps {
-  p.BuildOptions = append(p.BuildOptions, opts...)
+func (p *PodOps) WithSteps(opts ...PodBuildOption) *PodOps {
+  p.Steps = append(p.Steps, opts...)
   return p
 }
 
@@ -90,27 +112,27 @@ func (p *PodOps) Steps(opts ...PodBuildOption) *PodOps {
 // NOTE:
 //  Init is an implementation of Ops interface
 func (p *PodOps) Init() error {
-  for _, i := range o.InitOptions {
+  for _, init := range p.InitList {
     if len(p.Errors) > 0 {
       return errors.New("%v", p.Errors)
     }
-    i(p)
+    init(p)
   }
   return nil
 }
 
-// Run executes the build options in a ordered
+// Run executes the operations as steps in an ordered
 // manner. The order that was used while creating
 // this pod ops instance is used to execute as well.
 //
 // NOTE:
 //  Run is an implementation of Ops interface
 func (p *PodOps) Run() error {
-  for _, b := range o.BuildOptions {
+  for _, step := range p.Steps {
     if len(p.Errors) > 0 {
       return errors.New("%v", p.Errors)
     }
-    b(p)
+    step(p)
   }
   return nil
 }
@@ -156,7 +178,7 @@ func (i *ShouldBeRunning) Instance() Ops {
     pod.WithOpsStore(i.Store),
     pod.WithOpsID(i.ID),
     pod.WithOpsDesc(i.Desc),
-  ).Steps(
+  ).WithSteps(
     pod.WithOpsStoreObject("taskResult.podInfo.object"),
     pod.ShouldBeRunning(),
     pod.SaveTuple("name", "namespace"),
