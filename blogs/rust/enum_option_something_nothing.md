@@ -1,3 +1,8 @@
+Reference - https://doc.rust-lang.org/stable/book/ch06-00-enums.html
+
+### TIL _(Today I Learned)_
+- Kind as a suffix to name an enum
+
 ```rust
 // Define a type by enumerating its possible values. 
 // How an enum can encode meaning along with data. 
@@ -15,4 +20,12 @@
 //
 // Rust’s enums are most similar to **algebraic data types**
 // in functional languages, such as F#, OCaml, and Haskell.
+```
+
+```rust
+// V4 & V6 are variants of enum
+enum IpAddrKind {
+    V4,
+    V6,
+}
 ```
