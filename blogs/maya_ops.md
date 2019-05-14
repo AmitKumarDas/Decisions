@@ -54,23 +54,23 @@ type Runner interface {
   Run() error
 }
 
-type Factory interface {
-  Instance() Runner
+type Manager interface {
+  Manage() error
 }
 ```
 
 ```go
 // pkg/ops/v1alpha1/runner.go
 
-type SingleRunner struct {
+type SingleOpsManager struct {
   Ops Ops
 }
 
-func NewSingleRunner(o Ops) *SingleRunner {
-  return &SingleRunner{Ops: o}
+func NewSingleOpsManager(o Ops) *SingleOpsManager {
+  return &SingleOpsManager{Ops: o}
 }
 
-func (s *SingleRunner) Run() error {
+func (s *SingleOpsManager) Manage() error {
   err := s.Ops.Init()
   if err != nil {
     return err
@@ -79,20 +79,20 @@ func (s *SingleRunner) Run() error {
   return s.Ops.Run()
 }
 
-type GroupRunner struct {
+type GroupOpsManager struct {
   Items []Ops
 }
 
-func NewGroupRunner(o ...Ops) *GroupRunner {
-  m := &GroupRunner{}
+func NewGroupOpsManager(o ...Ops) *GroupOpsManager {
+  m := &GroupOpsManager{}
   m.Items = append(m.Items, o...)
   return m
 }
 
-func (g *GroupRunner) Run() error {
+func (g *GroupOpsManager) Manage() error {
   var err error
   for _, op := range g.Items {
-    err = NewSingleRunner(op).Run()
+    err = NewSingleOpsManager(op).Manage()
     if err != nil {
       return err
     }
@@ -205,31 +205,31 @@ import (
   ops "github.com/openebs/maya/pkg/ops/v1alpha1"
 )
 
-type registrar struct {
-  map[string]ops.Runner
+type managers struct {
+  map[string]ops.Manager
 }
 
-type RegistrarBuilder struct {
-  path string
-  factory ops.Factory
+type managerRegistrar struct {
+  upgradePath string
+  manager ops.ManagerFactory
 }
 
-func NewRegistrarBuilder() *RegistrarBuilder {
-  return &RegistrarBuilder{}
+func ManagerRegistrar() *managerRegistrar {
+  return &managerRegistrar{}
 }
 
-func (r *RegistrarBuilder) WithPath(path UpgradePath) *RegistrarBuilder {
-  r.path = path
+func (r *managerRegistrar) WithPath(path UpgradePath) *managerRegistrar {
+  r.upgradePath = path
   return r
 }
 
-func (r *RegistrarBuilder) WithFactory(factory ops.Factory) *RegistrarBuilder {
-  r.factory = factory
+func (r *managerRegistrar) WithManager(manager ops.ManagerFactory) *managerRegistrar {
+  r.manager = manager
   return r
 } 
 
-func (r *RegistrarBuilder) Register (
-  registrar[r.path] = r.factory
+func (r *managerRegistrar) Register (
+  managers[r.upgradePath] = r.manager
 )
 ```
 
@@ -241,12 +241,12 @@ type Executor struct {
 }
 
 func (e *Executor) Run() error {
-  factory := registrar[e.UpgradePath]
-  if factory == nil {
-    return errors.New("failed to run upgrade: invalid upgrade path {%s}", e.upgradePath)
+  manager := managers[e.UpgradePath]
+  if manager == nil {
+    return errors.New("failed to run upgrade: un-supported upgrade path {%s}", e.upgradePath)
   }
 
-  err := factory.Instance().Run()
+  err := manager.Manage()
   if err != nil {
     return errors.Wrapf(err, "failed to execute upgrade for path {%s}", e.upgradePath)
   }
@@ -265,27 +265,20 @@ import (
 
 init() {
   store := map[string]interface{}{}
-  grpRunner := ops.NewGroupRunner(
-    080-to-090.NewPodShouldBeRunning("pod101", "pod should be running", store),
-    080-to-090.NewPodUpdateImage("pod201", "pod's image should get updated", store),
+  grpOpsMgr := ops.NewGroupOpsManager(
+    080-to-090.PodShouldBeRunning("pod101", "pod should be running", store),
+    080-to-090.PodUpdateImage("pod201", "pod's image should get updated", store),
   )
 
-  RegistrarBuilder().
+  ManagerRegistrar().
     WithPath(080-to-090.UpgradePath).
-    WithRunner(grpRunner).
+    WithManager(grpOpsMgr).
     Register()
 }
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/common.go
-
-type Base struct {
-  ID string
-  Desc string
-  Store map[string]interface{}
-}
-
+// cmd/upgrade/0.8.0-0.9.0/constants.go
 const (
   UpgradePath string = "080-to-090"
 
@@ -296,20 +289,11 @@ const (
 ```go
 // cmd/upgrade/0.8.0-0.9.0/pod_should_be_running.go
 
-type PodShouldBeRunning struct {
-  Base
-}
-
-func NewPodShouldBeRunning(id, desc string, store map[string]interface{}) *PodShouldBeRunning {
-  return &PodShouldBeRunning{ID: id, Desc: desc, Store: store}
-}
-
-// Runner implements ops.Factory interface
-func (i *PodShouldBeRunning) Instance() Ops {
+func PodShouldBeRunning(id, desc string, store map[string]interface{}) Ops {
   return pod.Ops(
-    pod.WithOpsStore(i.Store),
-    pod.WithOpsID(i.ID),
-    pod.WithOpsDesc(i.Desc),
+    pod.WithOpsStore(store),
+    pod.WithOpsID(id),
+    pod.WithOpsDesc(desc),
   ).Steps(
     pod.WithObjectFromStore(PathToPodObject),
     pod.ShouldBeRunning(),
@@ -319,22 +303,13 @@ func (i *PodShouldBeRunning) Instance() Ops {
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pod_update_image.go
+// cmd/upgrade/0.8.0-0.9.0/pod_image_update.go
 
-type PodUpdateImage struct {
-  Base
-}
-
-func NewPodUpdateImage(id, desc string, store map[string]interface{}) *PodUpdateImage {
-  return &PodUpdateImage{ID: id, Desc: desc, Store: store}
-}
-
-// Runner implements ops.Factory interface
-func (i *PodUpdateImage) Instance() Ops {
+func PodImageUpdate(id, desc string, store map[string]interface{}) Ops {
   return pod.Ops(
-    pod.WithOpsStore(i.Store),
-    pod.WithOpsID(i.ID),
-    pod.WithOpsDesc(i.Desc),
+    pod.WithOpsStore(store),
+    pod.WithOpsID(id),
+    pod.WithOpsDesc(desc),
   ).Steps(
     pod.WithObjectFromStore(PathToPodObject),
     pod.SetImage("openebs.io/cstor-pool:0.12.1"),
