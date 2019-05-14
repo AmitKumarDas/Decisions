@@ -267,7 +267,7 @@ init() {
   store := map[string]interface{}{}
   grpOpsMgr := ops.NewGroupOpsManager(
     080-to-090.PodShouldBeRunning("pod101", "pod should be running", store),
-    080-to-090.PodUpdateImage("pod201", "pod's image should get updated", store),
+    080-to-090.PodImageUpdate("pod201", "pod's image should get updated", store),
   )
 
   ManagerRegistrar().
