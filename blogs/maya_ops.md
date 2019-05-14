@@ -53,6 +53,10 @@ type Runner interface {
   // operation
   Run() error
 }
+
+type Factory interface {
+  Instance() Runner
+}
 ```
 
 ```go
@@ -67,6 +71,11 @@ func NewSingleRunner(o Ops) *SingleRunner {
 }
 
 func (s *SingleRunner) Run() error {
+  err := s.Ops.Init()
+  if err != nil {
+    return err
+  }
+
   return s.Ops.Run()
 }
 
@@ -83,9 +92,9 @@ func NewGroupRunner(o ...Ops) *GroupRunner {
 func (g *GroupRunner) Run() error {
   var err error
   for _, op := range g.Items {
-    err = op.Run()
+    err = NewSingleRunner(op).Run()
     if err != nil {
-      return errors.Wrap(err, "failed to execute group runner")
+      return err
     }
   }
   
@@ -202,7 +211,7 @@ type registrar struct {
 
 type RegistrarBuilder struct {
   path string
-  runner ops.Runner
+  factory ops.Factory
 }
 
 func NewRegistrarBuilder() *RegistrarBuilder {
@@ -214,13 +223,13 @@ func (r *RegistrarBuilder) WithPath(path UpgradePath) *RegistrarBuilder {
   return r
 }
 
-func (r *RegistrarBuilder) WithRunner(runner ops.Runner) *RegistrarBuilder {
-  r.runner = runner
+func (r *RegistrarBuilder) WithFactory(factory ops.Factory) *RegistrarBuilder {
+  r.factory = factory
   return r
 } 
 
 func (r *RegistrarBuilder) Register (
-  registrar[r.path] = r.runner
+  registrar[r.path] = r.factory
 )
 ```
 
@@ -232,12 +241,12 @@ type Executor struct {
 }
 
 func (e *Executor) Run() error {
-  runner := registrar[e.UpgradePath]
-  if runner == nil {
+  factory := registrar[e.UpgradePath]
+  if factory == nil {
     return errors.New("failed to run upgrade: invalid upgrade path {%s}", e.upgradePath)
   }
 
-  err := runner.Run()
+  err := factory.Instance().Run()
   if err != nil {
     return errors.Wrapf(err, "failed to execute upgrade for path {%s}", e.upgradePath)
   }
@@ -256,7 +265,7 @@ import (
 
 init() {
   store := map[string]interface{}{}
-  grpRunner := ops.NewGroup(
+  grpRunner := ops.NewGroupRunner(
     080-to-090.NewPodShouldBeRunning("pod101", "pod should be running", store),
     080-to-090.NewPodUpdateImage("pod201", "pod's image should get updated", store),
   )
