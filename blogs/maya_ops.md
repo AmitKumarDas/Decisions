@@ -32,21 +32,24 @@ much into programmatic versus declarative approach, let us list down the feature
 ```go
 // pkg/ops/v1alpha1/interface.go
 
-// Factory exposes contract to register
-// any structure as an Ops instance
+// Factory exposes contract to create
+// an Ops instance
 type Factory interface {
   Instance() Ops
 }
 
-// Ops exposes all contracts necessary to
-// participate in operation based workflow(s)
+// Ops exposes contracts of an operation
+//
+// NOTE:
+//  An operation is typically represented as
+// a set of ordered steps
 type Ops interface {
   // Init sets initialization options if any
-  // before running the operations
+  // before running the operation
   Init() error
   
   // Run does the actual execution of 
-  // operations
+  // operation
   Run() error
 }
 ```
