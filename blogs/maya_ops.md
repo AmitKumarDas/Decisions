@@ -32,22 +32,23 @@ much into programmatic versus declarative approach, let us list down the feature
 ```go
 // pkg/ops/v1alpha1/interface.go
 
-// Factory exposes contract to create
-// an Ops instance
-type Factory interface {
-  Instance() Ops
-}
-
 // Ops exposes contracts of an operation
 //
 // NOTE:
 //  An operation is typically represented as
 // a set of ordered steps
 type Ops interface {
+  Initializer
+  Runner
+}
+
+type Initializer interface {
   // Init sets initialization options if any
   // before running the operation
   Init() error
-  
+}
+
+type Runner interface {
   // Run does the actual execution of 
   // operation
   Run() error
@@ -65,8 +66,8 @@ func NewSingleRunner(o Ops) *SingleRunner {
   return &SingleRunner{Ops: o}
 }
 
-func (s *SingleRunner) Instance() Ops {
-  return s
+func (s *SingleRunner) Run() error {
+  return s.Ops.Run()
 }
 
 type GroupRunner struct {
@@ -79,8 +80,16 @@ func NewGroupRunner(o ...Ops) *GroupRunner {
   return m
 }
 
-func (g *GroupRunner) Instance() Ops {
-  return g
+func (g *GroupRunner) Run() error {
+  var err error
+  for _, op := range g.Items {
+    err = op.Run()
+    if err != nil {
+      return errors.Wrap(err, "failed to execute group runner")
+    }
+  }
+  
+  return nil
 }
 ```
 
@@ -188,12 +197,12 @@ import (
 )
 
 type registrar struct {
-  map[string]ops.Factory
+  map[string]ops.Runner
 }
 
 type RegistrarBuilder struct {
   path string
-  ops ops.Factory
+  runner ops.Runner
 }
 
 func NewRegistrarBuilder() *RegistrarBuilder {
@@ -205,22 +214,40 @@ func (r *RegistrarBuilder) WithPath(path UpgradePath) *RegistrarBuilder {
   return r
 }
 
-func (r *RegistrarBuilder) WithOps(ops ops.Factory) *RegistrarBuilder {
-  r.ops = ops
+func (r *RegistrarBuilder) WithRunner(runner ops.Runner) *RegistrarBuilder {
+  r.runner = runner
   return r
 } 
 
 func (r *RegistrarBuilder) Register (
-  registrar[r.path] = r.ops
+  registrar[r.path] = r.runner
 )
 ```
 
 ```go
 // cmd/upgrade/execute.go
+
+type Executor struct {
+  UpgradePath string
+}
+
+func (e *Executor) Run() error {
+  runner := registrar[e.UpgradePath]
+  if runner == nil {
+    return errors.New("failed to run upgrade: invalid upgrade path {%s}", e.upgradePath)
+  }
+
+  err := runner.Run()
+  if err != nil {
+    return errors.Wrapf(err, "failed to execute upgrade for path {%s}", e.upgradePath)
+  }
+
+  return nil
+}
 ```
 
 ```go
-// cmd/upgrade/add_upgradepath_080_090.go
+// cmd/upgrade/register_upgradepath_080_090.go
 
 import (
   ops "github.com/openebs/maya/pkg/ops/v1alpah1"
@@ -229,14 +256,14 @@ import (
 
 init() {
   store := map[string]interface{}{}
-  ops := ops.NewGroup(
-    NewPodShouldBeRunning("pod101", "pod should be running", store),
-    NewPodUpdateImage("pod201", "pod's image should get updated", store),
+  grpRunner := ops.NewGroup(
+    080-to-090.NewPodShouldBeRunning("pod101", "pod should be running", store),
+    080-to-090.NewPodUpdateImage("pod201", "pod's image should get updated", store),
   )
 
   RegistrarBuilder().
     WithPath(080-to-090.UpgradePath).
-    WithOps(ops).
+    WithRunner(grpRunner).
     Register()
 }
 ```
