@@ -60,7 +60,7 @@ type Manager interface {
 ```
 
 ```go
-// pkg/ops/v1alpha1/runner.go
+// pkg/ops/v1alpha1/manager.go
 
 type SingleOpsManager struct {
   Ops Ops
@@ -281,7 +281,7 @@ init() {
 // cmd/upgrade/0.8.0-0.9.0/constants.go
 const (
   UpgradePath string = "080-to-090"
-
+  CStorPoolImage string = "openebs.io/cstor-pool:0.9.0"
   PathToPodObject string = "taskResult.podInfo.object"
 )
 ```
@@ -312,7 +312,7 @@ func PodImageUpdate(id, desc string, store map[string]interface{}) Ops {
     pod.WithOpsDesc(desc),
   ).Steps(
     pod.WithObjectFromStore(PathToPodObject),
-    pod.SetImage("openebs.io/cstor-pool:0.12.1"),
+    pod.SetImage(CStorPoolImage),
     pod.Update(),
   )
 }
