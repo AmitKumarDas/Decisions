@@ -30,6 +30,28 @@ much into programmatic versus declarative approach, let us list down the feature
 
 #### Core
 ```go
+// pkg/ops/v1alpha1/interface.go
+
+// Factory exposes contract to register
+// any structure as an Ops instance
+type Factory interface {
+  Instance() Ops
+}
+
+// Ops exposes all contracts necessary to
+// participate in operation based workflow(s)
+type Ops interface {
+  // Init sets initialization options if any
+  // before running the operations
+  Init() error
+  
+  // Run does the actual execution of 
+  // operations
+  Run() error
+}
+```
+
+```go
 // pkg/ops/v1alpha1/runner.go
 
 type SingleRunner struct {
@@ -40,7 +62,7 @@ func NewSingleRunner(o Ops) *SingleRunner {
   return &SingleRunner{Ops: o}
 }
 
-func (s *SingleRunner) OpsInstance() Ops {
+func (s *SingleRunner) Instance() Ops {
   return s
 }
 
@@ -54,30 +76,8 @@ func NewGroupRunner(o ...Ops) *GroupRunner {
   return m
 }
 
-func (g *GroupRunner) OpsInstance() Ops {
+func (g *GroupRunner) Instance() Ops {
   return g
-}
-```
-
-```go
-// pkg/ops/v1alpha1/interface.go
-
-// Register exposes contract to enable 
-// registration of Ops instance
-type Register interface {
-  OpsInstance() Ops
-}
-
-// Ops exposes all contracts necessary to
-// participate in operation based workflow(s)
-type Ops interface {
-  // Init sets initialization options if any
-  // before running the operations
-  Init() error
-  
-  // Run does the actual execution of 
-  // operations
-  Run() error
 }
 ```
 
@@ -185,12 +185,12 @@ import (
 )
 
 type registrar struct {
-  map[string]ops.Register
+  map[string]ops.Factory
 }
 
 type RegistrarBuilder struct {
   path string
-  ops ops.Register
+  ops ops.Factory
 }
 
 func NewRegistrarBuilder() *RegistrarBuilder {
@@ -202,7 +202,7 @@ func (r *RegistrarBuilder) WithPath(path UpgradePath) *RegistrarBuilder {
   return r
 }
 
-func (r *RegistrarBuilder) WithRunner(ops ops.Register) *RegistrarBuilder {
+func (r *RegistrarBuilder) WithOps(ops ops.Factory) *RegistrarBuilder {
   r.ops = ops
   return r
 } 
@@ -226,14 +226,14 @@ import (
 
 init() {
   store := map[string]interface{}{}
-  group := ops.NewGroup(
+  ops := ops.NewGroup(
     NewPodShouldBeRunning("pod101", "pod should be running", store),
     NewPodUpdateImage("pod201", "pod's image should get updated", store),
   )
 
   RegistrarBuilder().
     WithPath(080-to-090.UpgradePath).
-    WithRunner(group).
+    WithOps(ops).
     Register()
 }
 ```
@@ -265,8 +265,8 @@ func NewPodShouldBeRunning(id, desc string, store map[string]interface{}) *PodSh
   return &PodShouldBeRunning{ID: id, Desc: desc, Store: store}
 }
 
-// Runner implements ops.Register interface
-func (i *PodShouldBeRunning) OpsInstance() Ops {
+// Runner implements ops.Factory interface
+func (i *PodShouldBeRunning) Instance() Ops {
   return pod.Ops(
     pod.WithOpsStore(i.Store),
     pod.WithOpsID(i.ID),
@@ -290,8 +290,8 @@ func NewPodUpdateImage(id, desc string, store map[string]interface{}) *PodUpdate
   return &PodUpdateImage{ID: id, Desc: desc, Store: store}
 }
 
-// Runner implements ops.Register interface
-func (i *PodUpdateImage) OpsInstance() Ops {
+// Runner implements ops.Factory interface
+func (i *PodUpdateImage) Instance() Ops {
   return pod.Ops(
     pod.WithOpsStore(i.Store),
     pod.WithOpsID(i.ID),
