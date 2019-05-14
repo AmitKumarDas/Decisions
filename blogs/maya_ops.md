@@ -297,7 +297,7 @@ func PodShouldBeRunning(id, desc string, store map[string]interface{}) Ops {
   ).Steps(
     pod.WithObjectFromStore(PathToPodObject),
     pod.ShouldBeRunning(),
-    pod.SaveTuple("name", "namespace"),
+    pod.SaveTupleToStore("name", "namespace"),
   )
 }
 ```
