@@ -55,6 +55,10 @@ type Ops interface {
 ```go
 // pkg/kubernetes/pod/v1alpha1/podops.go
 
+// NOTE:
+//  This file (along with its package) deals
+// with pod related operations only.
+
 // GetStoreFunc abstracts fetching the in-memory
 // storage required while executing various steps
 // of an operation
@@ -142,7 +146,7 @@ func (p *Ops) Run() error {
 // pkg/kubernetes/pod/v1alpha1/podlistops.go
 ```
 
-#### Usage
+#### UseCase -- UpgradeExecutor
 ```go
 // cmd/upgrade/execute.go
 ```
@@ -152,7 +156,7 @@ func (p *Ops) Run() error {
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pod/registrar.go
+// cmd/upgrade/0.8.0-0.9.0/pod/common.go
 
 type Base struct {
   ID string
@@ -163,6 +167,10 @@ type Base struct {
 
 ```go
 // cmd/upgrade/0.8.0-0.9.0/pod/should_be_running.go
+
+import (
+ 
+)
 
 type ShouldBeRunning struct {
   Base
