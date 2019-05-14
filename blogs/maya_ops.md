@@ -30,13 +30,42 @@ much into programmatic versus declarative approach, let us list down the feature
 
 #### Core
 ```go
-// pkg/ops/v1alpha1/ops.go
+// pkg/ops/v1alpha1/runner.go
 
-// Register exposes contract to enable any
-// structure to get itself registered as
-// an Ops interface
+type SingleRunner struct {
+  Ops Ops
+}
+
+func NewSingleRunner(o Ops) *SingleRunner {
+  return &SingleRunner{Ops: o}
+}
+
+func (s *SingleRunner) OpsInstance() Ops {
+  return s
+}
+
+type GroupRunner struct {
+  Items []Ops
+}
+
+func NewGroupRunner(o ...Ops) *GroupRunner {
+  m := &GroupRunner{}
+  m.Items = append(m.Items, o...)
+  return m
+}
+
+func (g *GroupRunner) OpsInstance() Ops {
+  return g
+}
+```
+
+```go
+// pkg/ops/v1alpha1/interface.go
+
+// Register exposes contract to enable 
+// registration of Ops instance
 type Register interface {
-  Instance() Ops
+  OpsInstance() Ops
 }
 
 // Ops exposes all contracts necessary to
@@ -147,47 +176,103 @@ func (p *Ops) Run() error {
 ```
 
 #### UseCase -- UpgradeExecutor
+
+```go
+// cmd/upgrade/registrar.go
+
+import (
+  ops "github.com/openebs/maya/pkg/ops/v1alpha1"
+)
+
+type registrar struct {
+  map[string]ops.Register
+}
+
+type RegistrarBuilder struct {
+  path string
+  ops ops.Register
+}
+
+func NewRegistrarBuilder() *RegistrarBuilder {
+  return &RegistrarBuilder{}
+}
+
+func (r *RegistrarBuilder) WithPath(path UpgradePath) *RegistrarBuilder {
+  r.path = path
+  return r
+}
+
+func (r *RegistrarBuilder) WithRunner(ops ops.Register) *RegistrarBuilder {
+  r.ops = ops
+  return r
+} 
+
+func (r *RegistrarBuilder) Register (
+  registrar[r.path] = r.ops
+)
+```
+
 ```go
 // cmd/upgrade/execute.go
 ```
 
 ```go
-// cmd/upgrade/registrar.go
+// cmd/upgrade/add_upgradepath_080_090.go
+
+import (
+  ops "github.com/openebs/maya/pkg/ops/v1alpah1"
+  080-to-090 "github.com/openebs/maya/cmd/upgrade/0.8.0-0.9.0"
+)
+
+init() {
+  store := map[string]interface{}{}
+  group := ops.NewGroup(
+    NewPodShouldBeRunning("pod101", "pod should be running", store),
+    NewPodUpdateImage("pod201", "pod's image should get updated", store),
+  )
+
+  RegistrarBuilder().
+    WithPath(080-to-090.UpgradePath).
+    WithRunner(group).
+    Register()
+}
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pod/common.go
+// cmd/upgrade/0.8.0-0.9.0/common.go
 
 type Base struct {
   ID string
   Desc string
   Store map[string]interface{}
 }
+
+const (
+  UpgradePath string = "080-to-090"
+
+  PathToPodObject string = "taskResult.podInfo.object"
+)
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pod/should_be_running.go
+// cmd/upgrade/0.8.0-0.9.0/pod_should_be_running.go
 
-import (
- 
-)
-
-type ShouldBeRunning struct {
+type PodShouldBeRunning struct {
   Base
 }
 
-func NewShouldBeRunning(id, desc string, store map[string]interface{}) *ShouldBeRunning {
-  return &ShouldBeRunning{ID: id, Desc: desc, Store: store}
+func NewPodShouldBeRunning(id, desc string, store map[string]interface{}) *PodShouldBeRunning {
+  return &PodShouldBeRunning{ID: id, Desc: desc, Store: store}
 }
 
-// Instance implements ops.Register interface
-func (i *ShouldBeRunning) Instance() Ops {
+// Runner implements ops.Register interface
+func (i *PodShouldBeRunning) OpsInstance() Ops {
   return pod.Ops(
     pod.WithOpsStore(i.Store),
     pod.WithOpsID(i.ID),
     pod.WithOpsDesc(i.Desc),
   ).Steps(
-    pod.WithOpsStoreObject("taskResult.podInfo.object"),
+    pod.WithObjectFromStore(PathToPodObject),
     pod.ShouldBeRunning(),
     pod.SaveTuple("name", "namespace"),
   )
@@ -195,24 +280,24 @@ func (i *ShouldBeRunning) Instance() Ops {
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/pod/update_image.go
+// cmd/upgrade/0.8.0-0.9.0/pod_update_image.go
 
-type UpdateImage struct {
+type PodUpdateImage struct {
   Base
 }
 
-func NewUpdateImage(id, desc string, store map[string]interface{}) *UpdateImage {
-  return &UpdateImage{ID: id, Desc: desc, Store: store}
+func NewPodUpdateImage(id, desc string, store map[string]interface{}) *PodUpdateImage {
+  return &PodUpdateImage{ID: id, Desc: desc, Store: store}
 }
 
-// Instance implements ops.Register interface
-func (i *UpdateImage) Instance() Ops {
+// Runner implements ops.Register interface
+func (i *PodUpdateImage) OpsInstance() Ops {
   return pod.Ops(
     pod.WithOpsStore(i.Store),
     pod.WithOpsID(i.ID),
     pod.WithOpsDesc(i.Desc),
   ).Steps(
-    pod.WithOpsStoreObject("taskResult.podInfo.object"),
+    pod.WithObjectFromStore(PathToPodObject),
     pod.SetImage("openebs.io/cstor-pool:0.12.1"),
     pod.Update(),
   )
