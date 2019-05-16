@@ -35,25 +35,31 @@ much into programmatic versus declarative approach, let us list down the feature
 // Ops exposes contracts of an operation
 //
 // NOTE:
-//  An operation is typically represented as
+//  An operation is typically identified with
 // a set of ordered steps
 type Ops interface {
   Initializer
   Runner
 }
 
+// Initializer exposes init related contract(s)
+// w.r.t an operation
 type Initializer interface {
   // Init sets initialization options if any
   // before running the operation
   Init() error
 }
 
+// Runner exposes run related contract(s)
+// w.r.t an operation
 type Runner interface {
   // Run does the actual execution of 
   // operation
   Run() error
 }
 
+// Manager exposes management related
+// contract(s) w.r.t an operation
 type Manager interface {
   Manage() error
 }
@@ -62,14 +68,20 @@ type Manager interface {
 ```go
 // pkg/ops/v1alpha1/manager.go
 
+// SingleOpsManager is a concrete implementation
+// of Manager interface. As the name suggests
+// it manages/runs a single operation
 type SingleOpsManager struct {
   Ops Ops
 }
 
+// NewSingleOpsManager returns a new instance of
+// SingleOpsManager
 func NewSingleOpsManager(o Ops) *SingleOpsManager {
   return &SingleOpsManager{Ops: o}
 }
 
+// Manage execute the underlying operation
 func (s *SingleOpsManager) Manage() error {
   err := s.Ops.Init()
   if err != nil {
@@ -79,16 +91,23 @@ func (s *SingleOpsManager) Manage() error {
   return s.Ops.Run()
 }
 
-type GroupOpsManager struct {
+// MultiOpsManager is a concrete implementation
+// of Manager interface. As the name suggests
+// it manages/runs a set of operations
+type MultiOpsManager struct {
   Items []Ops
 }
 
-func NewGroupOpsManager(o ...Ops) *GroupOpsManager {
+// NewMultiOpsManager returns a new instance of
+// MultiOpsManager
+func NewMultiOpsManager(o ...Ops) *MultiOpsManager {
   m := &GroupOpsManager{}
   m.Items = append(m.Items, o...)
   return m
 }
 
+// Manage executes all the underlying operations
+// managed by this instance
 func (g *GroupOpsManager) Manage() error {
   var err error
   for _, op := range g.Items {
@@ -103,11 +122,27 @@ func (g *GroupOpsManager) Manage() error {
 ```
 
 ```go
-// pkg/kubernetes/pod/v1alpha1/podops.go
+// pkg/ops/kubernetes/pod/v1alpha1/pod.go
 
 // NOTE:
 //  This file (along with its package) deals
-// with pod related operations only.
+// with pod related operations only. 
+//
+// NOTE:
+//  Each operation step is named in a way that
+// reflects the actual behaviour.
+// 
+//  For example, A pod specific condition such as 
+// IsRunning() should be defined as two different
+// functions named as:
+// - ShouldBeRunning() &
+// - ShouldNotBeRunning()
+//
+//  These functions can be set in an order necessary 
+// to build one operation.
+//
+//  One can take the reference from BDD specs
+// to decide a name for any operation based step
 
 // GetStoreFunc abstracts fetching the in-memory
 // storage required while executing various steps
@@ -193,7 +228,7 @@ func (p *Ops) Run() error {
 ```
 
 ```go
-// pkg/kubernetes/pod/v1alpha1/podlistops.go
+// pkg/ops/kubernetes/pod/v1alpha1/list.go
 ```
 
 #### UseCase -- UpgradeExecutor
@@ -265,14 +300,14 @@ import (
 
 init() {
   store := map[string]interface{}{}
-  grpOpsMgr := ops.NewGroupOpsManager(
+  multiOpsMgr := ops.NewMultiOpsManager(
     080-to-090.PodShouldBeRunning("pod101", "pod should be running", store),
     080-to-090.PodImageUpdate("pod201", "pod's image should get updated", store),
   )
 
   ManagerRegistrar().
     WithPath(080-to-090.UpgradePath).
-    WithManager(grpOpsMgr).
+    WithManager(multiOpsMgr).
     Register()
 }
 ```
