@@ -23,7 +23,6 @@ much into programmatic versus declarative approach, let us list down the feature
 - Users of MayaOps need to learn MayaOps syntax
 - MayaOps is Go code and will be written inside a .go file
 - MayaOps syntax will expose one or more hooks that needs to be filled in
-- MayaOps SDK can packaged Maya Ops library as well as hooks as a single Docker image
 
 ### High Level Design
 
