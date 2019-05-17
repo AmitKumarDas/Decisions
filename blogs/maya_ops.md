@@ -320,7 +320,7 @@ func PodImageShouldGetUpdated(id, store map[string]interface{}) Ops {
   return pod.New(
     pod.WithStore(store),
     pod.WithID("update-pod-image"),
-    pod.WithDesc("pod's image should get updated",),
+    pod.WithDesc("pod's image should get updated"),
   ).Steps(
     pod.GetFromStore(".pod.object"),
     pod.SetImage(CStorPoolImage),
@@ -333,7 +333,7 @@ func SetPodImageIfRunning(id, store map[string]interface{}) Ops {
   return pod.New(
     pod.WithStore(store),
     pod.WithID("update-pod-image-if-running"),
-    pod.WithDesc("pod's image should get updated if is running",),
+    pod.WithDesc("pod's image should get updated if is running"),
   ).Steps(
     pod.GetFromStore(".pod.object"),
     pod.ShouldBeRunning(),
