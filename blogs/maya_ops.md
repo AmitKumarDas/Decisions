@@ -118,6 +118,38 @@ type Base struct {
 ```
 
 ```go
+// pkg/ops/v1alpha1/registrar.go
+
+import (
+  ops "github.com/openebs/maya/pkg/ops/v1alpha1"
+)
+
+type Registrar struct {
+  key string
+  manager ops.Manager
+  registry map[string]ops.Manager
+}
+
+func NewRegistrar() *Registrar {
+  return &Registrar{}
+}
+
+func (r *Registrar) WithKey(key string) *Registrar {
+  r.key = key
+  return r
+}
+
+func (r *Registrar) WithManager(manager ops.Manager) *Registrar {
+  r.manager = manager
+  return r
+} 
+
+func (r *Registrar) Register (
+  registry[r.key] = r.manager
+)
+```
+
+```go
 // pkg/ops/kubernetes/pod/v1alpha1/pod.go
 
 import (
@@ -217,49 +249,16 @@ func (p *Ops) Run() error {
 #### UseCase -- UpgradeExecutor
 
 ```go
-// cmd/upgrade/registrar.go
-
-import (
-  ops "github.com/openebs/maya/pkg/ops/v1alpha1"
-)
-
-type managers struct {
-  map[string]ops.Manager
-}
-
-type managerRegistrar struct {
-  upgradePath string
-  manager ops.ManagerFactory
-}
-
-func ManagerRegistrar() *managerRegistrar {
-  return &managerRegistrar{}
-}
-
-func (r *managerRegistrar) WithPath(path UpgradePath) *managerRegistrar {
-  r.upgradePath = path
-  return r
-}
-
-func (r *managerRegistrar) WithManager(manager ops.ManagerFactory) *managerRegistrar {
-  r.manager = manager
-  return r
-} 
-
-func (r *managerRegistrar) Register (
-  managers[r.upgradePath] = r.manager
-)
-```
-
-```go
 // cmd/upgrade/execute.go
+
+upgrades map[string]ops.Manager
 
 type Executor struct {
   UpgradePath string
 }
 
 func (e *Executor) Run() error {
-  manager := managers[e.UpgradePath]
+  manager := upgrades[e.UpgradePath]
   if manager == nil {
     return errors.New("failed to run upgrade: un-supported upgrade path {%s}", e.upgradePath)
   }
@@ -284,12 +283,12 @@ import (
 init() {
   store := map[string]interface{}{}
   multiOpsMgr := ops.NewMultiOpsManager(
-    080-to-090.PodShouldBeRunning("pod101", store),
-    080-to-090.PodImageShouldGetUpdated("pod201", store),
+    080-to-090.PodShouldBeRunning(store),
+    080-to-090.PodImageShouldGetUpdated(store),
   )
 
-  ManagerRegistrar().
-    WithPath(080-to-090.UpgradePath).
+  ops.Registrar(upgrades).
+    WithKey(080-to-090.UpgradePath).
     WithManager(multiOpsMgr).
     Register()
 }
@@ -304,28 +303,40 @@ import (
 const (
   UpgradePath string = "080-to-090"
   CStorPoolImage string = "openebs.io/cstor-pool:0.9.0"
-  PathToPodObject string = "taskResult.podInfo.object"
 )
 
-func PodShouldBeRunning(id, store map[string]interface{}) Ops {
+func PodShouldBeRunning(store map[string]interface{}) Ops {
   return pod.New(
     pod.WithStore(store),
-    pod.WithID(id),
+    pod.WithID("is-pod-running"),
     pod.WithDesc("pod should be running"),
   ).Steps(
-    pod.GetObjectFromStore(PathToPodObject),
+    pod.GetFromStore(".pod.object"),
     pod.ShouldBeRunning(),
-    pod.SaveTupleToStore("name", "namespace"),
   )
 }
 
 func PodImageShouldGetUpdated(id, store map[string]interface{}) Ops {
   return pod.New(
     pod.WithStore(store),
-    pod.WithID(id),
+    pod.WithID("update-pod-image"),
     pod.WithDesc("pod's image should get updated",),
   ).Steps(
-    pod.GetObjectFromStore(PathToPodObject),
+    pod.GetFromStore(".pod.object"),
+    pod.SetImage(CStorPoolImage),
+    pod.Update(),
+  )
+}
+
+// Alternatively
+func SetPodImageIfRunning(id, store map[string]interface{}) Ops {
+  return pod.New(
+    pod.WithStore(store),
+    pod.WithID("update-pod-image-if-running"),
+    pod.WithDesc("pod's image should get updated if is running",),
+  ).Steps(
+    pod.GetFromStore(".pod.object"),
+    pod.ShouldBeRunning(),
     pod.SetImage(CStorPoolImage),
     pod.Update(),
   )
