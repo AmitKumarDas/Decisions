@@ -36,21 +36,6 @@ much into programmatic versus declarative approach, let us list down the feature
 //  An operation is typically identified with
 // a set of ordered steps
 type Ops interface {
-  Initializer
-  Runner
-}
-
-// Initializer exposes init related contract(s)
-// w.r.t an operation
-type Initializer interface {
-  // Init sets initialization options if any
-  // before running the operation
-  Init() error
-}
-
-// Runner exposes run related contract(s)
-// w.r.t an operation
-type Runner interface {
   // Run does the actual execution of 
   // operation
   Run() error
@@ -81,11 +66,6 @@ func NewSingleOpsManager(o Ops) *SingleOpsManager {
 
 // Manage execute the underlying operation
 func (s *SingleOpsManager) Manage() error {
-  err := s.Ops.Init()
-  if err != nil {
-    return err
-  }
-
   return s.Ops.Run()
 }
 
@@ -120,7 +100,29 @@ func (g *GroupOpsManager) Manage() error {
 ```
 
 ```go
+// pkg/ops/v1alpha1/ops.go
+
+
+// GetStoreFunc abstracts fetching the in-memory
+// storage required while executing various steps
+// of an operation
+type GetStoreFunc func() map[string]interface{}
+
+type Base struct {
+  ID           string
+  Namespace    string
+  Errors       []error
+  RunSteps     []OpsStep
+  GetStore     GetStoreFunc
+}
+```
+
+```go
 // pkg/ops/kubernetes/pod/v1alpha1/pod.go
+
+import (
+  ops "github.com/openebs/maya/pkg/ops/v1alpha1"
+)
 
 // NOTE:
 //  This file (along with its package) deals
@@ -142,32 +144,24 @@ func (g *GroupOpsManager) Manage() error {
 //  One can take the reference from BDD specs
 // to decide a name for any operation based step
 
-// GetStoreFunc abstracts fetching the in-memory
-// storage required while executing various steps
-// of an operation
-type GetStoreFunc func() map[string]interface{}
-
 type Ops struct {
-  ID           string
-  Namespace    string
+  ops.Base
   Pod          *Pod
-  Errors       []error
-  InitList     []OpsInit
-  RunSteps     []OpsStep
-  GetStore     GetStoreFunc
 }
 
-// OpsInit abstracts implementation
-// of initializing an instance of Ops
-type OpsInit func(*Ops)
+// OpsOption abstracts building
+// an Ops instance
+type OpsOption func(*Ops)
 
 // OpsStep abstracts implementation
 // of an Ops step
 type OpsStep func(*Ops)
 
-// WithOpsStore is a Ops init option to
-// provide in-memory storage
-func WithOpsStore(store map[string]interface{}) OpsInit {
+// WithStore is a OpsOption function that
+// provide in-memory map to store result 
+// of an operation and at the same time
+// a placeholder to store config values
+func WithStore(store map[string]interface{}) OpsOption {
   return func(p *Ops) {
     p.GetStore = func() map[string]interface{} {
       return store
@@ -175,11 +169,13 @@ func WithOpsStore(store map[string]interface{}) OpsInit {
   }
 }
 
-// NewOps returns a new instance of Ops
-func NewOps(inits ...OpsInit) *Ops {
-  p := &Ops{}
-  p.InitList = append(p.InitList, inits...)
-  return p
+// New returns a new instance of Ops
+func New(opts ...OpsOption) *Ops {
+  o := &Ops{}
+  for _, option := opts {
+    option(o)
+  }
+  return o
 }
 
 // Steps sets Ops instance with the
@@ -193,21 +189,6 @@ func (p *Ops) Steps(opts ...OpsStep) *Ops {
   return p
 }
 
-// Init runs the initialization options
-// for this ops instance
-//
-// NOTE:
-//  Init is an implementation of Ops interface
-func (p *Ops) Init() error {
-  for _, init := range p.InitList {
-    if len(p.Errors) > 0 {
-      return errors.New("%v", p.Errors)
-    }
-    init(p)
-  }
-  return nil
-}
-
 // Run executes the operations as steps in an ordered
 // manner. The order that was used while creating
 // this ops instance is used to execute as well.
@@ -215,6 +196,10 @@ func (p *Ops) Init() error {
 // NOTE:
 //  Run is an implementation of Ops interface
 func (p *Ops) Run() error {
+  if len(p.Errors) > 0 {
+    return errors.New("%v", p.Errors)
+  }
+
   for _, step := range p.RunSteps {
     if len(p.Errors) > 0 {
       return errors.New("%v", p.Errors)
@@ -299,8 +284,8 @@ import (
 init() {
   store := map[string]interface{}{}
   multiOpsMgr := ops.NewMultiOpsManager(
-    080-to-090.PodShouldBeRunning("pod101", "pod should be running", store),
-    080-to-090.PodImageUpdate("pod201", "pod's image should get updated", store),
+    080-to-090.PodShouldBeRunning("pod101", store),
+    080-to-090.PodImageShouldGetUpdated("pod201", store),
   )
 
   ManagerRegistrar().
@@ -311,46 +296,34 @@ init() {
 ```
 
 ```go
-// cmd/upgrade/0.8.0-0.9.0/constants.go
+// cmd/upgrade/0.8.0-0.9.0/upgrade.go
+import (
+  pod "github.com/openebs/maya/pkg/ops/kubernetes/pod/v1alpha1"
+)
+
 const (
   UpgradePath string = "080-to-090"
   CStorPoolImage string = "openebs.io/cstor-pool:0.9.0"
   PathToPodObject string = "taskResult.podInfo.object"
 )
-```
 
-```go
-// cmd/upgrade/0.8.0-0.9.0/pod_should_be_running.go
-
-import (
-  pod "github.com/openebs/maya/pkg/ops/kubernetes/pod/v1alpha1"
-)
-
-func PodShouldBeRunning(id, desc string, store map[string]interface{}) Ops {
+func PodShouldBeRunning(id, store map[string]interface{}) Ops {
   return pod.New(
     pod.WithStore(store),
     pod.WithID(id),
-    pod.WithDesc(desc),
+    pod.WithDesc("pod should be running"),
   ).Steps(
     pod.GetObjectFromStore(PathToPodObject),
     pod.ShouldBeRunning(),
     pod.SaveTupleToStore("name", "namespace"),
   )
 }
-```
 
-```go
-// cmd/upgrade/0.8.0-0.9.0/pod_image_update.go
-
-import (
-  pod "github.com/openebs/maya/pkg/ops/kubernetes/pod/v1alpha1"
-)
-
-func PodImageUpdate(id, desc string, store map[string]interface{}) Ops {
+func PodImageShouldGetUpdated(id, store map[string]interface{}) Ops {
   return pod.New(
     pod.WithStore(store),
     pod.WithID(id),
-    pod.WithDesc(desc),
+    pod.WithDesc("pod's image should get updated",),
   ).Steps(
     pod.GetObjectFromStore(PathToPodObject),
     pod.SetImage(CStorPoolImage),
