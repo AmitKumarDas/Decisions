@@ -362,8 +362,11 @@ func SetPodImageIfRunning(id, store map[string]interface{}) Ops {
 ```
 - Add ability to run the steps directly against an Ops instance
 ```go
+func SetCStorPoolPodImageIfRunning() {
   pod.New().
+    GetFromKubernetes("my-cstor-pool-pod", "openebs")
     ShouldBeRunning().
     SetImage(CStorPoolImage).
     Verify()
+}
 ```
