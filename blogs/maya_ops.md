@@ -364,7 +364,8 @@ func SetPodImageIfRunning(id, store map[string]interface{}) Ops {
 ```go
 func SetCStorPoolPodImageIfRunning() {
   pod.New().
-    GetFromKubernetes("my-cstor-pool-pod", "openebs")
+    GetFromKubernetes("my-cstor-pool-pod", "openebs").
+    SkipIfVersionNotEqualsTo("0.8.2").
     ShouldBeRunning().
     SetImage(CStorPoolImage).
     Verify()
