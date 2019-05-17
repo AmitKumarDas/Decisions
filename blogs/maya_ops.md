@@ -322,13 +322,17 @@ const (
 ```go
 // cmd/upgrade/0.8.0-0.9.0/pod_should_be_running.go
 
+import (
+  pod "github.com/openebs/maya/pkg/ops/kubernetes/pod/v1alpha1"
+)
+
 func PodShouldBeRunning(id, desc string, store map[string]interface{}) Ops {
-  return pod.Ops(
-    pod.WithOpsStore(store),
-    pod.WithOpsID(id),
-    pod.WithOpsDesc(desc),
+  return pod.New(
+    pod.WithStore(store),
+    pod.WithID(id),
+    pod.WithDesc(desc),
   ).Steps(
-    pod.WithObjectFromStore(PathToPodObject),
+    pod.GetObjectFromStore(PathToPodObject),
     pod.ShouldBeRunning(),
     pod.SaveTupleToStore("name", "namespace"),
   )
@@ -338,13 +342,17 @@ func PodShouldBeRunning(id, desc string, store map[string]interface{}) Ops {
 ```go
 // cmd/upgrade/0.8.0-0.9.0/pod_image_update.go
 
+import (
+  pod "github.com/openebs/maya/pkg/ops/kubernetes/pod/v1alpha1"
+)
+
 func PodImageUpdate(id, desc string, store map[string]interface{}) Ops {
-  return pod.Ops(
-    pod.WithOpsStore(store),
-    pod.WithOpsID(id),
-    pod.WithOpsDesc(desc),
+  return pod.New(
+    pod.WithStore(store),
+    pod.WithID(id),
+    pod.WithDesc(desc),
   ).Steps(
-    pod.WithObjectFromStore(PathToPodObject),
+    pod.GetObjectFromStore(PathToPodObject),
     pod.SetImage(CStorPoolImage),
     pod.Update(),
   )
