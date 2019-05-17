@@ -342,3 +342,28 @@ func SetPodImageIfRunning(id, store map[string]interface{}) Ops {
   )
 }
 ```
+
+### Further Thinking
+- Add skip property that skips rest of the steps
+```go
+func SetPodImageIfRunning(id, store map[string]interface{}) Ops {
+  return pod.New(
+    pod.WithStore(store),
+    pod.WithID("update-pod-image-if-running"),
+    pod.WithDesc("pod's image should get updated if is running"),
+  ).Steps(
+    pod.GetFromStore(".pod.object"),
+    pod.SkipIfVersionNotEqualsTo("0.8.2")
+    pod.ShouldBeRunning(),
+    pod.SetImage(CStorPoolImage),
+    pod.Update(),
+  )
+}
+```
+- Add ability to run the steps directly against an Ops instance
+```go
+  pod.New().
+    ShouldBeRunning().
+    SetImage(CStorPoolImage).
+    Verify()
+```
