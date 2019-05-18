@@ -474,13 +474,15 @@ spec:
       PoolName: my-cstor-pool
 
     funcs:
-      getCSPUID: |
+    - name: getCStorPoolUID
+      body: |
         cspops.New().
           UseStore(MayaStore).
           GetFromKubernetes(PoolName).
           SaveUIDToStore("csp.uid")
 
-      updateCSPDeployment: |
+    - name: updateCStorPoolDeployment
+      body: |
         deployops.New().
           UseStore(MayaStore).
           GetFromKubernetes(PoolName, PoolNamespace).
@@ -526,5 +528,21 @@ spec:
             container.WithVolumeMount("sparse", "/var/openebs/sparse"),
             container.WithVolumeMount("udev", "/run/udev"),
           ).
-          UpdateToKubernetes()
+          UpdateToKubernetes().
+          ShouldRolloutEventually(
+            ops.WithRetryAttempts(10), 
+            ops.WithRetryInterval(3s)
+          )
+
+    - name: setStoragePoolVersion
+      body: |
+        spops.New().
+          GetFromKubernetes(PoolName).
+          SetLabel("openebs.io/version", TargetVersion)
+          
+    - name: setCStorPoolVersion
+      body: |
+        cspops.New().
+          GetFromKubernetes(PoolName).
+          SetLabel("openebs.io/version", TargetVersion)
 ```
