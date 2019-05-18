@@ -20,8 +20,9 @@ much into programmatic versus declarative approach, let us list down the feature
 
 #### Assumptions of MayaOps
 - Users of MayaOps need to learn MayaOps syntax
-- MayaOps is Go code and will be written inside a .go file
-- MayaOps syntax will expose one or more hooks that needs to be filled in
+- MayaOps is Go code and will be written inside:
+  - a .go file
+  - MayaOps kubernetes custom resource
 
 ### High Level Design
 
@@ -226,6 +227,9 @@ func (p *Ops) Steps(opts ...OpsStep) *Ops {
 //
 // NOTE:
 //  Run is an implementation of Ops interface
+//
+// NOTE:
+//  This is a final operation
 func (p *Ops) Run() error {
   if len(p.Errors) > 0 {
     return errors.New("%v", p.Errors)
@@ -238,6 +242,50 @@ func (p *Ops) Run() error {
     step(p)
   }
   return nil
+}
+
+// Verify provides the status of previously 
+// exected operation steps
+//
+// NOTE:
+//  This is a final operation
+func (p *Ops) Verify() error {
+  if len(p.Errors) > 0 {
+    return errors.New("%v", p.Errors)
+  }
+
+  return nil
+}
+
+// isRun flags if this operation
+// should continue executing subsequent
+// steps
+func (p *Ops) isRun() bool {
+  return !(len(p.Errors) > 0 || p.IsSkip)
+}
+
+// ShouldBeRunning sets error if pod is not
+// running
+func ShouldBeRunning() OpsStep {
+  return func(p *Ops) {
+    p.ShouldBeRunning()
+  }
+}
+
+// ShouldBeRunning sets error if pod is not
+// running
+func (p *Ops) ShouldBeRunning() *Ops {
+  if len(p.Errors) > 0 {
+    return p
+  }
+
+  isRunning := pod.New(pod.WithAPIObject(p.Pod)).IsRunning()
+  if !isRunning {
+    err := errors.Errorf("pod {%s} is not running", p.Pod.Name)
+    p.errs = append(p.errs, err)
+  }
+
+  return p
 }
 ```
 
