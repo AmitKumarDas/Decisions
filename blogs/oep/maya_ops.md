@@ -269,8 +269,14 @@ func (p *Ops) Run() error {
     if len(p.Errors) > 0 {
       return errors.New("%v", p.Errors)
     }
+
+    if p.ShouldSkip {
+      break
+    }
+
     step(p)
   }
+
   return nil
 }
 
