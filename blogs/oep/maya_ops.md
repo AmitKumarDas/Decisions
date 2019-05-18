@@ -458,3 +458,73 @@ func SetCStorPoolPodImageIfRunning() {
     Verify()
 }
 ```
+
+### MayaOps as a Kubernetes Custom Resource
+```yaml
+kind: MayaOps
+metadata:
+  name: upgrade-080-To-090
+  namespace: openebs
+spec:
+  go:
+    constants:
+      SourceVersion: "0.8.2"
+      TargetVersion: "0.9.0"
+      PoolNamespace: openebs
+      PoolName: my-cstor-pool
+
+    funcs:
+      getCSPUID: |
+        cspops.New().
+          UseStore(MayaStore).
+          GetFromKubernetes(PoolName).
+          SaveUIDToStore("csp.uid")
+
+      updateCSPDeployment: |
+        deployops.New().
+          UseStore(MayaStore).
+          GetFromKubernetes(PoolName, PoolNamespace).
+          SkipIfVersionNotEqualsTo(SourceVersion).
+          SetLabel("openebs.io/version", TargetVersion).
+          SetLabel("openebs.io/cstor-pool", PoolName).
+          UpdateContainer(
+            "cstor-pool",
+            container.WithImage("quay.io/openebs/cstor-pool:"+ TargetVersion),
+            container.WithENV("OPENEBS_IO_CSTOR_ID", FromStore("csp.uid")),
+            container.WithLivenessProbe(
+              probe.NewBuilder().
+                WithExec(
+                  k8scmd.Exec{
+                    "command": 
+                      - "/bin/sh"
+                      - "-c"
+                      - "zfs set io.openebs:livenesstimestap='$(date)' cstor-$OPENEBS_IO_CSTOR_ID"
+                  }
+                ).
+                WithFailureThreshold(3).
+                WithInitialDelaySeconds(300).
+                WithPeriodSeconds(10).
+                WithSuccessThreshold(1).
+                WithTimeoutSeconds(30).
+                Build()
+            ),
+          ).
+          UpdateContainer(
+            "cstor-pool-mgmt",
+            container.WithImage("quay.io/openebs/cstor-pool-mgmt:" + TargetVersion),
+            container.WithPortsNil(),
+          ).
+          UpdateContainer(
+            "maya-exporter",
+            container.WithImage("quay.io/openebs/m-exporter:" + TargetVersion),
+            container.WithCommand("maya-exporter"),
+            container.WithArgs("-e=pool"),
+            container.WithTCPPort(9500),
+            container.WithPriviledged(),
+            container.WithVolumeMount("device", "/dev"),
+            container.WithVolumeMount("tmp", "/tmp"),
+            container.WithVolumeMount("sparse", "/var/openebs/sparse"),
+            container.WithVolumeMount("udev", "/run/udev"),
+          ).
+          UpdateToKubernetes()
+```
