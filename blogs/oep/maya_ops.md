@@ -108,12 +108,23 @@ func (g *GroupOpsManager) Manage() error {
 // of an operation
 type GetStoreFunc func() map[string]interface{}
 
-type Base struct {
+type BaseOps struct {
   ID           string
   Namespace    string
+  ShouldSkip   bool
   Errors       []error
   RunSteps     []OpsStep
   GetStore     GetStoreFunc
+}
+
+type BaseOpsOption func(*BaseOps)
+
+func New(opts ...BaseOpsOption) *BaseOps {
+  b := &BaseOps{}
+  for _, o := range opts {
+    o(b)
+  }
+  return b
 }
 ```
 
@@ -154,6 +165,7 @@ func (r *Registrar) Register (
 
 import (
   ops "github.com/openebs/maya/pkg/ops/v1alpha1"
+  pod "github.com/openebs/maya/pkg/kubernetes/pod/v1alpha1"
 )
 
 // NOTE:
@@ -201,13 +213,31 @@ func WithStore(store map[string]interface{}) OpsOption {
   }
 }
 
-// New returns a new instance of Ops
-func New(opts ...OpsOption) *Ops {
-  o := &Ops{}
-  for _, option := opts {
+func (o *Ops) withOptions(opts ...OpsOption) *Ops{
+  for _, option := range opts {
     option(o)
   }
   return o
+}
+
+// New returns a new instance of Ops
+func New(opts ...OpsOption) *Ops {
+  o := &Ops{ops.Base: ops.New()}
+  return o.withOptions(opts...)
+}
+
+// From returns a new instance of Ops
+// by making use of the provided base
+// Ops instance
+func From(base *BaseOps, opts ...OpsOption) *Ops {
+  b := base
+  if b == nil {
+    b = ops.New()
+    b.Errors = append(b.Errors, errors.New("failed to init pod ops: nil base provided"))
+  }
+
+  o := &Ops{ops.Base: b}
+  return o.withOptions(opts...)
 }
 
 // Steps sets Ops instance with the
@@ -257,11 +287,11 @@ func (p *Ops) Verify() error {
   return nil
 }
 
-// isRun flags if this operation
+// isContinue flags if this operation
 // should continue executing subsequent
 // steps
-func (p *Ops) isRun() bool {
-  return !(len(p.Errors) > 0 || p.IsSkip)
+func (p *Ops) isContinue() bool {
+  return !(len(p.Errors) > 0 || p.ShouldSkip)
 }
 
 // ShouldBeRunning sets error if pod is not
@@ -275,14 +305,18 @@ func ShouldBeRunning() OpsStep {
 // ShouldBeRunning sets error if pod is not
 // running
 func (p *Ops) ShouldBeRunning() *Ops {
-  if len(p.Errors) > 0 {
+  if !p.isContinue() {
     return p
   }
 
-  isRunning := pod.New(pod.WithAPIObject(p.Pod)).IsRunning()
+  isRunning := pod.From(p.Pod).IsRunning()
   if !isRunning {
-    err := errors.Errorf("pod {%s} is not running", p.Pod.Name)
-    p.errs = append(p.errs, err)
+    err := errors.Errorf(
+      "pod {%s} is not running in namespace {%s}", 
+      p.Pod.Name, 
+      p.Pod.Namespace,
+    )
+    p.Errors = append(p.Errors, err)
   }
 
   return p
