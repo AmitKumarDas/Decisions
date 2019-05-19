@@ -9,6 +9,8 @@ Hence, this proof of concept is yet another attempt to provide **MayaOps** _(sim
 or so on)_. As one might have already guessed, this attempt will avoid declarative approach. However, without getting too 
 much into programmatic versus declarative approach, let us list down the features of `MayaOps`.
 
+_NOTE: For those YAML aficionados there is still some good news. Read till the end to understand._
+
 #### What MayaOps should provide
 - [ ] Simple way to code operations supported by Maya
 - [ ] Provide proper error messages for invalid operations
@@ -284,7 +286,12 @@ func setCStorPoolVersion() ops.Verifier {
 
 
 ### UseCase -- Upgrade as a Kubernetes Custom Resource - Drop 2
-- This is again programmatic with some yaml sugar
+- Note that this is completely programmatic with some yaml toppings
+- One will get the typical compile errors if any
+  - However, these compliation & runtime failures will be known at runtime
+  - Consider this as a dynamic language with full benefits of any statically compiled one
+- This is implemented as a Kubernetes custom resource
+  - The specifications is understood by a Kubernetes based controller
 - This custom resource is called **MayaLang**
 
 ```go
