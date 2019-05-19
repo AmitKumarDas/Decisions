@@ -30,71 +30,82 @@ much into programmatic versus declarative approach, let us list down the feature
 ```go
 // pkg/ops/v1alpha1/interface.go
 
-// Ops exposes contracts of an operation
-//
-// NOTE:
-//  An operation is typically identified with
-// a set of ordered steps
-type Ops interface {
+// Runner abstracts execution of an
+// operation
+type Runner interface {
   // Run does the actual execution of 
   // operation
   Run() error
 }
 
-// Manager exposes management related
-// contract(s) w.r.t an operation
-type Manager interface {
-  Manage() error
+// Verifier abstracts verfication of
+// an operation
+type Verifier interface {
+  // Verify verifies if operation execution
+  // was successful
+  Verify() error
 }
+
 ```
 
 ```go
-// pkg/ops/v1alpha1/manager.go
+// pkg/ops/v1alpha1/ops.go
 
-// SingleOpsManager is a concrete implementation
-// of Manager interface. As the name suggests
-// it manages/runs a single operation
-type SingleOpsManager struct {
-  Ops Ops
+// OperationListRunner is a concrete implementation
+// of Runner interface. As the name suggests
+// it runs a list of operations
+type OperationListRunner struct {
+  Items []Runner
 }
 
-// NewSingleOpsManager returns a new instance of
-// SingleOpsManager
-func NewSingleOpsManager(o Ops) *SingleOpsManager {
-  return &SingleOpsManager{Ops: o}
-}
-
-// Manage execute the underlying operation
-func (s *SingleOpsManager) Manage() error {
-  return s.Ops.Run()
-}
-
-// MultiOpsManager is a concrete implementation
-// of Manager interface. As the name suggests
-// it manages/runs a set of operations
-type MultiOpsManager struct {
-  Items []Ops
-}
-
-// NewMultiOpsManager returns a new instance of
-// MultiOpsManager
-func NewMultiOpsManager(o ...Ops) *MultiOpsManager {
-  m := &GroupOpsManager{}
+// NewOperationListRunner returns a new instance of
+// OperationListRunner
+func NewOperationListRunner(o ...Runner) *OperationListRunner {
+  m := &OperationListRunner{}
   m.Items = append(m.Items, o...)
   return m
 }
 
-// Manage executes all the underlying operations
+// Run executes all the underlying operations
 // managed by this instance
-func (g *GroupOpsManager) Manage() error {
+func (g *OperationListRunner) Run() error {
   var err error
   for _, op := range g.Items {
-    err = NewSingleOpsManager(op).Manage()
+    err = op.Run()
     if err != nil {
       return err
     }
   }
   
+  return nil
+}
+
+// OperationListVerifier is a concrete implementation
+// of Verifier interface. As the name suggests
+// it verifies a list of already executed operations
+type OperationListVerifier struct {
+  Items []Verifier
+}
+
+// NewOperationListVerifier returns a new instance of
+// OperationListVerifier
+func NewOperationListVerifier(o ...Verifier) *OperationListVerifier {
+  m := &OperationListVerifier{}
+  m.Items = append(m.Items, o...)
+  return m
+}
+
+// Verify verifies if all its operations
+// were executed successfully
+func (g *OperationListVerifier) Verify() error {
+  var err error
+  for _, op := range g.Items {
+    err = op.Verify()
+    if err != nil {
+      return err
+    }
+  }
+
   return nil
 }
 ```
@@ -106,14 +117,13 @@ func (g *GroupOpsManager) Manage() error {
 // GetStoreFunc abstracts fetching the in-memory
 // storage required while executing various steps
 // of an operation
-type GetStoreFunc func() map[string]interface{}
+type GetStoreFunc func() map[string]string
 
 type BaseOps struct {
   ID           string
   Namespace    string
   ShouldSkip   bool
   Errors       []error
-  RunSteps     []OpsStep
   GetStore     GetStoreFunc
 }
 
@@ -136,9 +146,9 @@ import (
 )
 
 type Registrar struct {
-  key string
-  manager ops.Manager
-  registry map[string]ops.Manager
+  key      string
+  runner   ops.Runner
+  registry map[string]ops.Runner
 }
 
 func NewRegistrar() *Registrar {
@@ -150,13 +160,13 @@ func (r *Registrar) WithKey(key string) *Registrar {
   return r
 }
 
-func (r *Registrar) WithManager(manager ops.Manager) *Registrar {
-  r.manager = manager
+func (r *Registrar) WithRunner(runner ops.Runner) *Registrar {
+  r.runner = runner
   return r
 } 
 
 func (r *Registrar) Register (
-  registry[r.key] = r.manager
+  registry[r.key] = r.runner
 )
 ```
 
@@ -191,6 +201,7 @@ import (
 type Ops struct {
   ops.Base
   Pod          *Pod
+  RunSteps     []OpsStep
 }
 
 // OpsOption abstracts building
@@ -256,10 +267,8 @@ func (p *Ops) Steps(opts ...OpsStep) *Ops {
 // this ops instance is used to execute as well.
 //
 // NOTE:
-//  Run is an implementation of Ops interface
-//
-// NOTE:
-//  This is a final operation
+//  Run is an implementation of ops.Runner 
+// interface
 func (p *Ops) Run() error {
   if len(p.Errors) > 0 {
     return errors.New("%v", p.Errors)
@@ -281,10 +290,11 @@ func (p *Ops) Run() error {
 }
 
 // Verify provides the status of previously 
-// exected operation steps
+// executed operation steps
 //
 // NOTE:
-//  This is a final operation
+//  Verify is an implementation of ops.Verifier
+// interface
 func (p *Ops) Verify() error {
   if len(p.Errors) > 0 {
     return errors.New("%v", p.Errors)
@@ -348,8 +358,88 @@ const (
   PoolName: my-cstor-pool
 )
 
+func Execute() error {
+  v := ops.NewOperationListVerifier(
+    getCStorPoolUID(),
+    updateCStorPoolDeployment(),
+    setStoragePoolVersion(),
+    setCStorPoolVersion(),
+  )
+  
+  return v.Verify()
+}
 
+func getCStorPoolUID() ops.Verifier {
+  return cspops.New().
+    UseStore(MayaStore).
+    GetFromKubernetes(PoolName).
+    SaveUIDToStore("csp.uid")
+}
 
+func updateCStorPoolDeployment() ops.VerifierVerifier { {
+  return deployops.New().
+    UseStore(MayaStore).
+    GetFromKubernetes(PoolName, PoolNamespace).
+    SkipIfVersionNotEqualsTo(SourceVersion).
+    SetLabel("openebs.io/version", TargetVersion).
+    SetLabel("openebs.io/cstor-pool", PoolName).
+    UpdateContainer(
+      "cstor-pool",
+      container.WithImage("quay.io/openebs/cstor-pool:"+ TargetVersion),
+      container.WithENV("OPENEBS_IO_CSTOR_ID", FromStore("csp.uid")),
+      container.WithLivenessProbe(
+        probe.NewBuilder().
+          WithExec(
+            k8scmd.Exec{
+              "command": 
+                - "/bin/sh"
+                - "-c"
+                - "zfs set io.openebs:livenesstimestap='$(date)' cstor-$OPENEBS_IO_CSTOR_ID"
+            }
+          ).
+          WithFailureThreshold(3).
+          WithInitialDelaySeconds(300).
+          WithPeriodSeconds(10).
+          WithSuccessThreshold(1).
+          WithTimeoutSeconds(30).
+          Build()
+      ),
+    ).
+    UpdateContainer(
+      "cstor-pool-mgmt",
+      container.WithImage("quay.io/openebs/cstor-pool-mgmt:" + TargetVersion),
+      container.WithPortsNil(),
+    ).
+    UpdateContainer(
+      "maya-exporter",
+      container.WithImage("quay.io/openebs/m-exporter:" + TargetVersion),
+      container.WithCommand("maya-exporter"),
+      container.WithArgs("-e=pool"),
+      container.WithTCPPort(9500),
+      container.WithPriviledged(),
+      container.WithVolumeMount("device", "/dev"),
+      container.WithVolumeMount("tmp", "/tmp"),
+      container.WithVolumeMount("sparse", "/var/openebs/sparse"),
+      container.WithVolumeMount("udev", "/run/udev"),
+    ).
+    UpdateToKubernetes().
+    ShouldRolloutEventually(
+      ops.WithRetryAttempts(10), 
+      ops.WithRetryInterval(3s)
+    )
+}
+
+func setStoragePoolVersion() ops.Verifier {
+  return spops.New().
+    GetFromKubernetes(PoolName).
+    SetLabel("openebs.io/version", TargetVersion)
+}
+
+func setCStorPoolVersion() ops.Verifier {
+  return cspops.New().
+    GetFromKubernetes(PoolName).
+    SetLabel("openebs.io/version", TargetVersion)
+}
 ```
 
 
