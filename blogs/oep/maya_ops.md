@@ -21,6 +21,15 @@ much into programmatic versus declarative approach, let us list down the feature
 ### High Level Design
 
 #### Core
+- Introduces **ops** pattern
+- Ops is the shorthard notation for Operations
+- The concept is built using **builder pattern**
+  - In this case each build method is executed immediately
+- This is built on top of Maya's core builder & predicate functions
+  - Maya's core builder pattern is based on lazy execution
+  - In other words, in core builders execution happens in final build methods
+- To avoid clash in names, this should be termed as **operations** or **ops**
+
 ```go
 // pkg/ops/v1alpha1/interface.go
 
@@ -39,7 +48,6 @@ type Verifier interface {
   // was successful
   Verify() error
 }
-
 ```
 
 ```go
@@ -107,18 +115,12 @@ func (g *OperationListVerifier) Verify() error {
 ```go
 // pkg/ops/v1alpha1/ops.go
 
-
-// GetStoreFunc abstracts fetching the in-memory
-// storage required while executing various steps
-// of an operation
-type GetStoreFunc func() map[string]string
-
 type BaseOps struct {
   ID           string
   Namespace    string
   ShouldSkip   bool
   Errors       []error
-  GetStore     GetStoreFunc
+  Store        map[string]string
 }
 
 type BaseOpsOption func(*BaseOps)
@@ -132,7 +134,7 @@ func New(opts ...BaseOpsOption) *BaseOps {
 }
 ```
 
-#### UseCase -- Upgrade
+#### UseCase -- Upgrade - v1alpha2 - Drop 1
 
 ```go
 // cmd/upgrade/app/v1alpha2/upgrade.go
@@ -194,6 +196,8 @@ const (
   PoolName string = "my-cstor-pool"
 )
 
+var store = map[string]string{}
+
 type Upgrade struct {}
 
 func (u *Upgrade) Verify() error {
@@ -207,14 +211,14 @@ func (u *Upgrade) Verify() error {
 
 func getCStorPoolUID() ops.Verifier {
   return cspops.New().
-    UseStore(MayaStore).
+    WithStore(store).
     GetFromKubernetes(PoolName).
     SaveUIDToStore("csp.uid")
 }
 
 func updateCStorPoolDeployment() ops.VerifierVerifier {
   return deployops.New().
-    UseStore(MayaStore).
+    WithStore(store).
     GetFromKubernetes(PoolName, PoolNamespace).
     SkipIfVersionNotEqualsTo(SourceVersion).
     SetLabel("openebs.io/version", TargetVersion).
@@ -279,7 +283,7 @@ func setCStorPoolVersion() ops.Verifier {
 ```
 
 
-### UseCase -- Upgrade as Kubernetes Custom Resource
+### UseCase -- Upgrade as a Kubernetes Custom Resource - Drop 2
 - This is again programmatic with some yaml sugar
 - This custom resource is called **MayaLang**
 
@@ -326,14 +330,14 @@ spec:
     - name: getCStorPoolUID
       body: |
         cspops.New().
-          UseStore(MayaStore).
+          WithStore(InMemStore).
           GetFromKubernetes(PoolName).
           SaveUIDToStore("csp.uid")
 
     - name: updateCStorPoolDeployment
       body: |
         deployops.New().
-          UseStore(MayaStore).
+          WithStore(InMemStore).
           GetFromKubernetes(PoolName, PoolNamespace).
           SkipIfVersionNotEqualsTo(SourceVersion).
           SetLabel("openebs.io/version", TargetVersion).
@@ -380,7 +384,7 @@ spec:
           UpdateToKubernetes().
           ShouldRolloutEventually(
             ops.WithRetryAttempts(10), 
-            ops.WithRetryInterval(3s)
+            ops.WithRetryInterval("3s")
           )
 
     - name: setStoragePoolVersion
@@ -396,7 +400,8 @@ spec:
           SetLabel("openebs.io/version", TargetVersion)
 ```
 
-### Low Level Parts
+### Low Level Parts -- Same for both the Drops
+- This is implementation of pkg/ops/v1alpha1/ interfaces
 
 ```go
 // pkg/ops/kubernetes/pod/v1alpha1/pod.go
@@ -437,20 +442,9 @@ type Ops struct {
 type OpsOption func(*Ops)
 
 // OpsStep abstracts implementation
-// of an Ops step
+// of a step participating in the
+// operation
 type OpsStep func(*Ops)
-
-// WithStore is a OpsOption function that
-// provide in-memory map to store result 
-// of an operation and at the same time
-// a placeholder to store config values
-func WithStore(store map[string]interface{}) OpsOption {
-  return func(p *Ops) {
-    p.GetStore = func() map[string]interface{} {
-      return store
-    }
-  }
-}
 
 func (o *Ops) withOptions(opts ...OpsOption) *Ops{
   for _, option := range opts {
@@ -536,6 +530,37 @@ func (p *Ops) Verify() error {
 // steps
 func (p *Ops) isContinue() bool {
   return !(len(p.Errors) > 0 || p.ShouldSkip)
+}
+
+// WithStore provides an in-memory store
+// to do the following:
+//
+//  [1] store results of operation steps &
+//  [2] store config values
+func WithStore(store map[string]string) OpsStep {
+  return func(p *Ops) {
+    p.WithStore(store)
+  }
+}
+
+// WithStore provides an in-memory store
+// to do the following:
+//
+//  [1] store results of operation steps &
+//  [2] store config values
+func (p *Ops) WithStore(store map[string]string) *Ops {
+  if !p.isContinue() {
+    return p
+  }
+  
+  if store == nil {
+    err := errors.New("nil store was provided")
+    p.Errors = append(p.Errors, err)
+    return p
+  }
+
+  p.Store = store
+  return p
 }
 
 // ShouldBeRunning sets error if pod is not
