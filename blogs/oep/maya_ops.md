@@ -18,12 +18,6 @@ much into programmatic versus declarative approach, let us list down the feature
 - [ ] Ability to package operations as a Kubernetes Job
 - [ ] Ability to package operations to be used by Litmus Executor
 
-#### Assumptions of MayaOps
-- Users of MayaOps need to learn MayaOps syntax
-- MayaOps is Go code and will be written inside:
-  - a .go file
-  - MayaOps kubernetes custom resource
-
 ### High Level Design
 
 #### Core
@@ -287,7 +281,7 @@ func setCStorPoolVersion() ops.Verifier {
 
 ### UseCase -- Upgrade as Kubernetes Custom Resource
 - This is again programmatic with some yaml sugar
-- This custom resource is called MayaLang
+- This custom resource is called **MayaLang**
 
 ```go
 
