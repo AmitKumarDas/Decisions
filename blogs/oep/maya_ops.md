@@ -138,17 +138,20 @@ func New(opts ...BaseOpsOption) *BaseOps {
 }
 ```
 
-```go
-// pkg/ops/v1alpha1/registrar.go
+#### UseCase -- Upgrade
 
-import (
-  ops "github.com/openebs/maya/pkg/ops/v1alpha1"
+```go
+// cmd/upgrade/app/v1alpha2/upgrade.go
+
+const (
+  From082To090 string = "082-to-090"
 )
+
+type upgrades map[string]ops.Verifier
 
 type Registrar struct {
   key      string
-  runner   ops.Runner
-  registry map[string]ops.Runner
+  verifier   ops.Verifier
 }
 
 func NewRegistrar() *Registrar {
@@ -160,15 +163,246 @@ func (r *Registrar) WithKey(key string) *Registrar {
   return r
 }
 
-func (r *Registrar) WithRunner(runner ops.Runner) *Registrar {
-  r.runner = runner
+func (r *Registrar) WithVerifier(verifier ops.Verifier) *Registrar {
+  r.verifier = verifier
   return r
 } 
 
-func (r *Registrar) Register (
-  registry[r.key] = r.runner
-)
+func (r *Registrar) Register() {
+  upgrades[r.key] = r.verifier
+}
+
 ```
+
+```go
+// cmd/upgrade/app/v1alpha2/add_upgrade_082_to_090.go
+
+import (
+  upgrade "github.com/openebs/maya/cmd/upgrade/app/v1alpha2/082-to-090"
+)
+
+func init() {
+  NewRegistrar().
+    WithKey(From082To090).
+    WithVerifier(&upgrade.Upgrade{}).
+    Register()
+}
+```
+
+```go
+// cmd/upgrade/app/v1alpha2/082-to-090/upgrade.go
+
+const (
+  // Get these from ConfigMap
+  SourceVersion string = "0.8.2"
+  TargetVersion string = "0.9.0"
+  PoolNamespace string = "openebs"
+  PoolName string = "my-cstor-pool"
+)
+
+type Upgrade struct {}
+
+func (u *Upgrade) Verify() error {
+  return ops.NewOperationListVerifier(
+    getCStorPoolUID(),
+    updateCStorPoolDeployment(),
+    setStoragePoolVersion(),
+    setCStorPoolVersion(),
+  ).Verify()
+}
+
+func getCStorPoolUID() ops.Verifier {
+  return cspops.New().
+    UseStore(MayaStore).
+    GetFromKubernetes(PoolName).
+    SaveUIDToStore("csp.uid")
+}
+
+func updateCStorPoolDeployment() ops.VerifierVerifier {
+  return deployops.New().
+    UseStore(MayaStore).
+    GetFromKubernetes(PoolName, PoolNamespace).
+    SkipIfVersionNotEqualsTo(SourceVersion).
+    SetLabel("openebs.io/version", TargetVersion).
+    SetLabel("openebs.io/cstor-pool", PoolName).
+    UpdateContainer(
+      "cstor-pool",
+      container.WithImage("quay.io/openebs/cstor-pool:"+ TargetVersion),
+      container.WithENV("OPENEBS_IO_CSTOR_ID", FromStore("csp.uid")),
+      container.WithLivenessProbe(
+        probe.NewBuilder().
+          WithExec(
+            k8scmd.Exec{
+              "command": 
+                - "/bin/sh"
+                - "-c"
+                - "zfs set io.openebs:livenesstimestap='$(date)' cstor-$OPENEBS_IO_CSTOR_ID"
+            }
+          ).
+          WithFailureThreshold(3).
+          WithInitialDelaySeconds(300).
+          WithPeriodSeconds(10).
+          WithSuccessThreshold(1).
+          WithTimeoutSeconds(30).
+          Build()
+      ),
+    ).
+    UpdateContainer(
+      "cstor-pool-mgmt",
+      container.WithImage("quay.io/openebs/cstor-pool-mgmt:" + TargetVersion),
+      container.WithPortsNil(),
+    ).
+    UpdateContainer(
+      "maya-exporter",
+      container.WithImage("quay.io/openebs/m-exporter:" + TargetVersion),
+      container.WithCommand("maya-exporter"),
+      container.WithArgs("-e=pool"),
+      container.WithTCPPort(9500),
+      container.WithPriviledged(),
+      container.WithVolumeMount("device", "/dev"),
+      container.WithVolumeMount("tmp", "/tmp"),
+      container.WithVolumeMount("sparse", "/var/openebs/sparse"),
+      container.WithVolumeMount("udev", "/run/udev"),
+    ).
+    UpdateToKubernetes().
+    ShouldRolloutEventually(
+      ops.WithRetryAttempts(10), 
+      ops.WithRetryInterval(3s)
+    )
+}
+
+func setStoragePoolVersion() ops.Verifier {
+  return spops.New().
+    GetFromKubernetes(PoolName).
+    SetLabel("openebs.io/version", TargetVersion)
+}
+
+func setCStorPoolVersion() ops.Verifier {
+  return cspops.New().
+    GetFromKubernetes(PoolName).
+    SetLabel("openebs.io/version", TargetVersion)
+}
+```
+
+
+### UseCase -- Upgrade as Kubernetes Custom Resource
+- This is again programmatic with some yaml sugar
+- This custom resource is called MayaLang
+
+```go
+
+type MayaLang struct {
+  Spec MayaLangSpec
+  Status MayaLangStatus
+}
+
+type MayaLangSpec struct {
+  GO        MayaLangGO `json:"go"`
+}
+
+type MayaLangGO struct {
+  Constants map[string]string  `json:"constants"`
+  Functions []MayaLangFunction `json:"funcs"`
+}
+
+type MayaLangFunction struct {
+  Name      string `json:"name"`
+  Disabled  bool   `json:"disabled"`
+  Body      string `json:"body"`
+}
+
+type MayaLangStatus struct {}
+
+```
+
+```yaml
+kind: MayaLang
+metadata:
+  name: upgrade-080-To-090
+  namespace: openebs
+spec:
+  go:
+    constants:
+      SourceVersion: "0.8.2"
+      TargetVersion: "0.9.0"
+      PoolNamespace: openebs
+      PoolName: my-cstor-pool
+
+    funcs:
+    - name: getCStorPoolUID
+      body: |
+        cspops.New().
+          UseStore(MayaStore).
+          GetFromKubernetes(PoolName).
+          SaveUIDToStore("csp.uid")
+
+    - name: updateCStorPoolDeployment
+      body: |
+        deployops.New().
+          UseStore(MayaStore).
+          GetFromKubernetes(PoolName, PoolNamespace).
+          SkipIfVersionNotEqualsTo(SourceVersion).
+          SetLabel("openebs.io/version", TargetVersion).
+          SetLabel("openebs.io/cstor-pool", PoolName).
+          UpdateContainer(
+            "cstor-pool",
+            container.WithImage("quay.io/openebs/cstor-pool:"+ TargetVersion),
+            container.WithENV("OPENEBS_IO_CSTOR_ID", FromStore("csp.uid")),
+            container.WithLivenessProbe(
+              probe.NewBuilder().
+                WithExec(
+                  k8scmd.Exec{
+                    "command": 
+                      - "/bin/sh"
+                      - "-c"
+                      - "zfs set io.openebs:livenesstimestap='$(date)' cstor-$OPENEBS_IO_CSTOR_ID"
+                  }
+                ).
+                WithFailureThreshold(3).
+                WithInitialDelaySeconds(300).
+                WithPeriodSeconds(10).
+                WithSuccessThreshold(1).
+                WithTimeoutSeconds(30).
+                Build()
+            ),
+          ).
+          UpdateContainer(
+            "cstor-pool-mgmt",
+            container.WithImage("quay.io/openebs/cstor-pool-mgmt:" + TargetVersion),
+            container.WithPortsNil(),
+          ).
+          UpdateContainer(
+            "maya-exporter",
+            container.WithImage("quay.io/openebs/m-exporter:" + TargetVersion),
+            container.WithCommand("maya-exporter"),
+            container.WithArgs("-e=pool"),
+            container.WithTCPPort(9500),
+            container.WithPriviledged(),
+            container.WithVolumeMount("device", "/dev"),
+            container.WithVolumeMount("tmp", "/tmp"),
+            container.WithVolumeMount("sparse", "/var/openebs/sparse"),
+            container.WithVolumeMount("udev", "/run/udev"),
+          ).
+          UpdateToKubernetes().
+          ShouldRolloutEventually(
+            ops.WithRetryAttempts(10), 
+            ops.WithRetryInterval(3s)
+          )
+
+    - name: setStoragePoolVersion
+      body: |
+        spops.New().
+          GetFromKubernetes(PoolName).
+          SetLabel("openebs.io/version", TargetVersion)
+          
+    - name: setCStorPoolVersion
+      body: |
+        cspops.New().
+          GetFromKubernetes(PoolName).
+          SetLabel("openebs.io/version", TargetVersion)
+```
+
+### Low Level Parts
 
 ```go
 // pkg/ops/kubernetes/pod/v1alpha1/pod.go
@@ -339,223 +573,3 @@ func (p *Ops) ShouldBeRunning() *Ops {
 }
 ```
 
-
-#### UseCase -- Upgrade
-
-
-```go
-// cmd/upgrade/app/v1alpha2/upgrade.go
-
-import (
-  
-)
-
-const (
-  // Get these from ConfigMap
-  SourceVersion: "0.8.2"
-  TargetVersion: "0.9.0"
-  PoolNamespace: openebs
-  PoolName: my-cstor-pool
-)
-
-func Execute() error {
-  v := ops.NewOperationListVerifier(
-    getCStorPoolUID(),
-    updateCStorPoolDeployment(),
-    setStoragePoolVersion(),
-    setCStorPoolVersion(),
-  )
-  
-  return v.Verify()
-}
-
-func getCStorPoolUID() ops.Verifier {
-  return cspops.New().
-    UseStore(MayaStore).
-    GetFromKubernetes(PoolName).
-    SaveUIDToStore("csp.uid")
-}
-
-func updateCStorPoolDeployment() ops.VerifierVerifier { {
-  return deployops.New().
-    UseStore(MayaStore).
-    GetFromKubernetes(PoolName, PoolNamespace).
-    SkipIfVersionNotEqualsTo(SourceVersion).
-    SetLabel("openebs.io/version", TargetVersion).
-    SetLabel("openebs.io/cstor-pool", PoolName).
-    UpdateContainer(
-      "cstor-pool",
-      container.WithImage("quay.io/openebs/cstor-pool:"+ TargetVersion),
-      container.WithENV("OPENEBS_IO_CSTOR_ID", FromStore("csp.uid")),
-      container.WithLivenessProbe(
-        probe.NewBuilder().
-          WithExec(
-            k8scmd.Exec{
-              "command": 
-                - "/bin/sh"
-                - "-c"
-                - "zfs set io.openebs:livenesstimestap='$(date)' cstor-$OPENEBS_IO_CSTOR_ID"
-            }
-          ).
-          WithFailureThreshold(3).
-          WithInitialDelaySeconds(300).
-          WithPeriodSeconds(10).
-          WithSuccessThreshold(1).
-          WithTimeoutSeconds(30).
-          Build()
-      ),
-    ).
-    UpdateContainer(
-      "cstor-pool-mgmt",
-      container.WithImage("quay.io/openebs/cstor-pool-mgmt:" + TargetVersion),
-      container.WithPortsNil(),
-    ).
-    UpdateContainer(
-      "maya-exporter",
-      container.WithImage("quay.io/openebs/m-exporter:" + TargetVersion),
-      container.WithCommand("maya-exporter"),
-      container.WithArgs("-e=pool"),
-      container.WithTCPPort(9500),
-      container.WithPriviledged(),
-      container.WithVolumeMount("device", "/dev"),
-      container.WithVolumeMount("tmp", "/tmp"),
-      container.WithVolumeMount("sparse", "/var/openebs/sparse"),
-      container.WithVolumeMount("udev", "/run/udev"),
-    ).
-    UpdateToKubernetes().
-    ShouldRolloutEventually(
-      ops.WithRetryAttempts(10), 
-      ops.WithRetryInterval(3s)
-    )
-}
-
-func setStoragePoolVersion() ops.Verifier {
-  return spops.New().
-    GetFromKubernetes(PoolName).
-    SetLabel("openebs.io/version", TargetVersion)
-}
-
-func setCStorPoolVersion() ops.Verifier {
-  return cspops.New().
-    GetFromKubernetes(PoolName).
-    SetLabel("openebs.io/version", TargetVersion)
-}
-```
-
-
-### MayaOps as a Kubernetes Custom Resource
-- This is again programmatic with some yaml sugar
-- This custom resource is called MayaLang
-
-```go
-
-type MayaLang struct {
-  Spec MayaLangSpec
-  Status MayaLangStatus
-}
-
-type MayaLangSpec struct {
-  GO        MayaLangGO `json:"go"`
-}
-
-type MayaLangGO struct {
-  Constants map[string]string  `json:"constants"`
-  Functions []MayaLangFunction `json:"funcs"`
-}
-
-type MayaLangFunction struct {
-  Name      string `json:"name"`
-  Disabled  bool   `json:"disabled"`
-  Body      string `json:"body"`
-}
-
-type MayaLangStatus struct {}
-
-```
-
-```yaml
-kind: MayaLang
-metadata:
-  name: upgrade-080-To-090
-  namespace: openebs
-spec:
-  go:
-    constants:
-      SourceVersion: "0.8.2"
-      TargetVersion: "0.9.0"
-      PoolNamespace: openebs
-      PoolName: my-cstor-pool
-
-    funcs:
-    - name: getCStorPoolUID
-      body: |
-        cspops.New().
-          UseStore(MayaStore).
-          GetFromKubernetes(PoolName).
-          SaveUIDToStore("csp.uid")
-
-    - name: updateCStorPoolDeployment
-      body: |
-        deployops.New().
-          UseStore(MayaStore).
-          GetFromKubernetes(PoolName, PoolNamespace).
-          SkipIfVersionNotEqualsTo(SourceVersion).
-          SetLabel("openebs.io/version", TargetVersion).
-          SetLabel("openebs.io/cstor-pool", PoolName).
-          UpdateContainer(
-            "cstor-pool",
-            container.WithImage("quay.io/openebs/cstor-pool:"+ TargetVersion),
-            container.WithENV("OPENEBS_IO_CSTOR_ID", FromStore("csp.uid")),
-            container.WithLivenessProbe(
-              probe.NewBuilder().
-                WithExec(
-                  k8scmd.Exec{
-                    "command": 
-                      - "/bin/sh"
-                      - "-c"
-                      - "zfs set io.openebs:livenesstimestap='$(date)' cstor-$OPENEBS_IO_CSTOR_ID"
-                  }
-                ).
-                WithFailureThreshold(3).
-                WithInitialDelaySeconds(300).
-                WithPeriodSeconds(10).
-                WithSuccessThreshold(1).
-                WithTimeoutSeconds(30).
-                Build()
-            ),
-          ).
-          UpdateContainer(
-            "cstor-pool-mgmt",
-            container.WithImage("quay.io/openebs/cstor-pool-mgmt:" + TargetVersion),
-            container.WithPortsNil(),
-          ).
-          UpdateContainer(
-            "maya-exporter",
-            container.WithImage("quay.io/openebs/m-exporter:" + TargetVersion),
-            container.WithCommand("maya-exporter"),
-            container.WithArgs("-e=pool"),
-            container.WithTCPPort(9500),
-            container.WithPriviledged(),
-            container.WithVolumeMount("device", "/dev"),
-            container.WithVolumeMount("tmp", "/tmp"),
-            container.WithVolumeMount("sparse", "/var/openebs/sparse"),
-            container.WithVolumeMount("udev", "/run/udev"),
-          ).
-          UpdateToKubernetes().
-          ShouldRolloutEventually(
-            ops.WithRetryAttempts(10), 
-            ops.WithRetryInterval(3s)
-          )
-
-    - name: setStoragePoolVersion
-      body: |
-        spops.New().
-          GetFromKubernetes(PoolName).
-          SetLabel("openebs.io/version", TargetVersion)
-          
-    - name: setCStorPoolVersion
-      body: |
-        cspops.New().
-          GetFromKubernetes(PoolName).
-          SetLabel("openebs.io/version", TargetVersion)
-```
