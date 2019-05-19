@@ -329,139 +329,62 @@ func (p *Ops) ShouldBeRunning() *Ops {
 }
 ```
 
-```go
-// pkg/ops/kubernetes/pod/v1alpha1/list.go
-```
 
-#### UseCase -- UpgradeExecutor
+#### UseCase -- Upgrade
+
 
 ```go
-// cmd/upgrade/execute.go
-
-upgrades map[string]ops.Manager
-
-type Executor struct {
-  UpgradePath string
-}
-
-func (e *Executor) Run() error {
-  manager := upgrades[e.UpgradePath]
-  if manager == nil {
-    return errors.New("failed to run upgrade: un-supported upgrade path {%s}", e.upgradePath)
-  }
-
-  err := manager.Manage()
-  if err != nil {
-    return errors.Wrapf(err, "failed to execute upgrade for path {%s}", e.upgradePath)
-  }
-
-  return nil
-}
-```
-
-```go
-// cmd/upgrade/register_upgradepath_080_090.go
+// cmd/upgrade/app/v1alpha2/upgrade.go
 
 import (
-  ops "github.com/openebs/maya/pkg/ops/v1alpah1"
-  080-to-090 "github.com/openebs/maya/cmd/upgrade/0.8.0-0.9.0"
-)
-
-init() {
-  store := map[string]interface{}{}
-  multiOpsMgr := ops.NewMultiOpsManager(
-    080-to-090.PodShouldBeRunning(store),
-    080-to-090.PodImageShouldGetUpdated(store),
-  )
-
-  ops.Registrar(upgrades).
-    WithKey(080-to-090.UpgradePath).
-    WithManager(multiOpsMgr).
-    Register()
-}
-```
-
-```go
-// cmd/upgrade/0.8.0-0.9.0/upgrade.go
-import (
-  pod "github.com/openebs/maya/pkg/ops/kubernetes/pod/v1alpha1"
+  
 )
 
 const (
-  UpgradePath string = "080-to-090"
-  CStorPoolImage string = "openebs.io/cstor-pool:0.9.0"
+  // Get these from ConfigMap
+  SourceVersion: "0.8.2"
+  TargetVersion: "0.9.0"
+  PoolNamespace: openebs
+  PoolName: my-cstor-pool
 )
 
-func PodShouldBeRunning(store map[string]interface{}) Ops {
-  return pod.New(
-    pod.WithStore(store),
-    pod.WithID("is-pod-running"),
-    pod.WithDesc("pod should be running"),
-  ).Steps(
-    pod.GetFromStore(".pod.object"),
-    pod.ShouldBeRunning(),
-  )
-}
 
-func PodImageShouldGetUpdated(id, store map[string]interface{}) Ops {
-  return pod.New(
-    pod.WithStore(store),
-    pod.WithID("update-pod-image"),
-    pod.WithDesc("pod's image should get updated"),
-  ).Steps(
-    pod.GetFromStore(".pod.object"),
-    pod.SetImage(CStorPoolImage),
-    pod.Update(),
-  )
-}
 
-// Alternatively
-func SetPodImageIfRunning(id, store map[string]interface{}) Ops {
-  return pod.New(
-    pod.WithStore(store),
-    pod.WithID("update-pod-image-if-running"),
-    pod.WithDesc("pod's image should get updated if is running"),
-  ).Steps(
-    pod.GetFromStore(".pod.object"),
-    pod.ShouldBeRunning(),
-    pod.SetImage(CStorPoolImage),
-    pod.Update(),
-  )
-}
 ```
 
-### Further Thinking
-- Add skip property that skips rest of the steps
-```go
-func SetPodImageIfRunning(id, store map[string]interface{}) Ops {
-  return pod.New(
-    pod.WithStore(store),
-    pod.WithID("update-pod-image-if-running"),
-    pod.WithDesc("pod's image should get updated if is running"),
-  ).Steps(
-    pod.GetFromStore(".pod.object"),
-    pod.SkipIfVersionNotEqualsTo("0.8.2")
-    pod.ShouldBeRunning(),
-    pod.SetImage(CStorPoolImage),
-    pod.Update(),
-  )
-}
-```
-- Add ability to run the steps directly against an Ops instance
-```go
-func SetCStorPoolPodImageIfRunning() {
-  pod.New().
-    GetFromKubernetes("my-cstor-pool-pod", "openebs").
-    SkipIfVersionNotEqualsTo("0.8.2").
-    ShouldBeRunning().
-    SetImage(CStorPoolImage).
-    Verify()
-}
-```
 
 ### MayaOps as a Kubernetes Custom Resource
+- This is again programmatic with some yaml sugar
+- This custom resource is called MayaLang
+
+```go
+
+type MayaLang struct {
+  Spec MayaLangSpec
+  Status MayaLangStatus
+}
+
+type MayaLangSpec struct {
+  GO        MayaLangGO `json:"go"`
+}
+
+type MayaLangGO struct {
+  Constants map[string]string  `json:"constants"`
+  Functions []MayaLangFunction `json:"funcs"`
+}
+
+type MayaLangFunction struct {
+  Name      string `json:"name"`
+  Disabled  bool   `json:"disabled"`
+  Body      string `json:"body"`
+}
+
+type MayaLangStatus struct {}
+
+```
+
 ```yaml
-kind: MayaOps
+kind: MayaLang
 metadata:
   name: upgrade-080-To-090
   namespace: openebs
