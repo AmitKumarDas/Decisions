@@ -169,7 +169,7 @@ func GetInstance(source, target string) ops.Verifier {
 // supported upgrades
 type Registrar struct {
   path       string
-  verifier   ops.Verifier
+  instance   ops.Verifier
 }
 
 // NewRegistrar returns a new instance of 
@@ -178,25 +178,25 @@ func NewRegistrar() *Registrar {
   return &Registrar{}
 }
 
-// WithPath sets the upgrade path by accepting
-// source & target versions
-func (r *Registrar) WithPath(source, target string) *Registrar {
+// WithUpgradePath sets the upgrade path by 
+// accepting source & target versions
+func (r *Registrar) WithUpgradePath(source, target string) *Registrar {
   r.path = buildUpgradePath(source, target)
   return r
 }
 
-// WithVerifier sets the verifier instance
+// WithUpgradeInstance sets the upgrade instance
 // that is applicable to the particular upgrade
 // path
-func (r *Registrar) WithVerifier(verifier ops.Verifier) *Registrar {
-  r.verifier = verifier
+func (r *Registrar) WithUpgradeInstance(instance ops.Verifier) *Registrar {
+  r.instance = instance
   return r
 } 
 
 // Register registers an upgrade instance
 func (r *Registrar) Register() {
   upgradePaths[r.path] = true
-  upgrades[r.path] = r.verifier
+  upgrades[r.path] = r.instance
 }
 ```
 
@@ -210,7 +210,7 @@ import (
 func init() {
   NewRegistrar().
     WithUpgradePath("0.8.2", "0.9.0").
-    WithVerifier(&u082to090.Upgrade{}).
+    WithUpgradeInstance(&u082to090.Upgrade{}).
     Register()
 }
 ```
