@@ -311,7 +311,6 @@ func setCStorPoolVersion() ops.Verifier {
 }
 ```
 
-
 ### UseCase -- Upgrade as a Kubernetes Custom Resource - Drop 2
 - Note that this is completely programmatic with some yaml toppings
 - One will get typical compile time errors if any
@@ -441,22 +440,26 @@ spec:
 ```
 
 ### UseCase -- Custom resources over MayaLang - Drop 3
-- There will be needs to create abstracts around MayaLang, since MayaLang is a low level construct
+- Since MayaLang is a low level construct, there will be a need to create abstractions around it
 - Some examples of these abstractions can be `UpgradeRecipe`, `ExperimentRecipe`, etc
 
 #### UpgradeRecipe
 - This will be a Kubernetes CR that is used to hold static content
 - Upgrade logic will refer to this recipe to perform following tasks:
-  - 1. build MayaLang resource based on the recipe
-  - 2. fill in appropriate constants against MayaLang resource based on recipe's `spec.type`
-  - 3. apply MayaLang resource against the K8s cluster
+  - 1. Build a MayaLang resource based on the recipe
+  - 2. Fill in appropriate constants against MayaLang resource based on recipe's `spec.type`
+  - 3. Apply MayaLang resource against the K8s cluster
+  - 4. Delete MayaLang resource when its status shows completed
+
 ```yaml
 kind: UpgradeRecipe
 metadata:
   name: upgrade-082-to-090
   namespace: openebs
 spec:
-  type: PoolUpgrade
+  # type refers to supported upgrade categories
+  # e.g. CStorPool, JivaVolume, CStorVolume
+  type: CStorPool
   mlang:
     spec:
       go:
