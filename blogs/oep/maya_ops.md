@@ -222,7 +222,8 @@ const (
   SourceVersion string = "0.8.2"
   TargetVersion string = "0.9.0"
   
-  // Get these from ConfigMap
+  // Get these at runtime 
+  // e.g. from ConfigMap
   PoolNamespace string = "openebs"
   PoolName string = "my-cstor-pool"
 )
@@ -362,24 +363,24 @@ metadata:
   namespace: openebs
 spec:
   go:
-    constants:
+    vars:
       SourceVersion: "0.8.2"
       TargetVersion: "0.9.0"
       PoolNamespace: openebs
       PoolName: my-cstor-pool
-
+    
     funcs:
     - name: getCStorPoolUID
       body: |
         cspops.New().
-          WithStore(InMemStore).
+          WithStore(Store).
           GetFromKubernetes(PoolName).
           SaveUIDToStore("csp.uid")
 
     - name: updateCStorPoolDeployment
       body: |
         deployops.New().
-          WithStore(InMemStore).
+          WithStore(Store).
           GetFromKubernetes(PoolName, PoolNamespace).
           SkipIfVersionNotEqualsTo(SourceVersion).
           SetLabel("openebs.io/version", TargetVersion).
@@ -442,7 +443,7 @@ spec:
           SetLabel("openebs.io/version", TargetVersion)
 ```
 
-### UseCase -- Custom resources over MayaLang - Drop 3
+### UseCase -- UpgradeRecipe - Drop 3
 - Since MayaLang is a low level construct, there will be a need to create abstractions around it
 - Some examples of these abstractions can be `UpgradeRecipe`, `ExperimentRecipe`, etc
 
@@ -470,11 +471,21 @@ spec:
   mlang:
     spec:
       go:
-        constants:
+        vars:
+          OwnerName:
+          OwnerNamespace:
+          OwnerUID:
+          OwnerAPIVersion:
+
           SourceVersion: "0.8.2"
           TargetVersion: "0.9.0"
+          
           # PoolNamespace: "<filled-in-at-runtime>"
           # PoolName: "<filled-in-at-runtime>"
+
+        store: |
+          unstructops.New().
+            GetFromKubernetes
 
         funcs:
         - name: setCStorPoolVersion
