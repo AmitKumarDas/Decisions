@@ -22,7 +22,7 @@ _NOTE: For those YAML aficionados there is still some good news. Read till the e
 
 ### High Level Design
 
-#### Core
+#### Core - Drop 0
 - Introduces **ops** pattern
 - Ops is the shorthard notation for Operations
 - The concept is built using **builder pattern**
@@ -117,6 +117,8 @@ func (g *OperationListVerifier) Verify() error {
 ```go
 // pkg/ops/v1alpha1/ops.go
 
+// BaseOps composes of all common fields
+// required for any Ops structure
 type BaseOps struct {
   ID           string
   Namespace    string
@@ -125,8 +127,11 @@ type BaseOps struct {
   Store        map[string]string
 }
 
+// BaseOpsOption is a custom function that
+// abstracts building the BaseOps instance
 type BaseOpsOption func(*BaseOps)
 
+// New returns a new instance of BaseOps
 func New(opts ...BaseOpsOption) *BaseOps {
   b := &BaseOps{}
   for _, o := range opts {
@@ -141,23 +146,28 @@ func New(opts ...BaseOpsOption) *BaseOps {
 ```go
 // cmd/upgrade/app/v1alpha2/upgrade.go
 
-const (
-  From082To090 string = "082-to-090"
-)
+// upgradePaths represents supported upgrade paths
+type upgradePaths map[string]bool
 
+// upgrades represents supported upgrades
 type upgrades map[string]ops.Verifier
 
+// Registrar is a utility type to register
+// supported upgrades
 type Registrar struct {
-  key      string
+  path       string
   verifier   ops.Verifier
 }
 
+// NewRegistrar returns a new instance of 
+// Registrar
 func NewRegistrar() *Registrar {
   return &Registrar{}
 }
 
-func (r *Registrar) WithKey(key string) *Registrar {
-  r.key = key
+// WithPath
+func (r *Registrar) WithPath(source, target string) *Registrar {
+  r.path = source + "-" + target
   return r
 }
 
@@ -167,22 +177,22 @@ func (r *Registrar) WithVerifier(verifier ops.Verifier) *Registrar {
 } 
 
 func (r *Registrar) Register() {
-  upgrades[r.key] = r.verifier
+  upgradePaths[r.path] = true
+  upgrades[r.path] = r.verifier
 }
-
 ```
 
 ```go
 // cmd/upgrade/app/v1alpha2/add_upgrade_082_to_090.go
 
 import (
-  upgrade "github.com/openebs/maya/cmd/upgrade/app/v1alpha2/082-to-090"
+  u082to090 "github.com/openebs/maya/cmd/upgrade/app/v1alpha2/082-to-090"
 )
 
 func init() {
   NewRegistrar().
-    WithKey(From082To090).
-    WithVerifier(&upgrade.Upgrade{}).
+    WithUpgradePath("0.8.2", "0.9.0").
+    WithVerifier(&u082to090.Upgrade{}).
     Register()
 }
 ```
