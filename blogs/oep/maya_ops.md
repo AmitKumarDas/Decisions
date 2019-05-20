@@ -347,9 +347,10 @@ type MayaLangGO struct {
 }
 
 type MayaLangFunction struct {
-  Name      string `json:"name"`
-  Disabled  bool   `json:"disabled"`
-  Body      string `json:"body"`
+  Name        string `json:"name"`
+  Disabled    bool   `json:"disabled"`
+  Description string `json:"desc"`
+  Body        string `json:"body"`
 }
 
 type MayaLangStatus struct {}
