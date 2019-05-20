@@ -152,6 +152,17 @@ type upgradePaths map[string]bool
 // upgrades represents supported upgrades
 type upgrades map[string]ops.Verifier
 
+func buildUpgradePath(source, target string) string {
+  return source + "-" + target
+}
+
+// GetInstance returns the upgrade instance
+// based on the provided source & target
+// versions
+func GetInstance(source, target string) ops.Verifier {
+  return upgrades[buildUpgradePath(source, target)]
+}
+
 // Registrar is a utility type to register
 // supported upgrades
 type Registrar struct {
@@ -165,17 +176,22 @@ func NewRegistrar() *Registrar {
   return &Registrar{}
 }
 
-// WithPath
+// WithPath sets the upgrade path by accepting
+// source & target versions
 func (r *Registrar) WithPath(source, target string) *Registrar {
-  r.path = source + "-" + target
+  r.path = buildUpgradePath(source, target)
   return r
 }
 
+// WithVerifier sets the verifier instance
+// that is applicable to the particular upgrade
+// path
 func (r *Registrar) WithVerifier(verifier ops.Verifier) *Registrar {
   r.verifier = verifier
   return r
 } 
 
+// Register registers an upgrade instance
 func (r *Registrar) Register() {
   upgradePaths[r.path] = true
   upgrades[r.path] = r.verifier
@@ -201,9 +217,10 @@ func init() {
 // cmd/upgrade/app/v1alpha2/082-to-090/upgrade.go
 
 const (
-  // Get these from ConfigMap
   SourceVersion string = "0.8.2"
   TargetVersion string = "0.9.0"
+  
+  // Get these from ConfigMap
   PoolNamespace string = "openebs"
   PoolName string = "my-cstor-pool"
 )
