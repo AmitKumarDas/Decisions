@@ -447,10 +447,10 @@ spec:
 #### UpgradeRecipe
 - This will be a Kubernetes CR that is used to hold static content
 - Upgrade logic will refer to this recipe to perform following tasks:
-  - 1. Build a MayaLang resource based on the recipe
-  - 2. Fill in appropriate constants against MayaLang resource based on recipe's `spec.type`
-  - 3. Apply MayaLang resource against the K8s cluster
-  - 4. Delete MayaLang resource when its status shows completed
+  - Build a MayaLang resource based on the recipe
+  - Fill in appropriate constants against MayaLang resource based on recipe's `spec.type`
+  - Apply MayaLang resource against the K8s cluster
+  - Delete MayaLang resource when its status shows completed
 
 ```yaml
 kind: UpgradeRecipe
