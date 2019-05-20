@@ -314,12 +314,18 @@ func setCStorPoolVersion() ops.Verifier {
 
 ### UseCase -- Upgrade as a Kubernetes Custom Resource - Drop 2
 - Note that this is completely programmatic with some yaml toppings
-- One will get the typical compile errors if any
-  - However, these compliation & runtime failures will be known at runtime
+- One will get typical compile time errors if any
+  - However, these compile & runtime failures will be known at runtime
   - Consider this as a dynamic language with full benefits of any statically compiled one
 - This is implemented as a Kubernetes custom resource
-  - The specifications is understood by a Kubernetes based controller
-- This custom resource is called **MayaLang**
+  - Its specifications is understood by a Kubernetes based controller
+- This custom resource is called as **MayaLang**
+- This resource will be watched by a controller named **mayalang-controller**
+  - It will watch for any MayaLang resources
+  - It will create a .go file based on this MayaLang resource
+  - It will build a Pod that consists of m-lang docker image
+  - It will load this .go file at an executable path of above Pod
+  - It will apply this Pod against Kubernetes cluster
 
 ```go
 
@@ -434,7 +440,42 @@ spec:
           SetLabel("openebs.io/version", TargetVersion)
 ```
 
-### Low Level Parts -- Same for both the Drops
+### UseCase -- Custom resources over MayaLang - Drop 3
+- There will be needs to create abstracts around MayaLang, since MayaLang is a low level construct
+- Some examples of these abstractions can be `UpgradeRecipe`, `ExperimentRecipe`, etc
+
+#### UpgradeRecipe
+- This will be a Kubernetes CR that is used to hold static content
+- Upgrade logic will refer to this recipe to perform following tasks:
+  - 1. build MayaLang resource based on the recipe
+  - 2. fill in appropriate constants against MayaLang resource based on recipe's `spec.type`
+  - 3. apply MayaLang resource against the K8s cluster
+```yaml
+kind: UpgradeRecipe
+metadata:
+  name: upgrade-082-to-090
+  namespace: openebs
+spec:
+  type: PoolUpgrade
+  mlang:
+    spec:
+      go:
+        constants:
+          SourceVersion: "0.8.2"
+          TargetVersion: "0.9.0"
+          # PoolNamespace: "<filled-in-at-runtime>"
+          # PoolName: "<filled-in-at-runtime>"
+
+        funcs:
+        - name: getCStorPoolUID
+          body: |
+            cspops.New().
+              WithStore(InMemStore).
+              GetFromKubernetes(PoolName).
+              SaveUIDToStore("csp.uid")
+```
+
+### Low Level Parts -- Required for Drop 1, Drop 2 & further
 - This is implementation of pkg/ops/v1alpha1/ interfaces
 
 ```go
@@ -625,4 +666,3 @@ func (p *Ops) ShouldBeRunning() *Ops {
   return p
 }
 ```
-
