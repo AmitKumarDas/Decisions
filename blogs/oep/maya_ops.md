@@ -477,12 +477,11 @@ spec:
           # PoolName: "<filled-in-at-runtime>"
 
         funcs:
-        - name: getCStorPoolUID
+        - name: setCStorPoolVersion
           body: |
             cspops.New().
-              WithStore(InMemStore).
               GetFromKubernetes(PoolName).
-              SaveUIDToStore("csp.uid")
+              SetLabel("openebs.io/version", TargetVersion)
 ```
 
 ### Low Level Parts -- Required for Drop 1, Drop 2 & further
