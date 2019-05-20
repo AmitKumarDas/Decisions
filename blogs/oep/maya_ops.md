@@ -322,9 +322,10 @@ func setCStorPoolVersion() ops.Verifier {
 - This resource will be watched by a controller named **mayalang-controller**
   - It will watch for any MayaLang resources
   - It will create a .go file based on this MayaLang resource
-  - It will build a Pod that consists of m-lang docker image
-  - It will load this .go file at an executable path of above Pod
-  - It will apply this Pod against Kubernetes cluster
+  - It will build a Job that consists of `m-lang` docker image
+  - It will load this .go file at an executable path of above Job's Pod
+    - Job Pod has got only one thing to do; i.e. `go run` above .go file
+  - It will apply this Job against Kubernetes cluster
 
 ```go
 
