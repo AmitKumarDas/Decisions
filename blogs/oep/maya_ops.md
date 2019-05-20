@@ -452,6 +452,10 @@ spec:
   - Apply MayaLang resource against the K8s cluster
   - Delete MayaLang resource when its status shows completed
 
+#### Summary
+Upgrade will take help of an UpgradeRecipe to perform upgrade. Further, this UpgradeRecipe makes use of MayaLang to perform
+the actions required to be at the desired upgrade state.
+
 ```yaml
 kind: UpgradeRecipe
 metadata:
