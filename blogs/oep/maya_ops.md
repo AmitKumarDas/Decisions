@@ -245,7 +245,7 @@ func getCStorPoolUID() ops.Verifier {
   return cspops.New().
     WithStore(store).
     GetFromKubernetes(PoolName).
-    SaveUIDToStore("csp.uid")
+    SaveUIDToStoreWithKey("csp.uid")
 }
 
 func updateCStorPoolDeployment() ops.VerifierVerifier {
@@ -258,7 +258,7 @@ func updateCStorPoolDeployment() ops.VerifierVerifier {
     UpdateContainer(
       "cstor-pool",
       container.WithImage("quay.io/openebs/cstor-pool:"+ TargetVersion),
-      container.WithENV("OPENEBS_IO_CSTOR_ID", FromStore("csp.uid")),
+      container.WithENV("OPENEBS_IO_CSTOR_ID", GetValueFromStoreKey("csp.uid")),
       container.WithLivenessProbe(
         probe.NewBuilder().
           WithExec(
@@ -373,14 +373,14 @@ spec:
     - name: getCStorPoolUID
       body: |
         cspops.New().
-          WithStore(Store).
+          WithStore(store).
           GetFromKubernetes(PoolName).
-          SaveUIDToStore("csp.uid")
+          SaveUIDToStoreWithKey("csp.uid")
 
     - name: updateCStorPoolDeployment
       body: |
         deployops.New().
-          WithStore(Store).
+          WithStore(store).
           GetFromKubernetes(PoolName, PoolNamespace).
           SkipIfVersionNotEqualsTo(SourceVersion).
           SetLabel("openebs.io/version", TargetVersion).
@@ -388,7 +388,7 @@ spec:
           UpdateContainer(
             "cstor-pool",
             container.WithImage("quay.io/openebs/cstor-pool:"+ TargetVersion),
-            container.WithENV("OPENEBS_IO_CSTOR_ID", FromStore("csp.uid")),
+            container.WithENV("OPENEBS_IO_CSTOR_ID", GetValueFromStoreKey("csp.uid")),
             container.WithLivenessProbe(
               probe.NewBuilder().
                 WithExec(
@@ -472,22 +472,26 @@ spec:
     spec:
       go:
         vars:
-          OwnerName:
-          OwnerNamespace:
-          OwnerUID:
-          OwnerAPIVersion:
-
           SourceVersion: "0.8.2"
           TargetVersion: "0.9.0"
           
           # PoolNamespace: "<filled-in-at-runtime>"
           # PoolName: "<filled-in-at-runtime>"
 
-        store: |
-          unstructops.New().
-            GetFromKubernetes
-
         funcs:
+        - name: saveCStorPoolDetails
+          body: |
+            unstructops.New().
+              WithStore(store).
+              WithGVK("openebs.io", "v1alpha1", "CStorPool").
+              WithNamespace(PoolNamespace).
+              GetFromKubernetes(PoolName).
+              SaveUIDToStoreWithKey("pool.uid").
+              SaveToStore(
+                unstructops.GetValueFromPath(".spec.device"),
+                unstructops.WithStoreKey("pool.device"),
+              )          
+
         - name: setCStorPoolVersion
           body: |
             cspops.New().
