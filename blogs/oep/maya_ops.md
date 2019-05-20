@@ -27,10 +27,12 @@ _NOTE: For those YAML aficionados there is still some good news. Read till the e
 - Ops is the shorthard notation for Operations
 - The concept is built using **builder pattern**
   - In this case each build method is executed immediately
-- This is built on top of Maya's core builder & predicate functions
-  - Maya's core builder pattern is based on lazy execution
-  - In other words, in core builders execution happens in final build methods
-- To avoid clash in names, this should be termed as **operations** or **ops**
+- _Detour_:
+  - Ops is built on top of Maya's core builder & predicate functions
+  - Maya's core builder pattern is however based on lazy executions
+  - In other words, core builder execute in their final build methods
+  - To repeat, Ops builder differs from core builder due to its immediate execution style
+- To avoid clash among both these builders, this is termed as **operations** or **ops**
 
 ```go
 // pkg/ops/v1alpha1/interface.go
