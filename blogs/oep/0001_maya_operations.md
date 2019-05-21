@@ -333,7 +333,8 @@ func (p *Ops) ShouldBeRunning() *Ops {
 ```go
 cspops.New().
   GetFromKubernetes(PoolName).
-  SetLabel("openebs.io/version", TargetVersion)
+  SetLabel("openebs.io/version", TargetVersion).
+  UpdateToKubernetes()
 ```
 
 ```go
@@ -346,7 +347,7 @@ unstructops.New().
   SaveToStore(
     unstructops.GetValueFromPath(".spec.device"),
     unstructops.WithStoreKey("pool.device"),
-  )   
+  )
 ```
 
 ```go
