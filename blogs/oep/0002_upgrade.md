@@ -1,7 +1,6 @@
 
-#### Assuptions
-- This needs following proposal(s) to be implemented:
-  - https://github.com/AmitKumarDas/Decisions/blob/master/blogs/oep/0001_maya_operations.md
+#### Depends on
+- https://github.com/AmitKumarDas/Decisions/blob/master/blogs/oep/0001_maya_operations.md
 
 #### High Level Design
 
