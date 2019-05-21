@@ -13,15 +13,15 @@ type upgradePaths map[string]bool
 // upgrades represents supported upgrades
 type upgrades map[string]ops.Verifier
 
-func buildUpgradePath(source, target string) string {
-  return source + "-" + target
+func buildUpgradePath(kind, source, target string) string {
+  return kind + "-" + source + "-" + target
 }
 
 // GetInstance returns the upgrade instance
 // based on the provided source & target
 // versions
-func GetInstance(source, target string) ops.Verifier {
-  return upgrades[buildUpgradePath(source, target)]
+func GetInstance(kind, source, target string) ops.Verifier {
+  return upgrades[buildUpgradePath(kind, source, target)]
 }
 
 // Registrar is a utility type to register
@@ -39,8 +39,8 @@ func NewRegistrar() *Registrar {
 
 // WithUpgradePath sets the upgrade path by 
 // accepting source & target versions
-func (r *Registrar) WithUpgradePath(source, target string) *Registrar {
-  r.path = buildUpgradePath(source, target)
+func (r *Registrar) WithUpgradePath(kind, source, target string) *Registrar {
+  r.path = buildUpgradePath(kind, source, target)
   return r
 }
 
@@ -60,22 +60,22 @@ func (r *Registrar) Register() {
 ```
 
 ```go
-// cmd/upgrade/app/v1alpha2/add_upgrade_082_to_090.go
+// cmd/upgrade/app/v1alpha2/add_upgrade_csp_082_to_090.go
 
 import (
-  u082to090 "github.com/openebs/maya/cmd/upgrade/app/v1alpha2/082-to-090"
+  csp "github.com/openebs/maya/cmd/upgrade/app/v1alpha2/082-to-090/cstorpool"
 )
 
 func init() {
   NewRegistrar().
-    WithUpgradePath("0.8.2", "0.9.0").
-    WithUpgradeInstance(&u082to090.Upgrade{}).
+    WithUpgradePath("cstorpool", "0.8.2", "0.9.0").
+    WithUpgradeInstance(&csp.Upgrade{}).
     Register()
 }
 ```
 
 ```go
-// cmd/upgrade/app/v1alpha2/082-to-090/upgrade.go
+// cmd/upgrade/app/v1alpha2/082-to-090/cstorpool/upgrade.go
 
 const (
   SourceVersion string = "0.8.2"
