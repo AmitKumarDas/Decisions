@@ -444,24 +444,37 @@ spec:
           SetLabel("openebs.io/version", TargetVersion)
 ```
 
-### UseCase -- UpgradeRecipe & More Custom Resources - Drop 3
-#### More Custom Resources
+### UseCase -- Lots of Custom Resources - Drop 3
+#### Why?
+- It helps in achieving dedicated tooling/logic per specific resource upgrade
+
+#### How?
 - Upgrade will take help of some custom resources to perform upgrade
 - These custom resources will have individual controllers
   - e.g. CStorPoolUpgrade, CStorVolumeUpgrade, JivaVolumeUpgrade, etc
 - These controllers will make use of appropriate UpgradeRecipe to perform upgrade
 - Since MayaLang is a low level construct, there will be a need to create abstractions around it
 - One such abstraction can be `UpgradeRecipe`
-- UpgradeRecipe makes use of MayaLang to perform actions required to be at the desired upgrade state
 
 #### UpgradeRecipe
 - This will be a Kubernetes CR that is used to hold static content
-- Upgrade logic will refer to this recipe to perform following tasks:
+- It makes use of MayaLang to perform actions required to be at the desired upgrade state
+- A recipe in itself does not have a controller
+- A recipe is only used to create MayaLang resource
+  - MayaLang resource has its controller/watcher
+
+#### Upgrade controller(s)
+- Controllers will watch for its respective resources
+  - In this case these resources are:
+    - CStorPoolUpgrade, 
+    - CStorVolumeUpgrade, 
+    - JivaVolumeUpgrade
+- Controller logic will refer to corresponding recipe to perform following tasks:
   - Build a MayaLang resource based on the recipe
-  - Fill in appropriate constants against MayaLang resource based on recipe's `spec.type`
+  - Fill in appropriate constants against MayaLang resource
   - Apply MayaLang resource against the K8s cluster
   - Delete MayaLang resource when its status shows completed
-
+  - Update its watched resource's status
 
 ```yaml
 kind: CStorPoolUpgrade
