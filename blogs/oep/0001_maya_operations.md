@@ -21,7 +21,7 @@ much into programmatic versus declarative approach, let us list down the feature
 - Ops is the shorthard notation for Operations
 - The concept is built using **builder pattern**
   - In this case each build method is executed immediately
-- _Detour_:
+- _Background_:
   - Ops is built on top of Maya's core builder & predicate functions
   - Maya's core builder pattern is however based on lazy executions
   - In other words, core builder execute in their final build methods
