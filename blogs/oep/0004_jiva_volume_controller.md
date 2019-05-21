@@ -11,18 +11,18 @@ metadata:
 spec:
   capacity:
   lun:
-iscsi:
-  iqn:
-  targetPortal:
-service:
-  name: pv-name-svc
-  namespace:
-targetDeployment:
-  name: pv-name-ctrl
-  namespace:
-replicaDeployment:
-  name: pv-name-rep
-  namespace:
+  iscsi:
+    iqn:
+    targetPortal:
+  service:
+    name: pv-name-svc
+    namespace:
+  targetDeployment:
+    name: pv-name-ctrl
+    namespace:
+  replicaDeployment:
+    name: pv-name-rep
+    namespace:
 status:
 ```
 
