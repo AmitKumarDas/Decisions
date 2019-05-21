@@ -1,75 +1,61 @@
-#### Prototype 1
+### JivaVolume as a Custom Resource
+- A Jiva volume is represented as a custom resource
+- A JivaVolume resource is watched by a controller named `jiva-volume-controller`
 ```yaml
 kind: JivaVolume
 metadata:
-  namespace:
-  name:
+  name: pv-name
   annotations:
   labels:
 spec:
   capacity:
-  casType:
-  fsType:
   lun:
 iscsi:
   iqn:
   targetPortal:
-casConfig:
 service:
-target:
-replica:
-references:
-  persistentVolume:
-  persistenVolumeClaim:
-  storageClass:
+  name: pv-name-svc
+  namespace:
+targetDeployment:
+  name: pv-name-ctrl
+  namespace:
+replicaDeployment:
+  name: pv-name-rep
+  namespace:
 status:
 ```
 
-#### Prototype 2
-- casConfig is wrong
-  - since cas config is not strictly typed
-  - since cas config is tightly coupled with go templating
-- config is replacement for casConfig
-  - config will represent most of common kubernetes types
-  - e.g. envs, labels, annotations, pod affinity, node affinity, etc
-- references are bad
-  - since spec should be the desired state on which reconcile should work
-  - spec should lead to owned resources/objects
-- spec should have simple annotations
-  - complex annotations typically indicate code smell
-  - annotations should be used to refer to external / in-direct resources
+### JivaVolumeResize as a Custom Resource
+- JivaVolumeResize represents an operation as well as a custom resource
+- JivaVolumeResize resource is watched by a controller named `jiva-volume-resize-controller`
+- A Resize workflow has following events:
+  - JivaVolume resource should enable resize via `resize.jiva.openebs.io/enabled: true` annotation
+  - JivaVolume resource should be annotated with `resize.jiva.openebs.io/name: <name-of-resize-resource>`
+  - A JivaVolumeResize resource is created
+- Once resize operation is completed, resize controller updates JivaVolumeResize's status
+- JivaVolume controller keeps a track of JivaVolumeResize if JivaVolume has resize annotation
+- If a resize operation is completed successfully, JivaVolume controller performs the following:
+  - Updates the capacity field
+- Resize workflow then performs following actions:
+  - Removes `resize.jiva.openebs.io/name` annotation
+  - Deletes JivaVolumeResize resource
+
 ```yaml
 kind: JivaVolume
 metadata:
-  namespace: # openebs system namespace
-  name: pv-name # can be pv name or anything
+  name: my-jiva
   annotations:
+    resize.jiva.openebs.io/enabled: true
+    resize.jiva.openebs.io/name: resize-6-to-12
+```
+
+```yaml
+kind: JivaVolumeResize
+metadata:
+  name: resize-6-to-12
   labels:
-    openebs.io/match-name: # can be pv name if metadata.name != pv name
+    jiva.openebs.io/name: my-jiva
 spec:
-  capacity:
-  casType:
-  fsType:
-  lun:
-iscsi:
-  iqn:
-  targetPortal:
-config: # common config applicable to service, target & replica
-  envs:
-  labels:
-    openebs.io/match-name: # can be pv name if metadata.name != pv name
-  annotations:
-service:
-  config: # service specific config; can override common config
-  name: pv-name # can be pv name or anything 
-  generateName: pv-name # can be pv name or anything
-target:
-  config: # target specific config; can override common config
-  name: pv-name # can be pv name or anything;
-  generateName: pv-name # can be pv name or anything;
-replica:
-  config: # replica specific config; can override common config
-  name: pv-name # can be pv name or anything;
-  generateName: pv-name # can be pv name or anything
+  capacity: 12
 status:
 ```
