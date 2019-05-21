@@ -9,16 +9,10 @@ Hence, this proof of concept is yet another attempt to provide **MayaOps** _(sim
 or so on)_. As one might have already guessed, this attempt will avoid declarative approach. However, without getting too 
 much into programmatic versus declarative approach, let us list down the features of `MayaOps`.
 
-_NOTE: For those YAML aficionados there is still some good news. Read till the end to understand._
-
 #### What MayaOps should provide
 - [ ] Simple way to code operations supported by Maya
 - [ ] Provide proper error messages for invalid operations
 - [ ] Operation steps can be ordered
-- [ ] Ability to package operations to be used by Upgrade Executor
-- [ ] Ability to package operations as a Docker image
-- [ ] Ability to package operations as a Kubernetes Job
-- [ ] Ability to package operations to be used by Litmus Executor
 
 ### High Level Design
 
@@ -142,7 +136,6 @@ func New(opts ...BaseOpsOption) *BaseOps {
   return b
 }
 ```
-
 
 ### Low Level Parts
 - This is implementation of pkg/ops/v1alpha1/ interfaces
