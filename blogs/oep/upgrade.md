@@ -1,5 +1,5 @@
 
-#### UseCase -- Upgrade - v1alpha2 - Drop 1
+#### High Level Design
 
 ```go
 // cmd/upgrade/app/v1alpha2/upgrade.go
