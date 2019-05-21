@@ -444,9 +444,15 @@ spec:
           SetLabel("openebs.io/version", TargetVersion)
 ```
 
-### UseCase -- UpgradeRecipe - Drop 3
+### UseCase -- UpgradeRecipe & More Custom Resources - Drop 3
+#### More Custom Resources
+- Upgrade will take help of some custom resources to perform upgrade
+- These custom resources will have individual controllers
+  - e.g. CStorPoolUpgrade, CStorVolumeUpgrade, JivaVolumeUpgrade, etc
+- These controllers will make use of appropriate UpgradeRecipe to perform upgrade
 - Since MayaLang is a low level construct, there will be a need to create abstractions around it
-- Some examples of these abstractions can be `UpgradeRecipe`, `ExperimentRecipe`, etc
+- One such abstraction can be `UpgradeRecipe`
+- UpgradeRecipe makes use of MayaLang to perform actions required to be at the desired upgrade state
 
 #### UpgradeRecipe
 - This will be a Kubernetes CR that is used to hold static content
@@ -456,26 +462,40 @@ spec:
   - Apply MayaLang resource against the K8s cluster
   - Delete MayaLang resource when its status shows completed
 
-#### Summary
-Upgrade will take help of an UpgradeRecipe to perform upgrade. Further, this UpgradeRecipe makes use of MayaLang to perform
-the actions required to be at the desired upgrade state.
+
+```yaml
+kind: CStorPoolUpgrade
+metadata:
+  name: my-csp-upgrade
+spec:
+  sourceVersion:
+  targetVersion:
+  # upgrade all cstor pools
+  all: true
+  # or upgrade based on the names
+  pools:
+  - name: csp-pool1
+  - name: csp-pool2
+  - name: csp-pool3
+status:
+```
 
 ```yaml
 kind: UpgradeRecipe
 metadata:
-  name: upgrade-082-to-090
+  name: cstorpool-upgrade-from-082-to-090
   namespace: openebs
+  labels:
+    cstorpool.upgrade.openebs.io/sourceversion: 
+    cstorpool.upgrade.openebs.io/targetversion:
 spec:
-  # type refers to supported upgrade categories
-  # e.g. CStorPool, JivaVolume, CStorVolume
-  type: CStorPool
   mlang:
     spec:
       go:
         vars:
           SourceVersion: "0.8.2"
           TargetVersion: "0.9.0"
-          
+
           # PoolNamespace: "<filled-in-at-runtime>"
           # PoolName: "<filled-in-at-runtime>"
 
