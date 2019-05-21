@@ -10,7 +10,10 @@
 
 #### Why UpgradeRecipe(s)?
 - It helps in having only k8s controller related logic inside controllers
-- Upgrade/Domain specific logic will reside in Recipes
+- Upgrade specific logic will reside in Recipes
+- Intention is to let upgrade logic be scripted as recipes
+  - This avoids the need to have new binaries/images for a new release
+  - This suits well for continuous delivery models
 
 #### UpgradeRecipe -- Deep Dive
 - This will be a Kubernetes CR that is used to hold **static content**
