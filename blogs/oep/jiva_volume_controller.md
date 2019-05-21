@@ -47,6 +47,8 @@ metadata:
   annotations:
     resize.jiva.openebs.io/enabled: true
     resize.jiva.openebs.io/name: resize-6-to-12
+spec:
+  capacity: 6
 ```
 
 ```yaml
