@@ -1,6 +1,7 @@
 ### JivaVolume as a Custom Resource
 - A Jiva volume is represented as a custom resource
 - A JivaVolume resource is watched by a controller named `jiva-volume-controller`
+
 ```yaml
 kind: JivaVolume
 metadata:
@@ -61,3 +62,12 @@ spec:
   capacity: 12
 status:
 ```
+
+### Why capacity expansion requires a Custom Resource?
+- One might imagine changing `spec.capacity` from existing value to a new value
+- IMO a dedicated logic specializing capacity expansion is better
+- This removes the need to reset to old value when capacity expansion fails / not authorized
+- There may be cases when capacity expansion needs to wait for some other operation to complete
+- The proposal here is to avoid modifying `spec.capacity` directly
+  - Instead, annotate the resource & delegate the logic to a separate controller
+  - Hence, let the controller update `spec.capacity` field via annotation(s)
