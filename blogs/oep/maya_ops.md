@@ -487,9 +487,21 @@ metadata:
 spec:
   sourceVersion:
   targetVersion:
+
+  # optional; controller can decide the
+  # recipe based on source & target
+  # versions
+  recipe:
+    name: 
+
   # upgrade all cstor pools
+  # optional; can be filled up by controller
   all: true
+
   # or upgrade based on the names
+  # is optional 
+  # controller sets spec.all to true
+  # if this list is nil
   pools:
   - name: csp-pool1
   - name: csp-pool2
