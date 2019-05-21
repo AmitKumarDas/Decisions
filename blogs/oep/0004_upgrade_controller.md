@@ -1,3 +1,6 @@
+#### Depends on
+- https://github.com/AmitKumarDas/Decisions/blob/master/blogs/oep/0003_maya_lang_controller.md
+
 #### Why?
 - Dedicated controller(s) helps in achieving specific logic per resource kind
 
