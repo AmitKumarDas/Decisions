@@ -446,19 +446,23 @@ spec:
 
 ### UseCase -- Lots of Custom Resources - Drop 3
 #### Why?
-- It helps in achieving dedicated tooling/logic per specific resource upgrade
+- Dedicated controllers helps in achieving specific logic per resource kind
 
 #### How?
 - Upgrade will take help of some custom resources to perform upgrade
 - These custom resources will have individual controllers
   - e.g. CStorPoolUpgrade, CStorVolumeUpgrade, JivaVolumeUpgrade, etc
-- These controllers will make use of appropriate UpgradeRecipe to perform upgrade
-- Since MayaLang is a low level construct, there will be a need to create abstractions around it
-- One such abstraction can be `UpgradeRecipe`
+- These controllers will make use of appropriate **UpgradeRecipe** to perform upgrade
+  - Recipes provides a declarative model to code the requirements
 
-#### UpgradeRecipe
-- This will be a Kubernetes CR that is used to hold static content
-- It makes use of MayaLang to perform actions required to be at the desired upgrade state
+#### Why UpgradeRecipe(s)?
+- It helps in having only k8s controller related logic inside controllers
+- Upgrade/Domain specific logic will reside in Recipes
+
+#### UpgradeRecipe -- Deep Dive
+- This will be a Kubernetes CR that is used to hold **static content**
+- UpgradeRecipe is a thin abstraction around MayaLang
+- It delegates to MayaLang to perform actions required to be at the desired upgrade state
 - A recipe in itself does not have a controller
 - A recipe is only used to create MayaLang resource
   - MayaLang resource has its controller/watcher
