@@ -36,7 +36,7 @@ type Base struct {
   
   rateLimiter               workqueue.RateLimiter
   exponentialBackOffOnError bool
-	threadiness               int
+  threadiness               int
   
   // isLeaderElection flags if kubernetes leader
   // election will be used. It should be enabled
@@ -53,41 +53,42 @@ type Base struct {
  	// candidates will wait to force acquire leadership.
  	// This is measured against time of last observed ack.
  	// Defaults to 15 seconds.
-	leaseDuration time.Duration
+  leaseDuration time.Duration
 	
 	// RenewDeadline is the duration that the acting
 	// master will retry refreshing leadership before
 	// giving up. Defaults to 10 seconds.
-	renewDeadline time.Duration
+  renewDeadline time.Duration
 
   // RetryPeriod is the duration the LeaderElector 
   // clients should wait between tries of actions.
   // Defaults to 2 seconds.
   retryPeriod time.Duration
 
-	hasRun     bool
-	hasRunLock *sync.Mutex
+  hasRun     bool
+  hasRunLock *sync.Mutex
 
   // TODO -- write appropriate comments
   //
-	// Map UID -> *PVC with all claims that may be
+  // Map UID -> *PVC with all claims that may be
   // provisioned in the background.
-	claimsInProgress sync.Map
+  claimsInProgress sync.Map
 }
 
 type baseOption func(*Base)
+type defaultOption func(*Base)
 
-var defaultOptions = []baseOption{
+var defaults = []defaultOption{
   setDefaultResyncPeriod(),
 }
 
 func setDefaults(b *Base) {
-  for _, option := range defaultOptions {
+  for _, option := range defaults {
     option(b)
   }
 }
 
-func setDefaultResyncPeriod() baseOption {
+func withDefaultResyncPeriod() defaultOption {
   return func(b *Base) {
     if b.resyncPeriod == nil {
       b.resyncPeriod = 15min
@@ -99,6 +100,12 @@ func setDefaultResyncPeriod() baseOption {
 // base controller
 type New() *Base {
   return &Base{}
+}
+
+type FromDefault() *Base {
+  b := New()
+  setDefaults(b)
+  return b
 }
 ```
 
