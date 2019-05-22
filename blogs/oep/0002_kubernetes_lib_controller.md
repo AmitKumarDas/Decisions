@@ -48,20 +48,20 @@ type Base struct {
   // election object. Defaults to the same 
   // namespace in which the the controller runs
   leaderElectionNamespace string
-  
-	// LeaseDuration is the duration that non-leader
-	// candidates will wait to force acquire leadership.
-	// This is measured against time of last observed ack.
-	// Defaults to 15 seconds.
+
+  // LeaseDuration is the duration that non-leader
+  // candidates will wait to force acquire leadership.
+  // This is measured against time of last observed ack.
+  // Defaults to 15 seconds.
   leaseDuration time.Duration
-	
-	// RenewDeadline is the duration that the acting
-	// master will retry refreshing leadership before
-	// giving up. Defaults to 10 seconds.
+
+  // RenewDeadline is the duration that the acting
+  // master will retry refreshing leadership before
+  // giving up. Defaults to 10 seconds.
   renewDeadline time.Duration
 
- 	// RetryPeriod is the duration the LeaderElector 
- 	// clients should wait between tries of actions.
+  // RetryPeriod is the duration the LeaderElector 
+  // clients should wait between tries of actions.
   // Defaults to 2 seconds.
   retryPeriod time.Duration
 
@@ -79,7 +79,8 @@ type baseOption func(*Base)
 type defaultOption func(*Base)
 
 var defaults = []defaultOption{
-  setDefaultResyncPeriod(),
+  withDefaultResyncPeriod(),
+	withDefaultThreadiness(),
 }
 
 func setDefaults(b *Base) {
@@ -92,6 +93,14 @@ func withDefaultResyncPeriod() defaultOption {
   return func(b *Base) {
     if b.resyncPeriod == nil {
       b.resyncPeriod = 15min
+    }
+  }
+}
+
+func withDefaultThreadiness() defaultOption {
+  return func(b *Base) {
+    if b.threadiness == 0 {
+      b.threadiness = 4
     }
   }
 }
@@ -134,6 +143,10 @@ func (b *Builder) WithResyncPeriod(resyncPeriod time.Duration) *Builder {
   return b
 }
 
+func (b *Builder) Build() *Base {
+  setDefaults(b.base)
+	return b.base
+}
 ```
 
 ```go
