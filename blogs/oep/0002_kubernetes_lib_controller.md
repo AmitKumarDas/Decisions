@@ -49,10 +49,10 @@ type Base struct {
   // namespace in which the the controller runs
   leaderElectionNamespace string
   
- 	// LeaseDuration is the duration that non-leader
- 	// candidates will wait to force acquire leadership.
- 	// This is measured against time of last observed ack.
- 	// Defaults to 15 seconds.
+	// LeaseDuration is the duration that non-leader
+	// candidates will wait to force acquire leadership.
+	// This is measured against time of last observed ack.
+	// Defaults to 15 seconds.
   leaseDuration time.Duration
 	
 	// RenewDeadline is the duration that the acting
@@ -60,8 +60,8 @@ type Base struct {
 	// giving up. Defaults to 10 seconds.
   renewDeadline time.Duration
 
-  // RetryPeriod is the duration the LeaderElector 
-  // clients should wait between tries of actions.
+ 	// RetryPeriod is the duration the LeaderElector 
+ 	// clients should wait between tries of actions.
   // Defaults to 2 seconds.
   retryPeriod time.Duration
 
@@ -71,7 +71,7 @@ type Base struct {
   // TODO -- write appropriate comments
   //
   // Map UID -> *PVC with all claims that may be
-  // provisioned in the background.
+ 	// provisioned in the background.
   claimsInProgress sync.Map
 }
 
