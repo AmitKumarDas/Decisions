@@ -19,84 +19,85 @@ Ops approach defined in this proposal allows business logic i.e. code to be more
 ```go
 // DeleteCSP ...
 func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
-	cspAPIList, err := ops.CSPClient.List(metav1.ListOptions{})
-	Expect(err).To(BeNil())
-	cspList := csp.
-		ListBuilderForAPIObject(cspAPIList).
-		List().
-		Filter(csp.HasLabel(string(apis.StoragePoolClaimCPK), spcName), csp.IsStatus("Healthy"))
-	cspCount := cspList.Len()
-	Expect(deleteCount).Should(BeNumerically("<=", cspCount))
+  cspAPIList, err := ops.CSPClient.List(metav1.ListOptions{})
+  Expect(err).To(BeNil())
+  cspList := csp.
+    ListBuilderForAPIObject(cspAPIList).
+    List().
+    Filter(csp.HasLabel(string(apis.StoragePoolClaimCPK), spcName), csp.IsStatus("Healthy"))
+  cspCount := cspList.Len()
+  Expect(deleteCount).Should(BeNumerically("<=", cspCount))
 
-	for i := 0; i < deleteCount; i++ {
-		_, err := ops.CSPClient.Delete(cspList.ObjectList.Items[i].Name, &metav1.DeleteOptions{})
-		Expect(err).To(BeNil())
-
-	}
+  for i := 0; i < deleteCount; i++ {
+    _, err := ops.CSPClient.Delete(cspList.ObjectList.Items[i].Name, &metav1.DeleteOptions{})
+    Expect(err).To(BeNil())
+  }
 }
 ```
 
 ```go
 // IsHealthyCspCount ...
 func (ops *Operations) IsHealthyCspCount(spcName string, expectedCspCount int) int {
-	var cspCount int
-	retries := maxRetry
-	for i := 0; i < retries; i++ {
-		cspCount = ops.GetHealthyCSPCount(spcName)
-		if cspCount == expectedCspCount {
-			return expectedCspCount
-		}
-		if retries == 0 {
-			break
-		}
-		retries--
-		time.Sleep(5 * time.Second)
-	}
-	return cspCount
+  var cspCount int
+  retries := maxRetry
+  for i := 0; i < retries; i++ {
+    cspCount = ops.GetHealthyCSPCount(spcName)
+    if cspCount == expectedCspCount {
+      return expectedCspCount
+    }
+    if retries == 0 {
+      break
+    }
+    retries--
+    time.Sleep(5 * time.Second)
+  }
+  return cspCount
 }
 ```
 
 ```go
 // ExecPod executes arbitrary command inside the pod
 func (ops *Operations) ExecPod(podName, namespace, containerName string, command ...string) ([]byte, error) {
-	var (
-		execOut bytes.Buffer
-		execErr bytes.Buffer
-		err     error
-	)
-	config, err := ops.PodClient.GetConfig()
-	Expect(err).To(BeNil(), "while getting config for exec'ing into pod")
-	cset, err := ops.PodClient.GetClientSet()
-	Expect(err).To(BeNil(), "while getting clientset for exec'ing into pod")
-	req := cset.
-		CoreV1().
-		RESTClient().
-		Post().
-		Resource("pods").
-		Name(podName).
-		Namespace(namespace).
-		SubResource("exec").
-		Param("container", containerName).
-		VersionedParams(&corev1.PodExecOptions{
-			Container: containerName,
-			Command:   command,
-			Stdin:     false,
-			Stdout:    true,
-			Stderr:    true,
-			TTY:       false,
-		}, scheme.ParameterCodec)
+  var (
+    execOut bytes.Buffer
+    execErr bytes.Buffer
+    err     error
+  )
+  config, err := ops.PodClient.GetConfig()
+  Expect(err).To(BeNil(), "while getting config for exec'ing into pod")
+  cset, err := ops.PodClient.GetClientSet()
+  Expect(err).To(BeNil(), "while getting clientset for exec'ing into pod")
+  req := cset.
+    CoreV1().
+    RESTClient().
+    Post().
+    Resource("pods").
+    Name(podName).
+    Namespace(namespace).
+    SubResource("exec").
+    Param("container", containerName).
+    VersionedParams(&corev1.PodExecOptions{
+      Container: containerName,
+      Command:   command,
+      Stdin:     false,
+      Stdout:    true,
+      Stderr:    true,
+      TTY:       false,
+      },
+      scheme.ParameterCodec
+    )
 
-	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
-	Expect(err).To(BeNil(), "while exec'ing command in pod ", podName)
+  exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+  Expect(err).To(BeNil(), "while exec'ing command in pod ", podName)
 
-	err = exec.Stream(remotecommand.StreamOptions{
-		Stdout: &execOut,
-		Stderr: &execErr,
-		Tty:    false,
-	})
-	Expect(err).To(BeNil(), "while streaming the command in pod ", podName, execOut.String(), execErr.String())
-	Expect(execOut.Len()).Should(BeNumerically(">", 0), "while streaming the command in pod ", podName, execErr.String(), execOut.String())
-	return execOut.Bytes(), nil
+  err = exec.Stream(remotecommand.StreamOptions{
+    Stdout: &execOut,
+    Stderr: &execErr,
+    Tty:    false,
+  })
+  Expect(err).To(BeNil(), "while streaming the command in pod ", podName, execOut.String(), execErr.String())
+  Expect(execOut.Len()).Should(BeNumerically(">", 0), "while streaming the command in pod ", podName, execErr.String(), execOut.String())
+  return execOut.Bytes(), nil
 }
 ```
 
