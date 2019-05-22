@@ -34,8 +34,8 @@ type Base struct {
   // Defaults to 4.
   threadiness               int
   
- 	rateLimiter               workqueue.RateLimiter
-	exponentialBackOffOnError bool
+  rateLimiter               workqueue.RateLimiter
+  exponentialBackOffOnError bool
 	threadiness               int
   
   // isLeaderElection flags if kubernetes leader
