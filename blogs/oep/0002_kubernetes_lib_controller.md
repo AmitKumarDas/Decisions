@@ -111,7 +111,7 @@ type New() *Base {
   return &Base{}
 }
 
-type FromDefault() *Base {
+type Default() *Base {
   b := New()
   setDefaults(b)
   return b
@@ -131,6 +131,13 @@ type Builder struct {
 // of builder
 func NewBuilder() *Builder {
   return &Builder{base: New()}
+}
+
+// BuilderFrom returns a new instance
+// of builder using the provided base
+// instance
+func BuilderFrom(base *Base) *Builder {
+  return &Builder{base: base}
 }
 
 // WithResyncPeriod is how often the controller relists
