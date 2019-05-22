@@ -107,12 +107,19 @@ func withDefaultThreadiness() defaultOption {
 
 // New returns an instance of 
 // base controller
-type New() *Base {
-  return &Base{}
+type New(opts ...baseOption) *Base {
+  b := &Base{}
+  for _, option := range opts {
+    option(b)
+  }
+  return b
 }
 
-type Default() *Base {
-  b := New()
+// Default returns a new instance 
+// of base controller optionally set
+// with default settings
+type Default(opts ...baseOption) *Base {
+  b := New(opts...)
   setDefaults(b)
   return b
 }
@@ -152,7 +159,7 @@ func (b *Builder) WithResyncPeriod(resyncPeriod time.Duration) *Builder {
 
 func (b *Builder) Build() *Base {
   setDefaults(b.base)
-	return b.base
+  return b.base
 }
 ```
 
