@@ -18,6 +18,15 @@ Ops approach defined in this proposal allows business logic i.e. code to be more
 
 ```go
 // DeleteCSP ...
+//
+// Observations:
+//  1. Method name & arguments seems to be out-of-band
+//
+//  2. Delete has taken up multiple responsibilities like 
+//    filtering & validating count
+//
+//  3. Use of Expect can also be thought of as tight 
+//    coupling with the implementation
 func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
   cspAPIList, err := ops.CSPClient.List(metav1.ListOptions{})
   Expect(err).To(BeNil())
@@ -37,6 +46,10 @@ func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
 
 ```go
 // IsHealthyCspCount ...
+//
+// Observations:
+//  1. Single method has taken up multiple responsibilities 
+//    i.e. validation & retries
 func (ops *Operations) IsHealthyCspCount(spcName string, expectedCspCount int) int {
   var cspCount int
   retries := maxRetry
@@ -57,6 +70,12 @@ func (ops *Operations) IsHealthyCspCount(spcName string, expectedCspCount int) i
 
 ```go
 // ExecPod executes arbitrary command inside the pod
+//
+// Observations:
+//  1. This seems to be a business logic that is not just
+//    related to testing.
+//
+//  2. This implementation is very rigid w.r.t PodExecOptions
 func (ops *Operations) ExecPod(podName, namespace, containerName string, command ...string) ([]byte, error) {
   var (
     execOut bytes.Buffer
