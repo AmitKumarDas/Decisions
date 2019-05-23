@@ -5,6 +5,6 @@ perform after initial storage related provisioning is done and applications have
 
 ### UseCases
 #### Add or Remove Disks
->> As a storage admin I would like to add new disks to increase capacity or replace bad disks with new ones to keep storage up
+> As a storage admin I would like to add new disks to increase capacity or replace bad disks with new ones to keep storage up
 and running without any side-effects.
 
