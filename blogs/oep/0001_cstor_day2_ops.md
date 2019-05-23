@@ -4,13 +4,16 @@ cover these activities as Day 2 operations. Day 2 as the name suggests are the a
 perform after initial storage related provisioning is done and applications have started to make use of this storage.
 
 ### UseCases
-#### Add or Remove Disks
+#### Add/Replace
 _As a storage admin I would like to [1] add new disks to increase capacity or [2] replace bad disks with new ones to keep storage up and running without any side-effects._
 
+#### Add to specific pool
 _As a storage admin I would like to add disk to a specific pool i.e. pool on a specific node._
 
+#### Remove from specific pool
 _As a storage admin I would like to use kubectl to add or remove disk from pool._
 
+#### Commissioning / Decommissioning a node
 _As a storage admin I would like to decomission nodes and create new nodes with automation. I would like to avoid the manual
 steps such as: fetch disk list, update pool from the helm chart, push it to git, update the catalog and then update the pool._
 
