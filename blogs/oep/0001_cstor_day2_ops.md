@@ -1,7 +1,7 @@
 ### Motivation
 Storage as an infrastructure requires proper maintainenance to serve the needs of higher order applications. We shall try to 
 cover these activities as Day 2 operations. Day 2 as the name suggests are the activites that a storage admin would like to 
-perform after initial storage related provisioning is done and applications have started to make use this storage.
+perform after initial storage related provisioning is done and applications have started to make use of this storage.
 
 ### UseCases
 #### Add or Remove Disks
