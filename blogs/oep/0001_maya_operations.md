@@ -2,12 +2,12 @@
 Ops approach defined in this proposal allows business logic i.e. code to be more cohesive. This approach also lets developers to express their logic that is readable and hence easy to understand.
 
 ### Issues without a proper ops approach -- some observations
-- Rise of utils
+- Rise of utils _(IMO this is an anti-pattern)_
 - For example, below code snippets are used during integration tests
-  - This core testing logic is placed in different file/struct
-  - The original test logic is somewhere else
-  - This leads to splitting of test related business logic across multiple files
-  - In other words, test logic is not cohesive
+  - This ideally should be part of actual test logic
+  - However, it is placed in file different from the original test logic
+  - This leads to splitting of logic _(here test logic)_ across multiple packages
+  - The resulting test logic is not **cohesive**
 - Scattering of core test logic can be verified from
   - Methods names that do not reflect its true behavior
   - Explosion of arguments for a single method
