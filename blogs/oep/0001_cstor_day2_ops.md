@@ -5,6 +5,22 @@ perform after initial storage related provisioning is done and applications have
 
 ### UseCases
 #### Add or Remove Disks
-> As a storage admin I would like to add new disks to increase capacity or replace bad disks with new ones to keep storage up
-and running without any side-effects.
+_As a storage admin I would like to [1] add new disks to increase capacity or [2] replace bad disks with new ones to keep storage up and running without any side-effects._
 
+### Custom Resources
+#### SPC
+
+
+#### CSPC
+
+
+### TestCases
+_NOTE: These test code will be available at below paths:_
+  - github.com/openebs/maya/tests
+
+- [ ] Removing a disk from pool should remove this disk from the storage
+  - maya/tests/
+- [ ] Replacing an old disk with a new disk should remove the old disk & add the new disk into the storage
+  - maya/tests/
+- [ ] Removing a storage node from pool should wipe off the storage associated with the node
+  - maya/tests/
