@@ -5,4 +5,6 @@
 // https://github.com/kubernetes-sigs/sig-storage-local-static-provisioner
 // https://github.com/kubernetes-sigs/sig-storage-lib-external-provisioner
 // https://github.com/kubernetes-sigs/vsphere-csi-driver
+// https://github.com/nats-io/nats-operator/
+// https://github.com/jaegertracing/jaeger-operator/
 ```
