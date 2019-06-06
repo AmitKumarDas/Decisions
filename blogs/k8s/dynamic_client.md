@@ -26,7 +26,10 @@ func resourceDefaultNamespace(namespaced bool, defaultNamespace string) string {
 // apiResource consults the REST mapper to translate an 
 // <apiVersion, kind, namespace> tuple to a 
 // unversioned.APIResource struct.
-func (gc *GarbageCollector) apiResource(apiVersion, kind string) (schema.GroupVersionResource, bool, error) {
+func (gc *GarbageCollector) apiResource(
+  apiVersion, 
+  kind string,
+) (schema.GroupVersionResource, bool, error) {
   fqKind := schema.FromAPIVersionAndKind(apiVersion, kind)
   mapping, err := gc.restMapper.RESTMapping(fqKind.GroupKind(), fqKind.Version)
   if err != nil {
@@ -35,7 +38,10 @@ func (gc *GarbageCollector) apiResource(apiVersion, kind string) (schema.GroupVe
   return mapping.Resource, mapping.Scope == meta.RESTScopeNamespace, nil
 }
 
-func (gc *GarbageCollector) deleteObject(item objectReference, policy *metav1.DeletionPropagation) error {
+func (gc *GarbageCollector) deleteObject(
+  item objectReference, 
+  policy *metav1.DeletionPropagation,
+) error {
   resource, namespaced, err := gc.apiResource(item.APIVersion, item.Kind)
   if err != nil {
     return err
@@ -60,7 +66,11 @@ func (gc *GarbageCollector) getObject(item objectReference) (*unstructured.Unstr
     Get(item.Name, metav1.GetOptions{})
 }
 
-func (gc *GarbageCollector) patchObject(item objectReference, patch []byte, pt types.PatchType) (*unstructured.Unstructured, error) {
+func (gc *GarbageCollector) patchObject(
+  item objectReference, 
+  patch []byte, 
+  pt types.PatchType,
+) (*unstructured.Unstructured, error) {
   resource, namespaced, err := gc.apiResource(item.APIVersion, item.Kind)
   if err != nil {
     return nil, err
