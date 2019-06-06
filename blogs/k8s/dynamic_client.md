@@ -1,3 +1,4 @@
+```go
 import (
   "encoding/json"
   "fmt"
@@ -69,3 +70,4 @@ func (gc *GarbageCollector) patchObject(item objectReference, patch []byte, pt t
     Namespace(resourceDefaultNamespace(namespaced, item.Namespace)).
     Patch(item.Name, pt, patch, metav1.PatchOptions{})
 }
+```
