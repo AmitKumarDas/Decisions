@@ -2,7 +2,7 @@
 Maya Ops represents a pipeline which is targeted to implement a set of ordered instructions. Ops approach defined in this proposal is primarily meant to be used while writing `test logic` or `tools` that cater to specific domain. In other words this pattern seems fit to be called as a domain specific language i.e. **DSL**. It allows business logic i.e. code to be more cohesive and specific to a targeted domain. This approach lets developers to express logic which is more readable and hence easy to understand.
 
 ### Graduation Criteria
-- Users find MayaOps to be easier than executing kubectl commands
+- Users find MayaOps to be GitOps friendly to manage OpenEBS
 - Users find MayaOps to be easier than writing shell scripts
 
 #### UseCase - CStor Pool Health Check
