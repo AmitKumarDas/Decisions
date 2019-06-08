@@ -15,6 +15,9 @@ Ops represents a pipeline which is targeted to implement a set of ordered instru
   - In other words, this test logic is not usable in other scenarios
     - e.g. monitoring, self-heal, tooling, etc.
 
+_NOTE: Below snippets are extracted from openebs/maya's integration test suite._
+Refer https://github.com/openebs/maya/blob/master/tests/operations.go
+
 #### Sample Code - 1
 ```go
 func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
