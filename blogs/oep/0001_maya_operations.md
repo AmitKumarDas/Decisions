@@ -1,5 +1,5 @@
 ### Motivation
-Ops approach defined in this proposal allows business logic i.e. code to be more cohesive. This approach also lets developers to express their logic that is readable and hence easy to understand.
+Ops represents a pipeline which is targetted to implement a set of ordered instructions. Ops approach defined in this proposal allows business logic i.e. code to be more cohesive. This approach lets developers to express logic which is more readable and hence easy to understand.
 
 ### Issues without a proper ops approach -- some observations
 - Rise of utils _(IMO this is an anti-pattern)_
@@ -15,18 +15,8 @@ Ops approach defined in this proposal allows business logic i.e. code to be more
   - In other words, this test logic is not usable in other scenarios
     - e.g. monitoring, self-heal, etc.
 
-
+#### Sample Code - 1
 ```go
-// DeleteCSP ...
-//
-// Observations:
-//  1. Method name & arguments seems to be out-of-band
-//
-//  2. Delete has taken up multiple responsibilities like 
-//    filtering & validating count
-//
-//  3. Use of Expect can also be thought of as tight 
-//    coupling with the implementation
 func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
   cspAPIList, err := ops.CSPClient.List(metav1.ListOptions{})
   Expect(err).To(BeNil())
@@ -42,6 +32,25 @@ func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
     Expect(err).To(BeNil())
   }
 }
+```
+```go
+// Observations:
+
+//  1. Method name & its arguments seems to be out-of-band
+//
+//  2. Delete has taken up multiple responsibilities like 
+//    filtering & validating count
+//
+//  3. Expect is tightly coupled with the implementation
+```
+```go
+// code when thought with ops pattern
+// somewhere in caller logic
+err := spcops.New().
+  ListCSPWithLabel(string(apis.StoragePoolClaimCPK), spcName).
+  FilterCSP(csp.IsStatus("Healthy")).
+  VerifyCSPLenLTE(count).
+  DeleteCSPCollection()
 ```
 
 ```go
