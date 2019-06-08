@@ -105,70 +105,101 @@ err := ops.
       VerifyLenEQ(count).
       DeleteList(),
     ops.RetryOnError(20, "3s"),    
-  )
+  ).
+  Done()
 ```
 
 #### Sample Code - 3
 ```go
-// ExecPod executes arbitrary command inside the pod
-func (ops *Operations) ExecPod(podName, namespace, containerName string, command ...string) ([]byte, error) {
-  var (
-    execOut bytes.Buffer
-    execErr bytes.Buffer
-    err     error
-  )
-  config, err := ops.PodClient.GetConfig()
-  Expect(err).To(BeNil(), "while getting config for exec'ing into pod")
-  cset, err := ops.PodClient.GetClientSet()
-  Expect(err).To(BeNil(), "while getting clientset for exec'ing into pod")
-  req := cset.
-    CoreV1().
-    RESTClient().
-    Post().
-    Resource("pods").
-    Name(podName).
-    Namespace(namespace).
-    SubResource("exec").
-    Param("container", containerName).
-    VersionedParams(&corev1.PodExecOptions{
-      Container: containerName,
-      Command:   command,
-      Stdin:     false,
-      Stdout:    true,
-      Stderr:    true,
-      TTY:       false,
-      },
-      scheme.ParameterCodec
-    )
+// VerifyOpenebs verify running state of required 
+// openebs control plane components
+func (ops *Operations) VerifyOpenebs(expectedPodCount int) *Operations {
+	By("waiting for maya-apiserver pod to come into running state")
+	podCount := ops.GetPodRunningCountEventually(
+		string(artifacts.OpenebsNamespace),
+		string(artifacts.MayaAPIServerLabelSelector),
+		expectedPodCount,
+	)
+	Expect(podCount).To(Equal(expectedPodCount))
 
-  exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
-  Expect(err).To(BeNil(), "while exec'ing command in pod ", podName)
+	By("waiting for openebs-provisioner pod to come into running state")
+	podCount = ops.GetPodRunningCountEventually(
+		string(artifacts.OpenebsNamespace),
+		string(artifacts.OpenEBSProvisionerLabelSelector),
+		expectedPodCount,
+	)
+	Expect(podCount).To(Equal(expectedPodCount))
 
-  err = exec.Stream(remotecommand.StreamOptions{
-    Stdout: &execOut,
-    Stderr: &execErr,
-    Tty:    false,
-  })
-  Expect(err).To(BeNil(), "while streaming the command in pod ", podName, execOut.String(), execErr.String())
-  Expect(execOut.Len()).Should(BeNumerically(">", 0), "while streaming the command in pod ", podName, execErr.String(), execOut.String())
-  return execOut.Bytes(), nil
+	By("Verifying 'admission-server' pod status as running")
+	_ = ops.GetPodRunningCountEventually(string(artifacts.OpenebsNamespace),
+		string(artifacts.OpenEBSAdmissionServerLabelSelector),
+		expectedPodCount,
+	)
+
+	Expect(podCount).To(Equal(expectedPodCount))
+
+	return ops
 }
 ```
 ```go
-
-// Observations:
-//  1. This seems to be a business logic that is not just
-//    related to testing.
+// Observations
 //
-//  2. This implementation is very rigid w.r.t PodExecOptions
+// 1. Above assumes expectedPodCount to be same for all
+// Pods
+//
+// 2. As the number of openebs components grows above
+// lines of code will grow as well
 ```
 ```go
-// same code when built with ops pattern
+// Same code when executed via ops pattern
 
+type VerifyOpenEBSFn func() ops.Interface
 
+var VerifyOpenEBSInstallFns = []VerifyOpenEBSFn{
+  VerifyMayaAPIServer,
+  VerifyNDMDaemonSet,
+}
+
+func VerifyOpenEBSInstall() error {
+  for _, fn := range VerifyOpenEBSInstallFns {
+    err := fn().Done()
+    if err != nil {
+      return err
+    }
+  }
+
+  return nil
+}
+
+VerifyMayaAPIServer := ops.
+  Desc(`
+    As an openebs admin, I want to test if maya api 
+    server is installed and all its pods are in running
+    state
+  `).
+  Run(
+    podops.
+      WithNamespace(openebs).
+      FilterWithLabel(pod.ListOpts(MayaAPIServerLabelSelector)).
+      Filter(pod.IsRunning()).
+      VerifyLenEQ(MayaAPIServerPodCount),
+    ops.RetryOnError(10, "3s"),
+  )
+
+VerifyNDMDaemonSet := ops.
+  Desc(`
+    As an openebs admin, I want to test if NDM daemon set 
+    is installed and all its pods are in running state
+  `).
+  Run(
+    podops.
+      WithNamespace(openebs).
+      FilterWithLabel(pod.ListOpts(NDMDaemonSetLabelSelector)).
+      Filter(pod.IsRunning()).
+      VerifyLenEQ(NDMDaemonSetPodCount),
+    ops.RetryOnError(10, "3s"),
+  )
 ```
-
-
 
 ### High Level Design
 
