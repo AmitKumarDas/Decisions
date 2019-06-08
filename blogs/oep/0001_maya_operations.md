@@ -1,24 +1,15 @@
 ### Motivation
 Maya Ops represents a pipeline which is targeted to implement a set of ordered instructions. Ops approach defined in this proposal is primarily meant to be used while writing `test logic` or `tools` that cater to specific domain. In other words this pattern seems fit to be called as a domain specific language i.e. **DSL**. It allows business logic i.e. code to be more cohesive and specific to a targeted domain. This approach lets developers to express logic which is more readable and hence easy to understand.
 
-#### UseCase - 1
-```go
-err := cspops.
-  Desc(`
-    As a test developer, I want to list & delete
-    Healthy CSPs of a given SPC after verifying
-    the CSP count against an expected value.
-  `).
-  List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
-  Filter(csp.IsStatus("Healthy")).
-  VerifyLenLTE(count).
-  DeleteList().
-  Done()
-```
+### Graduation Criteria
+- Users find MayaOps to be easier than executing kubectl commands
+- Users find MayaOps to be easier than writing shell scripts
 
-#### UseCase - 2
+#### UseCase - CStor Pool Health Check
 ```go
-err := ops.
+// pkg/tools/spc/health_check_csp/main.go
+
+err := ops.New().
   Desc(`
     As a test developer, I want to verify the number
     of Healthy cstor pools of a given SPC against an
@@ -32,16 +23,16 @@ err := ops.
       Filter(csp.IsStatus("Healthy")).
       VerifyLenEQ(count).
       DeleteList(),
-    ops.RetryOnError(20, "3s"),    
+    ops.RetryOnError(20, "3s"),  
   ).
-  Done()
+  Verify()
 ```
 
-#### UseCase - 3
+#### UseCase - OpenEBS Health Check
 ```go
-// Same code when executed via ops pattern
+// pkg/tools/openebs/health_check/main.go
 
-type VerifyOpenEBSFn func() ops.Interface
+type VerifyOpenEBSFn func() ops.Verifier
 
 var VerifyOpenEBSFns = []VerifyOpenEBSFn{
   VerifyMayaAPIServer,
@@ -50,7 +41,7 @@ var VerifyOpenEBSFns = []VerifyOpenEBSFn{
 
 func VerifyOpenEBS() error {
   for _, fn := range VerifyOpenEBSFns {
-    err := fn().Done()
+    err := fn().Verify()
     if err != nil {
       return err
     }
@@ -60,7 +51,7 @@ func VerifyOpenEBS() error {
 }
 
 func VerifyMayaAPIServer() ops.Interface {
-  return ops.
+  return ops.New().
     Desc(`
       As an openebs admin, I want to test if maya api 
       server is installed and all its pods are in running
@@ -69,7 +60,7 @@ func VerifyMayaAPIServer() ops.Interface {
     Run(
       podops.
         WithNamespace(openebs).
-        FilterWithLabel(pod.ListOpts(MayaAPIServerLabelSelector)).
+        List(pod.ListOpts(MayaAPIServerLabelSelector)).
         Filter(pod.IsRunning()).
         VerifyLenEQ(MayaAPIServerPodCount),
       ops.RetryOnError(10, "3s"),
@@ -77,7 +68,7 @@ func VerifyMayaAPIServer() ops.Interface {
 }
 
 func VerifyNDMDaemonSet() ops.Interface{
-  return ops.
+  return ops.New().
     Desc(`
       As an openebs admin, I want to test if NDM daemon set 
       is installed and all its pods are in running state
@@ -85,7 +76,7 @@ func VerifyNDMDaemonSet() ops.Interface{
     Run(
       podops.
         WithNamespace(openebs).
-        FilterWithLabel(pod.ListOpts(NDMDaemonSetLabelSelector)).
+        List(pod.ListOpts(NDMDaemonSetLabelSelector)).
         Filter(pod.IsRunning()).
         VerifyLenEQ(NDMDaemonSetPodCount),
       ops.RetryOnError(10, "3s"),
@@ -129,6 +120,21 @@ type Verifier interface {
 
 ```go
 // pkg/ops/v1alpha1/ops.go
+
+type Default struct {
+  Description string
+}
+
+func New() *Default {
+  return &Default{}
+}
+
+func (d *Default) Desc(msg string) *Default{
+  d.Description = msg
+  return d
+}
+
+func (d *Default)
 
 // OperationListRunner is a concrete implementation
 // of Runner interface. As the name suggests
