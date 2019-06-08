@@ -17,7 +17,7 @@ err := ops.New().
     expectation for a given number of attempts before
     giving up.
   `).
-  Runner(
+  WithRunner(
     cspops.New().Steps(
       cspops.List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)),
       cspops.Filter(csp.IsStatus("Healthy")),
@@ -58,7 +58,7 @@ func VerifyMayaAPIServer() ops.Runner {
       server is installed and all its pods are in running
       state
     `).
-    Runner(
+    WithRunner(
       podops.New().Steps(
         podops.WithNamespace(openebs),
         podops.List(pod.ListOpts(MayaAPIServerLabelSelector)),
@@ -75,7 +75,7 @@ func VerifyNDMDaemonSet() ops.Runner{
       As an openebs admin, I want to test if NDM daemon set 
       is installed and all its pods are in running state
     `).
-    Runner(
+    WithRunner(
       podops.New().Steps(
         podops.WithNamespace(openebs),
         podops.List(pod.ListOpts(NDMDaemonSetLabelSelector)),
@@ -137,9 +137,9 @@ type (f *FailedOperation) Error() string {
   return f
 }
 
-type Option func(*Default)
+type Option func(*DefaultRunner)
 
-type Default struct {
+type DefaultRunner struct {
   Description string
   Retry       Retry
 }
@@ -149,11 +149,11 @@ type Retry struct {
   Interval  string
 }
 
-func New() *Default {
-  return &Default{}
+func New() DefaultRunner {
+  return &DefaultRunner{}
 }
 
-func (d *Default) handleError(err error) error {
+func (d *DefaultRunner) handleError(err error) error {
   return &FailedOperation{
     Statement: d.Description,
     Result: "Failed",
@@ -161,21 +161,21 @@ func (d *Default) handleError(err error) error {
   }
 }
 
-func (d *Default) setOptions(opts ...Option) {
+func (d *DefaultRunner) setOptions(opts ...Option) {
   for _, option := range opts {
     option(d)
   }
 }
 
-func (d *Default) Desc(msg string) *Default{
+func (d *DefaultRunner) Desc(msg string) *Default{
   d.Description = msg
   return d
 }
 
-func (d *Default) Run(runner ops.Runner, opts ...ops.Option) error {
+func (d *DefaultRunner) Run(runner ops.Runner, opts ...ops.Option) error {
   d.setOptions(opts...)
   var err error
-  for attempt := range d.Retry.Attempts {
+  for _ := range d.Retry.Attempts {
     err = runner.Run()
     if err == nil {
       return nil
@@ -185,6 +185,10 @@ func (d *Default) Run(runner ops.Runner, opts ...ops.Option) error {
 
   return d.handleError(err)
 }
+
+
+// TODO Refactor Below !!!
+
 
 // OperationListRunner is a concrete implementation
 // of Runner interface. As the name suggests
