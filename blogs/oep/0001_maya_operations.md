@@ -11,9 +11,9 @@ Ops represents a pipeline which is targetted to implement a set of ordered instr
 - Scattering of core test logic can be verified from
   - Methods names that do not reflect its true behavior
   - Explosion of arguments for a single method
-- Once can also find test logic is tightly coupled with expect statements
+- One can also find test logic is tightly coupled with expect statements
   - In other words, this test logic is not usable in other scenarios
-    - e.g. monitoring, self-heal, etc.
+    - e.g. monitoring, self-heal, tooling, etc.
 
 #### Sample Code - 1
 ```go
@@ -46,11 +46,19 @@ func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
 ```go
 // code when thought with ops pattern
 // somewhere in caller logic
-err := spcops.New().
+
+err := spcops.
+  Desc(`
+    As a test developer, I want to list & delete
+    Healthy CSPs of a given SPC after verifying
+    the CSP count against an expected count.
+  `).
+  Init().
   ListCSPWithLabel(string(apis.StoragePoolClaimCPK), spcName).
   FilterCSP(csp.IsStatus("Healthy")).
   VerifyCSPLenLTE(count).
-  DeleteCSPCollection()
+  DeleteCSPCollection().
+  Done()
 ```
 
 ```go
