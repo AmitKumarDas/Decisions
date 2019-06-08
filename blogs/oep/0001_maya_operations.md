@@ -22,7 +22,6 @@ err := ops.New().
       cspops.List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)),
       cspops.Filter(csp.IsStatus("Healthy")),
       cspops.VerifyLenEQ(count),
-      cspops.DeleteList(),    
     ),
     ops.RetryOnError(20, "3s"),  
   ).
