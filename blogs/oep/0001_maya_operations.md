@@ -55,7 +55,6 @@ err := cspops.
     Healthy CSPs of a given SPC after verifying
     the CSP count against an expected value.
   `).
-  Init().
   List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
   Filter(csp.IsStatus("Healthy")).
   VerifyLenLTE(count).
@@ -103,7 +102,7 @@ err := ops.
     cspops.
       List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
       Filter(csp.IsStatus("Healthy")).
-      VerifyLenLTE(count).
+      VerifyLenEQ(count).
       DeleteList(),
     ops.RetryOnError(20, "3s"),    
   )
@@ -112,12 +111,6 @@ err := ops.
 #### Sample Code - 3
 ```go
 // ExecPod executes arbitrary command inside the pod
-//
-// Observations:
-//  1. This seems to be a business logic that is not just
-//    related to testing.
-//
-//  2. This implementation is very rigid w.r.t PodExecOptions
 func (ops *Operations) ExecPod(podName, namespace, containerName string, command ...string) ([]byte, error) {
   var (
     execOut bytes.Buffer
@@ -161,6 +154,21 @@ func (ops *Operations) ExecPod(podName, namespace, containerName string, command
   return execOut.Bytes(), nil
 }
 ```
+```go
+
+// Observations:
+//  1. This seems to be a business logic that is not just
+//    related to testing.
+//
+//  2. This implementation is very rigid w.r.t PodExecOptions
+```
+```go
+// same code when built with ops pattern
+
+
+```
+
+
 
 ### High Level Design
 
