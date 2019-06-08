@@ -1,54 +1,8 @@
 ### Motivation
 Maya Ops represents a pipeline which is targeted to implement a set of ordered instructions. Ops approach defined in this proposal is primarily meant to be used while writing `test logic` or `tools` that cater to specific domain. In other words this pattern seems fit to be called as a domain specific language i.e. **DSL**. It allows business logic i.e. code to be more cohesive and specific to a targeted domain. This approach lets developers to express logic which is more readable and hence easy to understand.
 
-### Issues without a proper ops approach -- some observations
-- Rise of utils _(IMO this is an anti-pattern)_
-- For example, below code snippets are used during integration tests
-  - This ideally should be part of actual test logic
-  - However, it is placed in file different from the original test logic
-  - This leads to splitting of logic _(here test logic)_ across multiple packages
-  - The resulting test logic is not **cohesive**
-- Scattering of core test logic can be verified from
-  - Methods names that do not reflect its true behavior
-  - Explosion of arguments for a single method
-- One can also find test logic is tightly coupled with expect statements
-  - In other words, this test logic is not usable in other scenarios
-    - e.g. monitoring, self-heal, tooling, etc.
-
-_NOTE: Below snippets are extracted from openebs/maya's integration test suite._
-Refer https://github.com/openebs/maya/blob/master/tests/operations.go
-
-#### Sample Code - 1
+#### UseCase - 1
 ```go
-func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
-  cspAPIList, err := ops.CSPClient.List(metav1.ListOptions{})
-  Expect(err).To(BeNil())
-  cspList := csp.
-    ListBuilderForAPIObject(cspAPIList).
-    List().
-    Filter(csp.HasLabel(string(apis.StoragePoolClaimCPK), spcName), csp.IsStatus("Healthy"))
-  cspCount := cspList.Len()
-  Expect(deleteCount).Should(BeNumerically("<=", cspCount))
-
-  for i := 0; i < deleteCount; i++ {
-    _, err := ops.CSPClient.Delete(cspList.ObjectList.Items[i].Name, &metav1.DeleteOptions{})
-    Expect(err).To(BeNil())
-  }
-}
-```
-```go
-// Observations:
-
-//  1. Method name & its arguments seems to be out-of-band
-//
-//  2. Delete has taken up multiple responsibilities like 
-//    filtering & validating count
-//
-//  3. Expect is tightly coupled with the implementation
-```
-```go
-// same code when built with ops pattern
-
 err := cspops.
   Desc(`
     As a test developer, I want to list & delete
@@ -62,34 +16,8 @@ err := cspops.
   Done()
 ```
 
-#### Sample Code - 2
+#### UseCase - 2
 ```go
-func (ops *Operations) IsHealthyCspCount(spcName string, expectedCspCount int) int {
-  var cspCount int
-  retries := maxRetry
-  for i := 0; i < retries; i++ {
-    cspCount = ops.GetHealthyCSPCount(spcName)
-    if cspCount == expectedCspCount {
-      return expectedCspCount
-    }
-    if retries == 0 {
-      break
-    }
-    retries--
-    time.Sleep(5 * time.Second)
-  }
-  return cspCount
-}
-```
-```go
-//
-// Observations:
-//  Single method has taken up multiple responsibilities 
-//  i.e. validation & retries
-```
-```go
-// same code when built with ops pattern
-
 err := ops.
   Desc(`
     As a test developer, I want to verify the number
@@ -109,47 +37,7 @@ err := ops.
   Done()
 ```
 
-#### Sample Code - 3
-```go
-// VerifyOpenebs verify running state of required 
-// openebs control plane components
-func (ops *Operations) VerifyOpenebs(expectedPodCount int) *Operations {
-	By("waiting for maya-apiserver pod to come into running state")
-	podCount := ops.GetPodRunningCountEventually(
-		string(artifacts.OpenebsNamespace),
-		string(artifacts.MayaAPIServerLabelSelector),
-		expectedPodCount,
-	)
-	Expect(podCount).To(Equal(expectedPodCount))
-
-	By("waiting for openebs-provisioner pod to come into running state")
-	podCount = ops.GetPodRunningCountEventually(
-		string(artifacts.OpenebsNamespace),
-		string(artifacts.OpenEBSProvisionerLabelSelector),
-		expectedPodCount,
-	)
-	Expect(podCount).To(Equal(expectedPodCount))
-
-	By("Verifying 'admission-server' pod status as running")
-	_ = ops.GetPodRunningCountEventually(string(artifacts.OpenebsNamespace),
-		string(artifacts.OpenEBSAdmissionServerLabelSelector),
-		expectedPodCount,
-	)
-
-	Expect(podCount).To(Equal(expectedPodCount))
-
-	return ops
-}
-```
-```go
-// Observations
-//
-// 1. Above assumes expectedPodCount to be same for all
-// Pods
-//
-// 2. As the number of openebs components grows above
-// lines of code will grow as well
-```
+#### UseCase - 3
 ```go
 // Same code when executed via ops pattern
 
