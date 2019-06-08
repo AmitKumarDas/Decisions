@@ -1,5 +1,5 @@
 ### Motivation
-Ops represents a pipeline which is targeted to implement a set of ordered instructions. Ops approach defined in this proposal is primarily meant to be used while writing `test logic` or `tools` that cater to specific domain. In other words this pattern seems fit to be called as a domain specific language i.e. **DSL**. It allows business logic i.e. code to be more cohesive and specific to a targeted domain. This approach lets developers to express logic which is more readable and hence easy to understand.
+Maya Ops represents a pipeline which is targeted to implement a set of ordered instructions. Ops approach defined in this proposal is primarily meant to be used while writing `test logic` or `tools` that cater to specific domain. In other words this pattern seems fit to be called as a domain specific language i.e. **DSL**. It allows business logic i.e. code to be more cohesive and specific to a targeted domain. This approach lets developers to express logic which is more readable and hence easy to understand.
 
 ### Issues without a proper ops approach -- some observations
 - Rise of utils _(IMO this is an anti-pattern)_
@@ -155,13 +155,13 @@ func (ops *Operations) VerifyOpenebs(expectedPodCount int) *Operations {
 
 type VerifyOpenEBSFn func() ops.Interface
 
-var VerifyOpenEBSInstallFns = []VerifyOpenEBSFn{
+var VerifyOpenEBSFns = []VerifyOpenEBSFn{
   VerifyMayaAPIServer,
   VerifyNDMDaemonSet,
 }
 
-func VerifyOpenEBSInstall() error {
-  for _, fn := range VerifyOpenEBSInstallFns {
+func VerifyOpenEBS() error {
+  for _, fn := range VerifyOpenEBSFns {
     err := fn().Done()
     if err != nil {
       return err
@@ -171,34 +171,38 @@ func VerifyOpenEBSInstall() error {
   return nil
 }
 
-VerifyMayaAPIServer := ops.
-  Desc(`
-    As an openebs admin, I want to test if maya api 
-    server is installed and all its pods are in running
-    state
-  `).
-  Run(
-    podops.
-      WithNamespace(openebs).
-      FilterWithLabel(pod.ListOpts(MayaAPIServerLabelSelector)).
-      Filter(pod.IsRunning()).
-      VerifyLenEQ(MayaAPIServerPodCount),
-    ops.RetryOnError(10, "3s"),
-  )
+func VerifyMayaAPIServer() ops.Interface {
+  return ops.
+    Desc(`
+      As an openebs admin, I want to test if maya api 
+      server is installed and all its pods are in running
+      state
+    `).
+    Run(
+      podops.
+        WithNamespace(openebs).
+        FilterWithLabel(pod.ListOpts(MayaAPIServerLabelSelector)).
+        Filter(pod.IsRunning()).
+        VerifyLenEQ(MayaAPIServerPodCount),
+      ops.RetryOnError(10, "3s"),
+    )
+}
 
-VerifyNDMDaemonSet := ops.
-  Desc(`
-    As an openebs admin, I want to test if NDM daemon set 
-    is installed and all its pods are in running state
-  `).
-  Run(
-    podops.
-      WithNamespace(openebs).
-      FilterWithLabel(pod.ListOpts(NDMDaemonSetLabelSelector)).
-      Filter(pod.IsRunning()).
-      VerifyLenEQ(NDMDaemonSetPodCount),
-    ops.RetryOnError(10, "3s"),
-  )
+func VerifyNDMDaemonSet() ops.Interface{
+  return ops.
+    Desc(`
+      As an openebs admin, I want to test if NDM daemon set 
+      is installed and all its pods are in running state
+    `).
+    Run(
+      podops.
+        WithNamespace(openebs).
+        FilterWithLabel(pod.ListOpts(NDMDaemonSetLabelSelector)).
+        Filter(pod.IsRunning()).
+        VerifyLenEQ(NDMDaemonSetPodCount),
+      ops.RetryOnError(10, "3s"),
+    )
+}
 ```
 
 ### High Level Design
