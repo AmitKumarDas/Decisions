@@ -505,3 +505,11 @@ cspops.New().
   GetFromKubernetes(PoolName).
   SaveUIDToStoreWithKey("csp.uid")
 ```
+
+### Research
+- Use of Gopkg.toml for every tool / folder
+- Use of Dockerfile for every tool / folder
+- Config Priority:
+  - flags via github.com/spf13/pflag
+  - environment variables
+  - constants
