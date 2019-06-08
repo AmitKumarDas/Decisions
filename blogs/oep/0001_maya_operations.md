@@ -137,11 +137,15 @@ type (f *FailedOperation) Error() string {
   return f
 }
 
-type Option func(*DefaultRunner)
+type Base struct {
+  Retry       *Retry
+}
+
+type Option func(*Base)
 
 type DefaultRunner struct {
+  *Base
   Description string
-  Retry       Retry
 }
 
 type Retry struct {
@@ -149,8 +153,15 @@ type Retry struct {
   Interval  string
 }
 
+func WithRetry(attempts int, interval string) Option {
+  return func(b *Base) {
+    b.Retry.Attempts = attempts
+    b.Retry.Interval = interval
+  }
+}
+
 func New() DefaultRunner {
-  return &DefaultRunner{}
+  return &DefaultRunner{Base: &Base{}}
 }
 
 func (d *DefaultRunner) handleError(err error) error {
@@ -163,7 +174,7 @@ func (d *DefaultRunner) handleError(err error) error {
 
 func (d *DefaultRunner) setOptions(opts ...Option) {
   for _, option := range opts {
-    option(d)
+    option(d.Base)
   }
 }
 
@@ -172,7 +183,7 @@ func (d *DefaultRunner) Desc(msg string) *Default{
   return d
 }
 
-func (d *DefaultRunner) Run(runner ops.Runner, opts ...ops.Option) error {
+func (d *DefaultRunner) Run(runner ops.Runner, opts ...Option) error {
   d.setOptions(opts...)
   var err error
   for _ := range d.Retry.Attempts {
