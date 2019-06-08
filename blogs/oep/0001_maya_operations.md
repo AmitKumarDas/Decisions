@@ -17,22 +17,23 @@ err := ops.New().
     expectation for a given number of attempts before
     giving up.
   `).
-  Run(
-    cspops.
-      List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
-      Filter(csp.IsStatus("Healthy")).
-      VerifyLenEQ(count).
-      DeleteList(),
+  Runner(
+    cspops.New().Steps(
+      cspops.List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)),
+      cspops.Filter(csp.IsStatus("Healthy")),
+      cspops.VerifyLenEQ(count),
+      cspops.DeleteList(),    
+    ),
     ops.RetryOnError(20, "3s"),  
   ).
-  Verify()
+  Run()
 ```
 
 #### UseCase - OpenEBS Health Check
 ```go
 // pkg/tools/openebs/health_check/main.go
 
-type VerifyOpenEBSFn func() ops.Verifier
+type VerifyOpenEBSFn func() ops.Runner
 
 var VerifyOpenEBSFns = []VerifyOpenEBSFn{
   VerifyMayaAPIServer,
@@ -41,7 +42,7 @@ var VerifyOpenEBSFns = []VerifyOpenEBSFn{
 
 func VerifyOpenEBS() error {
   for _, fn := range VerifyOpenEBSFns {
-    err := fn().Verify()
+    err := fn().Run()
     if err != nil {
       return err
     }
@@ -50,35 +51,37 @@ func VerifyOpenEBS() error {
   return nil
 }
 
-func VerifyMayaAPIServer() ops.Interface {
+func VerifyMayaAPIServer() ops.Runner {
   return ops.New().
     Desc(`
       As an openebs admin, I want to test if maya api 
       server is installed and all its pods are in running
       state
     `).
-    Run(
-      podops.
-        WithNamespace(openebs).
-        List(pod.ListOpts(MayaAPIServerLabelSelector)).
-        Filter(pod.IsRunning()).
-        VerifyLenEQ(MayaAPIServerPodCount),
+    Runner(
+      podops.New().Steps(
+        podops.WithNamespace(openebs),
+        podops.List(pod.ListOpts(MayaAPIServerLabelSelector)),
+        podops.Filter(pod.IsRunning()),
+        podops.VerifyLenEQ(MayaAPIServerPodCount),
+      ),
       ops.RetryOnError(10, "3s"),
     )
 }
 
-func VerifyNDMDaemonSet() ops.Interface{
+func VerifyNDMDaemonSet() ops.Runner{
   return ops.New().
     Desc(`
       As an openebs admin, I want to test if NDM daemon set 
       is installed and all its pods are in running state
     `).
-    Run(
-      podops.
-        WithNamespace(openebs).
-        List(pod.ListOpts(NDMDaemonSetLabelSelector)).
-        Filter(pod.IsRunning()).
-        VerifyLenEQ(NDMDaemonSetPodCount),
+    Runner(
+      podops.New().Steps(
+        podops.WithNamespace(openebs),
+        podops.List(pod.ListOpts(NDMDaemonSetLabelSelector)),
+        podops.Filter(pod.IsRunning()),
+        podops.VerifyLenEQ(NDMDaemonSetPodCount),      
+      ),
       ops.RetryOnError(10, "3s"),
     )
 }
@@ -87,16 +90,15 @@ func VerifyNDMDaemonSet() ops.Interface{
 ### High Level Design
 
 #### Core - Drop 0
-- Introduces **ops** pattern
-- Ops is the shorthard notation for Operations
-- The concept is built using **builder pattern**
+- Introducing **ops** pattern
+- Ops is the shorthard notation for **MayaOperations**
+- This concept is built around **builder pattern**
   - In this case each build method is executed immediately
 - _Background_:
   - Ops is built on top of Maya's core builder & predicate functions
   - Maya's core builder pattern is however based on lazy executions
   - In other words, core builder execute in their final build methods
   - To repeat, Ops builder differs from core builder due to its immediate execution style
-- To avoid clash among both these builders, this is termed as **operations** or **ops**
 
 ```go
 // pkg/ops/v1alpha1/interface.go
@@ -121,12 +123,48 @@ type Verifier interface {
 ```go
 // pkg/ops/v1alpha1/ops.go
 
+type FailedOperation struct {
+  Statement string
+  Result    string
+  Reason    string
+}
+
+type (f *FailedOperation) String() string {
+  return "statement: %s,\nresult: %s,\nreason: %s\n"
+}
+
+type (f *FailedOperation) Error() string {
+  return f
+}
+
+type Option func(*Default)
+
 type Default struct {
   Description string
+  Retry       Retry
+}
+
+type Retry struct {
+  Attempts  int
+  Interval  string
 }
 
 func New() *Default {
   return &Default{}
+}
+
+func (d *Default) handleError(err error) error {
+  return &FailedOperation{
+    Statement: d.Description,
+    Result: "Failed",
+    Reason: err.Error(),
+  }
+}
+
+func (d *Default) setOptions(opts ...Option) {
+  for _, option := range opts {
+    option(d)
+  }
 }
 
 func (d *Default) Desc(msg string) *Default{
@@ -134,7 +172,19 @@ func (d *Default) Desc(msg string) *Default{
   return d
 }
 
-func (d *Default)
+func (d *Default) Run(runner ops.Runner, opts ...ops.Option) error {
+  d.setOptions(opts...)
+  var err error
+  for attempt := range d.Retry.Attempts {
+    err = runner.Run()
+    if err == nil {
+      return nil
+    }
+    sleep(d.Retry.Interval)
+  }
+
+  return d.handleError(err)
+}
 
 // OperationListRunner is a concrete implementation
 // of Runner interface. As the name suggests
