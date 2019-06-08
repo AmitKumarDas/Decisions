@@ -47,29 +47,24 @@ func (ops *Operations) DeleteCSP(spcName string, deleteCount int) {
 //  3. Expect is tightly coupled with the implementation
 ```
 ```go
-// code when thought with ops pattern
-// somewhere in caller logic
+// same code when built with ops pattern
 
-err := spcops.
+err := cspops.
   Desc(`
     As a test developer, I want to list & delete
     Healthy CSPs of a given SPC after verifying
-    the CSP count against an expected count.
+    the CSP count against an expected value.
   `).
   Init().
-  ListCSPWithLabel(string(apis.StoragePoolClaimCPK), spcName).
-  FilterCSP(csp.IsStatus("Healthy")).
-  VerifyCSPLenLTE(count).
-  DeleteCSPCollection().
+  List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
+  Filter(csp.IsStatus("Healthy")).
+  VerifyLenLTE(count).
+  DeleteList().
   Done()
 ```
 
+#### Sample Code - 2
 ```go
-// IsHealthyCspCount ...
-//
-// Observations:
-//  1. Single method has taken up multiple responsibilities 
-//    i.e. validation & retries
 func (ops *Operations) IsHealthyCspCount(spcName string, expectedCspCount int) int {
   var cspCount int
   retries := maxRetry
@@ -87,7 +82,34 @@ func (ops *Operations) IsHealthyCspCount(spcName string, expectedCspCount int) i
   return cspCount
 }
 ```
+```go
+//
+// Observations:
+//  Single method has taken up multiple responsibilities 
+//  i.e. validation & retries
+```
+```go
+// same code when built with ops pattern
 
+err := ops.
+  Desc(`
+    As a test developer, I want to verify the number
+    of Healthy cstor pools of a given SPC against an
+    expected value. I would also like to retry above
+    expectation for a given number of attempts before
+    giving up.
+  `).
+  Run(
+    cspops.
+      List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
+      Filter(csp.IsStatus("Healthy")).
+      VerifyLenLTE(count).
+      DeleteList(),
+    ops.RetryOnError(20, "3s"),    
+  )
+```
+
+#### Sample Code - 3
 ```go
 // ExecPod executes arbitrary command inside the pod
 //
