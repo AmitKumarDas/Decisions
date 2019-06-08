@@ -1,5 +1,5 @@
 ### Motivation
-Ops represents a pipeline which is targetted to implement a set of ordered instructions. Ops approach defined in this proposal allows business logic i.e. code to be more cohesive. This approach lets developers to express logic which is more readable and hence easy to understand.
+Ops represents a pipeline which is targeted to implement a set of ordered instructions. Ops approach defined in this proposal is primarily meant to be used while writing `test logic` or `tools` that cater to specific domain. In other words this pattern seems fit to be called as a domain specific language i.e. **DSL**. It allows business logic i.e. code to be more cohesive and specific to a targeted domain. This approach lets developers to express logic which is more readable and hence easy to understand.
 
 ### Issues without a proper ops approach -- some observations
 - Rise of utils _(IMO this is an anti-pattern)_
