@@ -13,9 +13,7 @@ err := pipe.New().
   Desc(`
     As a test developer, I want to verify the number
     of Healthy cstor pools of a given SPC against an
-    expected value. I would also like to retry above
-    expectation for a given number of attempts before
-    giving up.
+    expected value.
   `).
   Add(
     cspops.New().
@@ -97,22 +95,30 @@ func VerifyNDMDaemonSet() pipe.Runner{
   - To repeat, Ops builder differs from core builder due to its immediate execution style
 
 ```go
+// pkg/pipe/v1alpha1/doc.go
+
+// What is a pipe?
+//
+// pipe can be thought of as a
+// pipeline of a set of ordered
+// operations
+```
+
+```go
 // pkg/pipe/v1alpha1/interface.go
 
-// Runner abstracts execution of an
-// operation
-type Runner interface {
-  // Run does the actual execution of 
-  // operation
-  Run() error
+// Pipeline defines the contracts
+// supported by a pipeline
+type Pipeline interface {
+  Start() error
 }
 
-// Verifier abstracts verfication of
-// an operation
-type Verifier interface {
-  // Verify verifies if operation execution
-  // was successful
-  Verify() error
+// Operation defines the contracts
+// supported by a pipeline operation
+type Operation interface {
+  // Run does the actual execution of 
+  // an operation
+  Run() error
 }
 ```
 
@@ -133,15 +139,35 @@ type (f *FailedPipe) Error() string {
   return f
 }
 
-type Base struct {
+type Options struct {
   Retry       *Retry
 }
 
-type Option func(*Base)
+type OptionsFn func(*Options)
 
-type Pipeline struct {
+func NewOptions(fns ...OptionsFn) *Options {
+  o := &Options{}
+  for _, fn := range fns {
+    fn(o)
+  }
+  return o
+}
+
+func (o *Options) Run(op Operation) error {
+  err := op.Run()
+  if err == nil {
+    return nil
+  }
+
+  return o.Retry.Run(op)
+}
+
+// Default is the default implementation
+// of a Pipeline
+type Default struct {
   *Base
   Description string
+  Operations map[Operation][]Option
 }
 
 type Retry struct {
@@ -156,11 +182,19 @@ func WithRetry(attempts int, interval string) Option {
   }
 }
 
-func New() Pipeline {
-  return &Pipeline{Base: &Base{}}
+func New(opts ...Option) Default {
+  d := &Default{Base: &Base{}}
+  d.setOptions(opts...)
+  return d
 }
 
-func (d *Pipeline) handleError(err error) error {
+func (d *Default) setOptions(opts ...Option) {
+  for _, option := range opts {
+    option(d.Base)
+  }
+}
+
+func (d *Default) handleError(err error) error {
   return &FailedPipe{
     Statement: d.Description,
     Result: "Failed",
@@ -168,22 +202,21 @@ func (d *Pipeline) handleError(err error) error {
   }
 }
 
-func (d *Pipeline) setOptions(opts ...Option) {
-  for _, option := range opts {
-    option(d.Base)
-  }
-}
-
-func (d *Pipeline) Desc(msg string) *Default{
+func (d *Default) Desc(msg string) *Default{
   d.Description = msg
   return d
 }
 
-func (d *Pipeline) Run(runner ops.Runner, opts ...Option) error {
-  d.setOptions(opts...)
+func (d *Default) Add(op Operation, opts ...Option) *Default{
+  options := append(options, opts...)
+  d.Operations[op] = options
+  return d
+}
+
+func (d *Default) Start() error {
   var err error
-  for _ := range d.Retry.Attempts {
-    err = runner.Run()
+  for op, opts := range d.Operations {
+    err = op.Run()
     if err == nil {
       return nil
     }
