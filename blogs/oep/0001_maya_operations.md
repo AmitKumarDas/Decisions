@@ -9,7 +9,7 @@ Maya Ops represents a pipeline which is targeted to implement a set of ordered i
 ```go
 // pkg/tools/spc/health_check_csp/main.go
 
-err := ops.New().
+err := pipe.New().
   Desc(`
     As a test developer, I want to verify the number
     of Healthy cstor pools of a given SPC against an
@@ -17,13 +17,12 @@ err := ops.New().
     expectation for a given number of attempts before
     giving up.
   `).
-  WithRunner(
-    cspops.New().Steps(
-      cspops.List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)),
-      cspops.Filter(csp.IsStatus("Healthy")),
-      cspops.VerifyLenEQ(count),
-    ),
-    ops.RetryOnError(20, "3s"),  
+  Add(
+    cspops.New().
+      List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
+      Filter(csp.IsStatus("Healthy")).
+      VerifyLenEQ(count),
+    pipe.RetryOnError(10, "3s"),
   ).
   Run()
 ```
@@ -32,7 +31,7 @@ err := ops.New().
 ```go
 // pkg/tools/openebs/health_check/main.go
 
-type VerifyOpenEBSFn func() ops.Runner
+type VerifyOpenEBSFn func() pipe.Runner
 
 var VerifyOpenEBSFns = []VerifyOpenEBSFn{
   VerifyMayaAPIServer,
@@ -50,38 +49,36 @@ func VerifyOpenEBS() error {
   return nil
 }
 
-func VerifyMayaAPIServer() ops.Runner {
-  return ops.New().
+func VerifyMayaAPIServer() pipe.Runner {
+  return pipe.New().
     Desc(`
       As an openebs admin, I want to test if maya api 
       server is installed and all its pods are in running
       state
     `).
-    WithRunner(
-      podops.New().Steps(
-        podops.WithNamespace(openebs),
-        podops.List(pod.ListOpts(MayaAPIServerLabelSelector)),
-        podops.Filter(pod.IsRunning()),
-        podops.VerifyLenEQ(MayaAPIServerPodCount),
-      ),
-      ops.RetryOnError(10, "3s"),
+    Add(
+      podops.New().
+        WithNamespace(openebs).
+        List(pod.ListOpts(MayaAPIServerLabelSelector)).
+        Filter(pod.IsRunning()).
+        VerifyLenEQ(MayaAPIServerPodCount),
+      ops.RetryOption(10, "3s"),
     )
 }
 
-func VerifyNDMDaemonSet() ops.Runner{
-  return ops.New().
+func VerifyNDMDaemonSet() pipe.Runner{
+  return pipe.New().
     Desc(`
       As an openebs admin, I want to test if NDM daemon set 
       is installed and all its pods are in running state
     `).
-    WithRunner(
-      podops.New().Steps(
-        podops.WithNamespace(openebs),
-        podops.List(pod.ListOpts(NDMDaemonSetLabelSelector)),
-        podops.Filter(pod.IsRunning()),
-        podops.VerifyLenEQ(NDMDaemonSetPodCount),      
-      ),
-      ops.RetryOnError(10, "3s"),
+    Add(
+      podops.New().
+        WithNamespace(openebs).
+        List(pod.ListOpts(NDMDaemonSetLabelSelector)).
+        Filter(pod.IsRunning()).
+        VerifyLenEQ(NDMDaemonSetPodCount),
+      pipe.RetryOnError(10, "3s"),
     )
 }
 ```
@@ -100,7 +97,7 @@ func VerifyNDMDaemonSet() ops.Runner{
   - To repeat, Ops builder differs from core builder due to its immediate execution style
 
 ```go
-// pkg/ops/v1alpha1/interface.go
+// pkg/pipe/v1alpha1/interface.go
 
 // Runner abstracts execution of an
 // operation
@@ -120,19 +117,19 @@ type Verifier interface {
 ```
 
 ```go
-// pkg/ops/v1alpha1/ops.go
+// pkg/pipe/v1alpha1/pipe.go
 
-type FailedOperation struct {
+type FailedPipe struct {
   Statement string
   Result    string
   Reason    string
 }
 
-type (f *FailedOperation) String() string {
+type (f *FailedPipe) String() string {
   return "statement: %s,\nresult: %s,\nreason: %s\n"
 }
 
-type (f *FailedOperation) Error() string {
+type (f *FailedPipe) Error() string {
   return f
 }
 
@@ -142,7 +139,7 @@ type Base struct {
 
 type Option func(*Base)
 
-type DefaultRunner struct {
+type Pipeline struct {
   *Base
   Description string
 }
@@ -159,30 +156,30 @@ func WithRetry(attempts int, interval string) Option {
   }
 }
 
-func New() DefaultRunner {
-  return &DefaultRunner{Base: &Base{}}
+func New() Pipeline {
+  return &Pipeline{Base: &Base{}}
 }
 
-func (d *DefaultRunner) handleError(err error) error {
-  return &FailedOperation{
+func (d *Pipeline) handleError(err error) error {
+  return &FailedPipe{
     Statement: d.Description,
     Result: "Failed",
     Reason: err.Error(),
   }
 }
 
-func (d *DefaultRunner) setOptions(opts ...Option) {
+func (d *Pipeline) setOptions(opts ...Option) {
   for _, option := range opts {
     option(d.Base)
   }
 }
 
-func (d *DefaultRunner) Desc(msg string) *Default{
+func (d *Pipeline) Desc(msg string) *Default{
   d.Description = msg
   return d
 }
 
-func (d *DefaultRunner) Run(runner ops.Runner, opts ...Option) error {
+func (d *Pipeline) Run(runner ops.Runner, opts ...Option) error {
   d.setOptions(opts...)
   var err error
   for _ := range d.Retry.Attempts {
@@ -197,7 +194,9 @@ func (d *DefaultRunner) Run(runner ops.Runner, opts ...Option) error {
 }
 
 
+// ----------------------------
 // TODO Refactor Below !!!
+// ----------------------------
 
 
 // OperationListRunner is a concrete implementation
