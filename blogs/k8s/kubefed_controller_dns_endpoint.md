@@ -59,15 +59,15 @@ d.dnsObjectStore, d.dnsObjectController, err = util.NewGenericInformer(
 )
 
 if minimizeLatency {
-	d.minimizeLatency()
+  d.minimizeLatency()
 }
 
 d.queue = workqueue.NewNamedRateLimitingQueue(
   workqueue.NewItemExponentialFailureRateLimiter(
-	  d.minRetryDelay, 
-	  d.maxRetryDelay,
-	), 
-	objectKind+"DNSEndpoint",
+    d.minRetryDelay, 
+    d.maxRetryDelay,
+  ), 
+  objectKind+"DNSEndpoint",
 )
 ```
 ```go
@@ -103,7 +103,7 @@ func (d *controller) Run(stopCh <-chan struct{}) {
   for i := 0; i < numWorkers; i++ {
     // here d.worker is a function that
     // satisfies the signature of wait.Until
-	  go wait.Until(d.worker, time.Second, stopCh)
+    go wait.Until(d.worker, time.Second, stopCh)
   }
 
 <-stopCh
@@ -119,7 +119,7 @@ func (d *controller) Run(stopCh <-chan struct{}) {
 func (d *controller) worker() {
   // processNextWorkItem will automatically wait until there's work available
   for d.processNextItem() {
-	  // continue looping
+    // continue looping
   }
 }
 
@@ -136,19 +136,19 @@ func (d *controller) processNextItem() bool {
   err := d.processItem(key.(string))
 
   if err == nil {
-	  // No error, tell the queue to stop tracking history
-	  d.queue.Forget(key)
+    // No error, tell the queue to stop tracking history
+    d.queue.Forget(key)
 
   } else if d.queue.NumRequeues(key) < maxRetries {
-	  klog.Errorf("Error processing %s (will retry): %v", key, err)
-	  // requeue the item to work on later
-	  d.queue.AddRateLimited(key)
+    klog.Errorf("Error processing %s (will retry): %v", key, err)
+    // requeue the item to work on later
+    d.queue.AddRateLimited(key)
 
   } else {
-	  // err != nil and too many retries
-	  klog.Errorf("Error processing %s (giving up): %v", key, err)
-	  d.queue.Forget(key)
-	  runtime.HandleError(err)
+    // err != nil and too many retries
+    klog.Errorf("Error processing %s (giving up): %v", key, err)
+    d.queue.Forget(key)
+    runtime.HandleError(err)
   }
 
   return true
@@ -170,10 +170,10 @@ func (d *controller) processNextItem() bool {
 func (d *controller) enqueueObject(obj pkgruntime.Object) {
   key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
   if err != nil {
-	  klog.Errorf("Couldn't get key for object %#v: %v", obj, err)
-	  return
+    klog.Errorf("Couldn't get key for object %#v: %v", obj, err)
+    return
   }
-	
+
   d.queue.Add(key)
 }
 
@@ -182,16 +182,16 @@ func (d *controller) processItem(key string) error {
   startTime := time.Now()
   klog.V(4).Infof("Processing change to %q DNSEndpoint %s", d.dnsObjectKind, key)
   defer func() {
-	  klog.V(4).Infof("Finished processing %q DNSEndpoint %q (%v)", d.dnsObjectKind, key, time.Since(startTime))
+    klog.V(4).Infof("Finished processing %q DNSEndpoint %q (%v)", d.dnsObjectKind, key, time.Since(startTime))
   }()
 
-	...
+  ...
 }
 
 // minimizeLatency reduces delays and timeouts to make the controller 
 // more responsive (useful for testing).
 func (d *controller) minimizeLatency() {
-	d.minRetryDelay = 50 * time.Millisecond
-	d.maxRetryDelay = 2 * time.Second
+  d.minRetryDelay = 50 * time.Millisecond
+  d.maxRetryDelay = 2 * time.Second
 }
 ```
