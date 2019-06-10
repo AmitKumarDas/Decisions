@@ -92,8 +92,8 @@ func (d *controller) Run(stopCh <-chan struct{}) {
 
   // wait for the caches to synchronize before starting the worker
   if !cache.WaitForCacheSync(stopCh, d.dnsObjectController.HasSynced) {
-	  runtime.HandleError(errors.New("Timed out waiting for caches to sync"))
-	  return
+    runtime.HandleError(errors.New("Timed out waiting for caches to sync"))
+    return
   }
 
   klog.Infof("%q DNSEndpoint controller synced and ready", d.dnsObjectKind)
@@ -128,7 +128,7 @@ func (d *controller) processNextItem() bool {
   if quit {
     // this is the only instance when
     // false is returned
-	  return false
+    return false
   }
   defer d.queue.Done(key)
 
@@ -182,7 +182,12 @@ func (d *controller) processItem(key string) error {
   startTime := time.Now()
   klog.V(4).Infof("Processing change to %q DNSEndpoint %s", d.dnsObjectKind, key)
   defer func() {
-    klog.V(4).Infof("Finished processing %q DNSEndpoint %q (%v)", d.dnsObjectKind, key, time.Since(startTime))
+    klog.V(4).Infof(
+      "Finished processing %q DNSEndpoint %q (%v)", 
+      d.dnsObjectKind, 
+      key, 
+      time.Since(startTime),
+    )
   }()
 
   ...
