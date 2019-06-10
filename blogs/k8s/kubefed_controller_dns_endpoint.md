@@ -19,20 +19,20 @@
 type GetEndpointsFunc func(interface{}) ([]*feddnsv1a1.Endpoint, error)
 
 type controller struct {
-	client genericclient.Client
+  client genericclient.Client
 
-	// Informer Store for DNS objects
-	dnsObjectStore cache.Store
+  // Informer Store for DNS objects
+  dnsObjectStore cache.Store
 
-	// Informer controller for DNS objects
-	dnsObjectController cache.Controller
+  // Informer controller for DNS objects
+  dnsObjectController cache.Controller
 
-	dnsObjectKind string
-	getEndpoints  GetEndpointsFunc
+  dnsObjectKind string
+  getEndpoints  GetEndpointsFunc
 
-	queue         workqueue.RateLimitingInterface
-	minRetryDelay time.Duration
-	maxRetryDelay time.Duration
+  queue         workqueue.RateLimitingInterface
+  minRetryDelay time.Duration
+  maxRetryDelay time.Duration
 }
 ```
 
