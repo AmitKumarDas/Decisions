@@ -5,6 +5,29 @@
 Let's take a look at a more complex example now, which uses both interfaces. Suppose we wanted to have a field stored as gzipped compressed text in the database. We'll want to implement the Valuer interface, as before, as a way of automatically compressing data on its way to the database:
 
 ```go
+type Valuer interface {
+  // Value returns a driver Value.
+  Value() (Value, error)
+}
+```
+
+```go
+type Scanner interface {
+  // Scan assigns a value from a database driver.
+  //
+  // The src value will be of one of the following restricted
+  // set of types:
+  //
+  //    int64, float64, bool, []byte, string, time.Time
+  //    nil - for NULL values
+  //
+  // An error should be returned if the value can not be stored
+  // without loss of information.
+  Scan(src interface{}) error
+}
+```
+
+```go
 type GzippedText []byte
 
 func (g GzippedText) Value() (driver.Value, error) {
