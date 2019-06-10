@@ -47,7 +47,7 @@ func (r *Reconcile) Run() error {
   var actions = []Action {
     Delete(IsObjectNotExists),
     Create(IsChildrenNotExists),
-    Update(IsDiff),
+    Update(IsObjectDiff),
   }
 
   for _, act := range actions {
