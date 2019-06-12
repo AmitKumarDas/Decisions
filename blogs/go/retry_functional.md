@@ -6,7 +6,7 @@
 // usage
 err := retry.Times(2).Wait(3 * time.Second).Try(func(attempt uint) error {
   return command.DownloadAndUnZIP(
-	  downloadLocation.Src, 
+ 	  downloadLocation.Src, 
     stepPth,
   )
 })
