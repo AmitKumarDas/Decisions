@@ -120,3 +120,53 @@ ctrl.contentQueue = workqueue.NewNamedRateLimitingQueue(
   "csi-snapshotter-content",
 )
 ```
+
+```go
+// constructor: listers & informers
+
+import (
+  storageinformers "github.com/kubernetes-csi/external-snapshotter/pkg/client/informers/externalversions/volumesnapshot/v1alpha1"
+  storagelisters "github.com/kubernetes-csi/external-snapshotter/pkg/client/listers/volumesnapshot/v1alpha1"
+
+  coreinformers "k8s.io/client-go/informers/core/v1"
+  corelisters "k8s.io/client-go/listers/core/v1"
+)
+
+// NewCSISnapshotController returns a new *csiSnapshotController
+func NewCSISnapshotController(
+  volumeSnapshotInformer        storageinformers.VolumeSnapshotInformer,
+  volumeSnapshotContentInformer storageinformers.VolumeSnapshotContentInformer,
+  volumeSnapshotClassInformer   storageinformers.VolumeSnapshotClassInformer,
+  pvcInformer                   coreinformers.PersistentVolumeClaimInformer,
+  resyncPeriod                  time.Duration,
+) *csiSnapshotController {
+
+ctrl.pvcLister = pvcInformer.Lister()
+ctrl.pvcListerSynced = pvcInformer.Informer().HasSynced
+
+ctrl.classLister = volumeSnapshotClassInformer.Lister()
+ctrl.classListerSynced = volumeSnapshotClassInformer.Informer().HasSynced
+
+volumeSnapshotInformer.Informer().AddEventHandlerWithResyncPeriod(
+  cache.ResourceEventHandlerFuncs{
+    AddFunc:    func(obj interface{}) { ctrl.enqueueSnapshotWork(obj) },
+    UpdateFunc: func(oldObj, newObj interface{}) { ctrl.enqueueSnapshotWork(newObj) },
+    DeleteFunc: func(obj interface{}) { ctrl.enqueueSnapshotWork(obj) },
+  },
+ctrl.resyncPeriod,
+)
+ctrl.snapshotLister = volumeSnapshotInformer.Lister()
+ctrl.snapshotListerSynced = volumeSnapshotInformer.Informer().HasSynced
+
+volumeSnapshotContentInformer.Informer().AddEventHandlerWithResyncPeriod(
+  cache.ResourceEventHandlerFuncs{
+    AddFunc:    func(obj interface{}) { ctrl.enqueueContentWork(obj) },
+    UpdateFunc: func(oldObj, newObj interface{}) { ctrl.enqueueContentWork(newObj) },
+    DeleteFunc: func(obj interface{}) { ctrl.enqueueContentWork(obj) },
+  },
+  ctrl.resyncPeriod,
+)
+ctrl.contentLister = volumeSnapshotContentInformer.Lister()
+ctrl.contentListerSynced = volumeSnapshotContentInformer.Informer().HasSynced
+}
+```
