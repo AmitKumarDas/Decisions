@@ -49,7 +49,7 @@ if content.Spec.VolumeSnapshotRef.UID == "" {
 }
 ```
 
-// https://github.com/kubernetes-csi/external-snapshotter/blob/master/pkg/controller/snapshot_controller_base.go
+- https://github.com/kubernetes-csi/external-snapshotter/blob/master/pkg/controller/snapshot_controller_base.go
 ```go
 type csiSnapshotController struct {
   clientset       clientset.Interface
@@ -82,4 +82,24 @@ type csiSnapshotController struct {
   createSnapshotContentInterval   time.Duration
   resyncPeriod                    time.Duration
 }
+```
+
+```go
+// constructor
+
+broadcaster := record.NewBroadcaster().
+  StartLogging(klog.Infof).
+  StartRecordingToSink(
+    &corev1.EventSinkImpl{
+      Interface: client.CoreV1().Events(v1.NamespaceAll),
+    },
+  )
+
+var eventRecorder record.EventRecorder
+eventRecorder = broadcaster.NewRecorder(
+  scheme.Scheme, 
+  v1.EventSource{
+    Component: fmt.Sprintf("csi-snapshotter %s", snapshotterName),
+  },
+)
 ```
