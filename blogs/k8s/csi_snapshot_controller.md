@@ -85,7 +85,7 @@ type csiSnapshotController struct {
 ```
 
 ```go
-// constructor
+// constructor: event
 
 broadcaster := record.NewBroadcaster().
   StartLogging(klog.Infof).
@@ -101,5 +101,22 @@ eventRecorder = broadcaster.NewRecorder(
   v1.EventSource{
     Component: fmt.Sprintf("csi-snapshotter %s", snapshotterName),
   },
+)
+```
+
+```go
+// constructor: store & queue
+
+ctrl.snapshotStore = cache.NewStore(cache.DeletionHandlingMetaNamespaceKeyFunc)
+ctrl.contentStore = cache.NewStore(cache.DeletionHandlingMetaNamespaceKeyFunc)
+
+ctrl.snapshotQueue = workqueue.NewNamedRateLimitingQueue(
+  workqueue.DefaultControllerRateLimiter(),
+  "csi-snapshotter-snapshot"
+)
+
+ctrl.contentQueue = workqueue.NewNamedRateLimitingQueue(
+  workqueue.DefaultControllerRateLimiter(), 
+  "csi-snapshotter-content",
 )
 ```
