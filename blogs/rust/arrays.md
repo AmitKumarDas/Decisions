@@ -34,6 +34,27 @@ let a: &[i32] = &[1, 2, 3, 4];
 - We then take a reference to it (type &[i32; 4])
 - That reference is **coerced** to type &[i32]
 
+### Acess is bounds checked
+- You can also check the length yourself by using len()
+  - So clearly the length of the array is known somewhere. 
+- **Bounds checking**, which is an integral part of **memory safety**. 
+- The size is known dynamically (as opposed to statically in the case of fixed length arrays),
+  - Hence slice types are dynamically sized types **(DSTs)**
+  - _**FUN:** !!! DST ~ Dessert !!! You want to know Size of Your Dessert !!!_
+
+### How's of DST
+- Slice is just a sequence of values,
+- Is the size stored as part of the slice?
+  - **NO**
+- Instead it is stored as part of the pointer
+  - **Part of the Pointer?**
+  - Remember that slices must always exist as pointer types
+  - A pointer to a slice (like all pointers to DSTs) is a **fat pointer**
+  - It is **two words** wide, rather than one, 
+  - Contains the pointer to the **data** + **a payload**
+  - In the case of slices, the payload is the length of the slice
+
+
 ### If you want a C-like array
 - You need to explicitly make a pointer to the array
 - This will **give you a Pointer to the FIRST element**
