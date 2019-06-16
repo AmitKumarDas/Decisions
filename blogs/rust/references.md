@@ -2,3 +2,4 @@
 - https://rust-embedded.github.io/book/
 - https://doc.rust-lang.org/stable/book/
 - https://github.com/clux/kube-rs
+- https://github.com/nrc/r4cppp/
