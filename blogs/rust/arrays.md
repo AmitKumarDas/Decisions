@@ -52,8 +52,35 @@ let a: &[i32] = &[1, 2, 3, 4];
   - A pointer to a slice (like all pointers to DSTs) is a **fat pointer**
   - It is **two words** wide, rather than one, 
   - Contains the pointer to the **data** + **a payload**
-  - In the case of slices, the payload is the length of the slice
+  - In the case of slices, the **payload is the length of the slice**
+  - _**FUN**: !!!Pay load is lengthy!!! like Bank EMIs that like to get paid long!!!_
+- **QUERY:** !!!Is length same as size in terms of rust jargons!!!
 
+### Fat Pointer for `let a: &[i32] = &[1, 2, 3, 4];`
+- The pointer a will be 128 bits wide (on a 64 bit system) ~ _**2 words**_
+- First 64 bits will store the address of the 1 in the sequence [1, 2, 3, 4], &
+- Second 64 bits will contain 4 == payload == length
+- Usually, as a Rust programmer, these fat pointers can just be treated as regular pointers
+  - But it is good to know about (it can affect the things you can do with casts, for example)
+
+### Range Syntax with Arrays
+```rust
+let a: [i32; 4] = [1, 2, 3, 4];
+let b: &[i32] = &a;   // Slice of the whole array.
+let c = &a[0..4];     // Another slice of the whole array, also has type &[i32].
+let c = &a[1..3];     // The middle two elements, &[i32].
+let c = &a[1..];      // The last three elements.
+let c = &a[..3];      // The first three elements.
+let c = &a[..];       // The whole array, again.
+let c = &b[1..3];     // We can also slice a slice.
+```
+- **Trick: Left & Right Numbers** - Subtract the numbers to get the number of elements
+- **Trick: One Sided Number** - left is excluded if left is set
+- **Trick: One Sided Number** - right is included if right is set
+
+### Amazing Ops w.r.t Range Syntax
+- a..b produces an iterator which runs from a to b-1
+- This can be combined with other iterators in the usual way, or can be used in for loops:
 
 ### If you want a C-like array
 - You need to explicitly make a pointer to the array
