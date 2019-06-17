@@ -1,8 +1,18 @@
+### Crash Learning
+```rust
+fn example_simple()
+fn example_params(x: u64, y: &u64, z: &mut u64)
+fn example_returns(x: u64) -> u64
+fn example_generic<U: Read>(reader: U) -> u64
+fn example_generic_alt<U>(reader: U) -> u64
+    where U: Read
+```
+
+
 ```rust
 // amitd: initial learnings in rust
 // tag: fmt, format
 
-// - fn are terse
 // - we implement trait for struct
 // - fn returns are indicated by arrow i.e. ->
 // - :: is used between package::Struct
