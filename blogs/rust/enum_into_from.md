@@ -10,13 +10,13 @@
 
 ```rust
 pub enum MyError {
-    Io(io::Error),
-    Utf8(Utf8Error)
+  Io(io::Error),
+  Utf8(Utf8Error)
 }
 
 impl From<io::Error> for MyError {
-    fn from(err: io::Error) -> MyError {
-        MyError::Io(err)
-    }
+  fn from(err: io::Error) -> MyError {
+    MyError::Io(err)
+  }
 }
 ```
