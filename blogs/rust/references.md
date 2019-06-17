@@ -3,3 +3,4 @@
 - https://doc.rust-lang.org/stable/book/
 - https://github.com/clux/kube-rs
 - https://github.com/nrc/r4cppp/
+- https://github.com/ctjhoa/rust-learning/blob/master/README.md
