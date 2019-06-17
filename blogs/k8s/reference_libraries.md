@@ -8,4 +8,5 @@
 // https://github.com/nats-io/nats-operator/
 // https://github.com/jaegertracing/jaeger-operator/
 // https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/types.go
+// https://github.com/kubernetes-csi/csi-lib-utils/blob/master/leaderelection/leader_election.go
 ```
