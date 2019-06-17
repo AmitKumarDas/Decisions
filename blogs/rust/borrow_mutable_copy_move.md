@@ -1,3 +1,6 @@
+### References:
+- https://brson.github.io/rust-anthology/1/understanding-over-guesswork.html
+
 ### Notes:
 - Borrowing types:
   - Immutably borrowing (&), 
@@ -33,3 +36,9 @@ fn main() {
   rad.push('c');
 } // foo is destroyed.
 ```
+
+### Further Details
+- No worries about making sure each of their malloc() calls have a corresponding free()
+- No need to rely on an outside tool (ref) to discover such errors
+- The borrow checker determines when a value has been moved into a function call
+  - and should not be further used in the caller
