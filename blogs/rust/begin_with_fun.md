@@ -1,3 +1,6 @@
+### References
+- https://brson.github.io/rust-anthology/1/understanding-over-guesswork.html
+
 ### Crash Learning
 ```rust
 fn example_simple()
