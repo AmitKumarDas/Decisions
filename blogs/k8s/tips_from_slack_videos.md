@@ -6,3 +6,8 @@
 - Serializers read versioned objects
 - Decoders wrap serializers 
 - Decoders perform domain specific actions like defaulting and/or converting to internal version
+
+### Probes
+- readiness
+- liveness
+- startup
