@@ -37,6 +37,8 @@ spec:
   version: 1.1.0
   components:
   # installs local provisioner only
+  # un-installs other components if 
+  # installed previously
   - name: LocalProvisioner
 ```
 
@@ -51,6 +53,8 @@ spec:
   version: 1.1.0  
   components:
   # installs specified components
+  # un-installs other components if
+  # installed previously
   - name: LocalProvisioner
   - name: MayaAPIServer
   - name: ExternalCSIProvisioner
@@ -66,7 +70,9 @@ metadata:
 spec:
   # installs or upgrades to OpenEBS 1.1.0
   version: 1.1.0
-  # optional config name
+  # optional config name; operator can
+  # look up this config by using its 
+  # metadata.name value
   config: the-one-and-only
 ```
 
