@@ -22,8 +22,7 @@ metadata:
   name: TheOne
   namespace: openebs
 spec:
-  # installs all supported components
-  # w.r.t OpenEBS release 1.1.0
+  # installs or upgrades to OpenEBS 1.1.0
   version: 1.1.0
 ```
 
@@ -34,7 +33,7 @@ metadata:
   name: TheOne
   namespace: openebs
 spec:
-  # installs or upgrades to 1.1.0
+  # installs or upgrades to OpenEBS 1.1.0
   version: 1.1.0
   components:
   # installs local provisioner only
@@ -48,7 +47,7 @@ metadata:
   name: TheOne
   namespace: openebs
 spec:
-  # installs or upgrades to 1.1.0
+  # installs or upgrades to OpenEBS 1.1.0
   version: 1.1.0
   components:
   # installs specified components
