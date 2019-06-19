@@ -11,6 +11,7 @@ OpenEBS operator should ideally take over most of the manual operations needed t
 ### Possible Custom Resources
 - Operator
 - ReleaseConfig
+- ReleaseJob
 - ConfigInjector
 
 ### Sample Schemas
@@ -76,6 +77,22 @@ spec:
   config: the-one-and-only
 ```
 
+#### Operator - Sample 5
+```yaml
+kind: Operator
+metadata:
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  # installs or upgrades to OpenEBS 1.1.0
+  version: 1.1.0
+
+  # optional release based jobs; operator
+  # can look up this release job by using
+  # its metadata.name value
+  job: the-one-and-only
+```
+
 #### ReleaseConfig - Sample 1
 ```yaml
 kind: ReleaseConfig
@@ -84,6 +101,10 @@ metadata:
   namespace: openebs
 spec:
   components:
+  # these components are understood internally
+  # i.e. controller logic via their names;
+  # controller understands if a component is a 
+  # deployment, or STS, or DaemonSet, or Job, etc.
   - name: MayaAPIServer
     image: quay.io/openebs/m-apiserver
     imageTag: 1.0.0
@@ -95,6 +116,20 @@ spec:
   - name: NDM
     image: quay.io/openebs/ndm
     imageTag: 0.5.0
+    namespace: openebs
+```
+
+#### ReleaseJob - Sample 1
+```yaml
+kind: ReleaseJob
+metadata:
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  tasks:
+  - name: DeleteOrphanCStorVolume
+    image: quay.io/openebs/m-orhpancstordel
+    imageTag: 0.0.1
     namespace: openebs
 ```
 
