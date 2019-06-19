@@ -64,3 +64,6 @@ spec:
 #### ConfigInjector - Sample 1
 ```yaml
 ```
+
+#### References
+- [OEP on CSI](https://github.com/openebs/openebs/pull/2617/)
