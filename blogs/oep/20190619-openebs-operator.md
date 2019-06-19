@@ -19,7 +19,7 @@ OpenEBS operator should ideally take over most of the manual operations needed t
 ```yaml
 kind: Operator
 metadata:
-  name: TheOne
+  name: the-one-and-only
   namespace: openebs
 spec:
   # installs or upgrades to OpenEBS 1.1.0
@@ -30,35 +30,66 @@ spec:
 ```yaml
 kind: Operator
 metadata:
-  name: TheOne
+  name: the-one-and-only
   namespace: openebs
 spec:
   # installs or upgrades to OpenEBS 1.1.0
   version: 1.1.0
   components:
   # installs local provisioner only
-  - name: local-provisioner
+  - name: LocalProvisioner
 ```
 
 #### Operator - Sample 3
 ```yaml
 kind: Operator
 metadata:
-  name: TheOne
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  # installs or upgrades to OpenEBS 1.1.0
+  version: 1.1.0  
+  components:
+  # installs specified components
+  - name: LocalProvisioner
+  - name: MayaAPIServer
+  - name: ExternalCSIProvisioner
+  - name: NDM
+```
+
+#### Operator - Sample 4
+```yaml
+kind: Operator
+metadata:
+  name: the-one-and-only
   namespace: openebs
 spec:
   # installs or upgrades to OpenEBS 1.1.0
   version: 1.1.0
-  components:
-  # installs specified components
-  - name: local-provisioner
-  - name: maya-api-server
-  - name: external-provisioner
-  - name: ndm
+  # optional config name
+  config: the-one-and-only
 ```
 
 #### ReleaseConfig - Sample 1
 ```yaml
+kind: ReleaseConfig
+metadata:
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  components:
+  - name: MayaAPIServer
+    image: quay.io/openebs/m-apiserver
+    imageTag: 1.0.0
+    namespace: openebs
+    sidecars:
+    - name: maya-exporter
+      image: quay.io/openebs/m-exporter
+      imageTag: 1.0.0
+  - name: NDM
+    image: quay.io/openebs/ndm
+    imageTag: 0.5.0
+    namespace: openebs
 ```
 
 #### ConfigInjector - Sample 1
