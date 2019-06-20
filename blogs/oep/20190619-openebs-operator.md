@@ -11,7 +11,6 @@ OpenEBS operator should ideally take over most of the manual operations needed t
 ### Possible Custom Resources
 - Operator
 - ReleaseConfig
-- ReleaseJob
 - ConfigInjector
 
 ### Sample Schemas
@@ -23,8 +22,26 @@ metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
-  # installs or upgrades to OpenEBS 1.1.0
-  version: 1.1.0
+  # installs or upgrades OpenEBS to
+  # this specified version
+  version:
+
+  # config is optional; has detailed
+  # speciations of supported components
+  #
+  # operator searches for a config with
+  # same name as that of operator
+  config:
+
+  # components is optional; operator
+  # installs or upgrades all components
+  #
+  # can install specified components only
+  #
+  # will un-install the ones that are not
+  # specified and are running due to 
+  # earlier installations
+  components:  
 ```
 
 #### Operator - Sample 2
@@ -34,14 +51,9 @@ metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
-  # installs or upgrades to OpenEBS 1.1.0
-  version: 1.1.0
-  components:
-  # installs local provisioner only
-  # un-installs other components if 
-  # installed previously
-  - name: LocalProvisioner
+  version: 1.0.0  
 ```
+
 
 #### Operator - Sample 3
 ```yaml
@@ -50,16 +62,9 @@ metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
-  # installs or upgrades to OpenEBS 1.1.0
-  version: 1.1.0  
+  version: 1.1.0
   components:
-  # installs specified components
-  # un-installs other components if
-  # installed previously
   - name: LocalProvisioner
-  - name: MayaAPIServer
-  - name: ExternalCSIProvisioner
-  - name: NDM
 ```
 
 #### Operator - Sample 4
@@ -69,12 +74,12 @@ metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
-  # installs or upgrades to OpenEBS 1.1.0
-  version: 1.1.0
-  # optional config name; operator can
-  # look up this config by using its 
-  # metadata.name value
-  config: the-one-and-only
+  version: 1.1.0  
+  components:
+  - name: LocalProvisioner
+  - name: MayaAPIServer
+  - name: ExternalCSIProvisioner
+  - name: NDM
 ```
 
 #### Operator - Sample 5
@@ -84,31 +89,72 @@ metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
-  # installs or upgrades to OpenEBS 1.1.0
   version: 1.1.0
-
-  # optional release based jobs; operator
-  # can look up this release job by using
-  # its metadata.name value
-  job: the-one-and-only
+  config: the-one-and-only
 ```
 
-#### ReleaseConfig - Sample 1
+#### OperatorConfig - Sample 1
 ```yaml
-kind: ReleaseConfig
+kind: OperatorConfig
+metadata:
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  # optional k8s jobs that are run before reconciling
+  # the operator
+  #
+  # out-of-band pre tasks can be handled here
+  #
+  # pre tasks can be validation, patch, update, create, etc
+  preTasks:
+
+  # optional k8s jobs that are run after reconciling
+  # the operator
+  #
+  # out-of-band post tasks can be handled here
+  #
+  # post tasks should be limited to validation or monitoring
+  # related activities
+  postTasks:
+
+  # component selector is optional
+  #
+  # component selector selects various
+  # openebs components
+  componentSelector:
+  
+  # components should have these labels to be
+  # enabled for operator reconciliation
+  - labels: 
+      openebs.io/is-operator-managed: true
+  
+  # any of these labels can match against the
+  # components labels to enable these components 
+  # for operator reconciliation
+  - labelsAny:
+      openebs.io/version: 0.8.0
+      openebs.io/version: 0.7.0
+
+  # components are understood internally
+  #
+  # operator understands if a component is a 
+  # deployment, or STS, or DaemonSet, or Job, etc.
+  components:
+```
+
+#### OperatorConfig - Sample 2
+```yaml
+kind: OperatorConfig
 metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
   components:
-  # these components are understood internally
-  # i.e. controller logic via their names;
-  # controller understands if a component is a 
-  # deployment, or STS, or DaemonSet, or Job, etc.
   - name: MayaAPIServer
     image: quay.io/openebs/m-apiserver
     imageTag: 1.0.0
     namespace: openebs
+    labelSelector:
     sidecars:
     - name: maya-exporter
       image: quay.io/openebs/m-exporter
@@ -117,20 +163,61 @@ spec:
     image: quay.io/openebs/ndm
     imageTag: 0.5.0
     namespace: openebs
+    labelSelector:
 ```
 
-#### ReleaseJob - Sample 1
+#### OperatorConfig - Sample 3
 ```yaml
-kind: ReleaseJob
+kind: OperatorConfig
 metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
-  tasks:
-  - name: DeleteOrphanCStorVolume
-    image: quay.io/openebs/m-orhpancstordel
+  preTasks:
+  - name: DeleteDeprecatedCRDs
+    image: quay.io/openebs/m-RemoveDeprecated
     imageTag: 0.0.1
     namespace: openebs
+  postTasks:
+  - name: IsOpenEBSRunning
+    image: quay.io/openebs/m-IsRunning
+    imageTag: 0.0.1
+    namespace: openebs
+  components:
+  - name: MayaAPIServer
+    image: quay.io/openebs/m-apiserver
+    imageTag: 1.0.0
+    namespace: openebs
+    labelSelector:
+    sidecars:
+    - name: maya-exporter
+      image: quay.io/openebs/m-exporter
+      imageTag: 1.0.0
+```
+
+#### OperatorConfig - Sample 4
+```yaml
+kind: OperatorConfig
+metadata:
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  componentSelector:
+  - labels: 
+      openebs.io/is-operator-managed: true
+  - labelsAny:
+      openebs.io/version: 0.8.0
+      openebs.io/version: 0.7.0
+  components:
+  - name: MayaAPIServer
+    image: quay.io/openebs/m-apiserver
+    imageTag: 1.0.0
+    namespace: openebs
+    labelSelector:
+    sidecars:
+    - name: maya-exporter
+      image: quay.io/openebs/m-exporter
+      imageTag: 1.0.0
 ```
 
 #### ConfigInjector - Sample 1
