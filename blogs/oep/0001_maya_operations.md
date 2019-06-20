@@ -9,7 +9,8 @@ Maya Ops represents a pipeline which is targeted to implement a set of ordered i
 ```go
 // pkg/tools/spc/health_check_csp/main.go
 
-err := pipe.New().
+err := pipe.
+  New().
   Desc(`
     As a test developer, I want to verify the number
     of Healthy cstor pools of a given SPC against an
@@ -28,16 +29,23 @@ err := pipe.New().
 ```go
 // pkg/tools/openebs/health_check/main.go
 
-type VerifyOpenEBSFn func() pipe.Runner
+// NOTE: This example shows how one can 
+// add pipe.Operation instances and execute
+//
+// NOTE: This can alternatively be implemented
+// as pipe.Pipeline, which has the ability to add
+// operations and execute at the end
 
-var VerifyOpenEBSFns = []VerifyOpenEBSFn{
+type VerifyOpenEBS func() pipe.Operation
+
+var VerifyOpenEBSOps = []VerifyOpenEBS{
   VerifyMayaAPIServer,
   VerifyNDMDaemonSet,
 }
 
 func VerifyOpenEBS() error {
-  for _, runner := range VerifyOpenEBSFns {
-    err := runner().Run()
+  for _, op := range VerifyOpenEBSOps {
+    err := op().Run()
     if err != nil {
       return err
     }
@@ -46,14 +54,15 @@ func VerifyOpenEBS() error {
   return nil
 }
 
-func VerifyMayaAPIServer() pipe.Runner {
-  return pipe.New().
+func VerifyMayaAPIServer() pipe.Operation {
+  return pipe.
+    OperationBuilder().
     Desc(`
       As an openebs admin, I want to test if maya api 
       server is installed and all its pods are in running
       state
     `).
-    Add(
+    Operation(
       podops.New().
         WithNamespace(openebs).
         List(pod.ListOpts(MayaAPIServerLabelSelector)).
@@ -62,13 +71,14 @@ func VerifyMayaAPIServer() pipe.Runner {
     )
 }
 
-func VerifyNDMDaemonSet() pipe.Runner{
-  return pipe.New().
+func VerifyNDMDaemonSet() pipe.Operation{
+  return pipe.
+    OperationBuilder().
     Desc(`
       As an openebs admin, I want to test if NDM daemon set 
       is installed and all its pods are in running state
     `).
-    Add(
+    Operation(
       podops.New().
         WithNamespace(openebs).
         List(pod.ListOpts(NDMDaemonSetLabelSelector)).
