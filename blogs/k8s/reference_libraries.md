@@ -12,4 +12,5 @@
 // config management - https://github.com/pusher/wave
 // https://github.com/zalando-incubator/es-operator
 // https://github.com/kubernetes-csi/external-snapshotter
+// https://github.com/etiennecoutaud/kanary
 ```
