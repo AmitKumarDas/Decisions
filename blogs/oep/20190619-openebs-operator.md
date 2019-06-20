@@ -14,6 +14,8 @@ OpenEBS operator should ideally take over most of the manual operations needed t
 - ConfigInjector
 
 ### Sample Schemas
+#### Operator Custom Resource
+This is the only custom resource that is watched and is reconciled by the operator.
 
 #### Operator - Sample 1
 ```yaml
@@ -93,6 +95,10 @@ spec:
   config: the-one-and-only
 ```
 
+#### OperatorConfig Custom Resource
+OperatorConfig custom resource provides necessary configuration to reconcile openebs operator. This does not have a 
+dedicated controller/watcher of its own.
+
 #### OperatorConfig - Sample 1
 ```yaml
 kind: OperatorConfig
@@ -126,14 +132,11 @@ spec:
   # components should have these labels to be
   # enabled for operator reconciliation
   - labels: 
-      openebs.io/is-operator-managed: true
   
   # any of these labels can match against the
   # components labels to enable these components 
   # for operator reconciliation
   - labelsAny:
-      openebs.io/version: 0.8.0
-      openebs.io/version: 0.7.0
 
   # components are understood internally
   #
