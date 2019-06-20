@@ -19,10 +19,9 @@ err := pipe.New().
     cspops.New().
       List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
       Filter(csp.IsStatus("Healthy")).
-      VerifyLenEQ(count),
-    pipe.RetryOnError(10, "3s"),
+      VerifyLenEQ(count)
   ).
-  Run()
+  Start()
 ```
 
 #### UseCase - OpenEBS Health Check
@@ -37,8 +36,8 @@ var VerifyOpenEBSFns = []VerifyOpenEBSFn{
 }
 
 func VerifyOpenEBS() error {
-  for _, fn := range VerifyOpenEBSFns {
-    err := fn().Run()
+  for _, runner := range VerifyOpenEBSFns {
+    err := runner().Run()
     if err != nil {
       return err
     }
@@ -59,8 +58,7 @@ func VerifyMayaAPIServer() pipe.Runner {
         WithNamespace(openebs).
         List(pod.ListOpts(MayaAPIServerLabelSelector)).
         Filter(pod.IsRunning()).
-        VerifyLenEQ(MayaAPIServerPodCount),
-      ops.RetryOption(10, "3s"),
+        VerifyLenEQ(MayaAPIServerPodCount)
     )
 }
 
@@ -75,8 +73,7 @@ func VerifyNDMDaemonSet() pipe.Runner{
         WithNamespace(openebs).
         List(pod.ListOpts(NDMDaemonSetLabelSelector)).
         Filter(pod.IsRunning()).
-        VerifyLenEQ(NDMDaemonSetPodCount),
-      pipe.RetryOnError(10, "3s"),
+        VerifyLenEQ(NDMDaemonSetPodCount)
     )
 }
 ```
@@ -99,9 +96,8 @@ func VerifyNDMDaemonSet() pipe.Runner{
 
 // What is a pipe?
 //
-// pipe can be thought of as a
-// pipeline of a set of ordered
-// operations
+// Pipe can be thought of as a pipeline
+// of a set of ordered operations
 ```
 
 ```go
@@ -116,82 +112,56 @@ type Pipeline interface {
 // Operation defines the contracts
 // supported by a pipeline operation
 type Operation interface {
+
   // Run does the actual execution of 
-  // an operation
+  // a piped operation
   Run() error
 }
 ```
 
 ```go
-// pkg/pipe/v1alpha1/pipe.go
+// pkg/pipe/v1alpha1/error.go
 
+// FailedPipe represents an error that occurred
+// while running a pipeline
 type FailedPipe struct {
   Statement string
   Result    string
   Reason    string
 }
 
+// String representation of FailedPipe instance
 type (f *FailedPipe) String() string {
   return "statement: %s,\nresult: %s,\nreason: %s\n"
 }
 
+// Error returns self which is an error
 type (f *FailedPipe) Error() string {
   return f
 }
+```
 
-type Options struct {
-  Retry       *Retry
-}
+```go
+// pkg/pipe/v1alpha1/pipe.go
 
-type OptionsFn func(*Options)
-
-func NewOptions(fns ...OptionsFn) *Options {
-  o := &Options{}
-  for _, fn := range fns {
-    fn(o)
-  }
-  return o
-}
-
-func (o *Options) Run(op Operation) error {
-  err := op.Run()
-  if err == nil {
-    return nil
-  }
-
-  return o.Retry.Run(op)
-}
+// Option abstracts setting of Default instance
+type Option func(*Default)
 
 // Default is the default implementation
 // of a Pipeline
 type Default struct {
-  *Base
   Description string
-  Operations map[Operation][]Option
+  Operations []Operation
 }
 
-type Retry struct {
-  Attempts  int
-  Interval  string
-}
-
-func WithRetry(attempts int, interval string) Option {
-  return func(b *Base) {
-    b.Retry.Attempts = attempts
-    b.Retry.Interval = interval
-  }
-}
-
+// New returns a new instance of Default
 func New(opts ...Option) Default {
-  d := &Default{Base: &Base{}}
-  d.setOptions(opts...)
-  return d
-}
+  d := &Default{Description: "default pipeline"}
 
-func (d *Default) setOptions(opts ...Option) {
   for _, option := range opts {
-    option(d.Base)
+    option(d)
   }
+  return d
 }
 
 func (d *Default) handleError(err error) error {
@@ -202,28 +172,33 @@ func (d *Default) handleError(err error) error {
   }
 }
 
+// Desc sets the description of this pipeline
 func (d *Default) Desc(msg string) *Default{
   d.Description = msg
   return d
 }
 
-func (d *Default) Add(op Operation, opts ...Option) *Default{
-  options := append(options, opts...)
-  d.Operations[op] = options
+// Add adds the given operation to the pipeline
+func (d *Default) Add(op Operation) *Default{
+  d.Operations = append(d.Operations, op)
   return d
 }
 
 func (d *Default) Start() error {
   var err error
-  for op, opts := range d.Operations {
+  
+  if len(d.Operations) == 0 {
+    return d.handleError(errors.New("failed to start pipeline: nil operations"))
+  }
+  
+  for _, op := range d.Operations {
     err = op.Run()
-    if err == nil {
-      return nil
+    if err != nil {
+      return d.handleError(err)
     }
-    sleep(d.Retry.Interval)
   }
 
-  return d.handleError(err)
+  return nil
 }
 
 
