@@ -155,25 +155,16 @@ spec:
   # related activities
   postTasks:
 
-  # component selector is optional
+  # labelSelector is optional
   #
-  # component selector selects various
-  # openebs components
-  componentSelector:
-  
-  # components should have these labels to be
-  # enabled for operator reconciliation
-  - labels: 
-  
-  # any of these labels can match against the
-  # components labels to enable these components 
-  # for operator reconciliation
-  - labelsAny:
+  # label selector selects various openebs components via labels
+  # or label expressions
+  labelSelector:
 
   # components are understood internally
   #
-  # operator understands if a component is a 
-  # deployment, or STS, or DaemonSet, or Job, etc.
+  # operator understands if a component is a deployment, or STS, 
+  # or DaemonSet, or Job, etc.
   components:
 ```
 
@@ -237,12 +228,13 @@ metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
-  componentSelector:
-  - labels: 
+  labelSelector:
+    matchLabels: 
       openebs.io/is-operator-managed: true
-  - labelsAny:
-      openebs.io/version: 0.8.0
-      openebs.io/version: 0.7.0
+    matchExpressions:
+    - key: openebs.io/version
+      operator: In
+      values: ["0.8.0", "0.7.0"]
   components:
   - name: MayaAPIServer
     image: quay.io/openebs/m-apiserver
