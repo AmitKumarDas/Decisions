@@ -35,15 +35,25 @@ spec:
   # same name as that of operator
   config:
 
+  # if set to true it disables reconciling the
+  # operator
+  disable:
+
   # components is optional; operator
   # installs or upgrades all components
+  # if this is not set
   #
-  # can install specified components only
+  # can install specified components as-well
   #
   # will un-install the ones that are not
   # specified and are running due to 
   # earlier installations
-  components:  
+  components:
+
+  # if set to true it avoids installing or upgrading
+  # or un-installing openebs components. In other
+  # words it has no effect on existing components.
+  componentsNoEffect:
 ```
 
 #### Operator - Sample 2
@@ -93,6 +103,28 @@ metadata:
 spec:
   version: 1.1.0
   config: the-one-and-only
+```
+
+#### Operator - Sample 6
+```yaml
+kind: Operator
+metadata:
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  version: 1.1.0
+  componentsNoEffect: true
+```
+
+#### Operator - Sample 7
+```yaml
+kind: Operator
+metadata:
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  version: 1.1.0
+  disable: true
 ```
 
 #### OperatorConfig Custom Resource
