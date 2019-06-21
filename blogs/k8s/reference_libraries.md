@@ -14,4 +14,5 @@
 // https://github.com/kubernetes-csi/external-snapshotter
 // https://github.com/etiennecoutaud/kanary
 // https://github.com/portworx/sched-ops/blob/master/k8s/k8s.go
+// https://kubernetes.io/blog/2019/06/20/crd-structural-schema/
 ```
