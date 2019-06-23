@@ -116,7 +116,9 @@ metadata:
   namespace: openebs
 spec:
   version: 1.1.0
-  config: the-one-and-only
+  config:
+    name: the-one-and-only
+    namespace: openebs
 ```
 
 #### Operator - Sample 6
@@ -128,7 +130,7 @@ metadata:
 spec:
   version: 1.1.0  
   crds:
-  - name: AllCRD
+  - name: CRDAll
 ```
 
 #### Operator - Sample 7
@@ -140,10 +142,9 @@ metadata:
 spec:
   version: 1.1.0
   storageclasses:
-  - name: AllStorageClass
-  - name: JivaStorageClass
-  - name: CStorStorageClass
-  - name: LocalPVStorageClass
+  - name: StorageClassJiva
+  - name: StorageClassCStor
+  - name: StorageClassLocalPV
 ```
 
 #### Operator - Sample 8
@@ -285,6 +286,12 @@ spec:
 ##### Test Driven Development (TDD)
 - [ ] Operations based library in Maya
 - [ ] Improve pkg/kubernetes/client package
+- [ ] Improve pkg/kubernetes/deployment package
+- [ ] Add pkg/kubernetes/sts package
+- [ ] Add or Improve pkg/kubernetes/job package
+- [ ] Improve pkg/unstruct package
+- [ ] Add tools folder in maya
+- [ ] Add integration tests in maya that makes use of above tools
 
 ##### Core Development
 - [ ] Dockerfile to build operator
@@ -293,8 +300,21 @@ spec:
 - [ ] GolangCI file for operator
 - [ ] Minikube file for operator
 - [ ] Makefile for operator
-- [ ] tools folder in operator
-- [ ] Integration tests via above tools
+- [ ] Add tools folder in operator
+- [ ] Add integration tests in operator that makes use of above tools
+- [ ] Add pkg/apis/operator/v1alpha1/types_operator.go
+- [ ] Add pkg/apis/operator/v1alpha1/types_config.go
+- [ ] Add pkg/apis/operator/v1alpha1/types_configinjector.go
+- [ ] Update Makefile to include deepcopy code gen for apis package
+- [ ] Add pkg/core/v1alpha1/
+- [ ] Add pkg/core/config/v1alpha1/
+- [ ] Add pkg/core/configinjector/v1alpha1/
+- [ ] Add pkg/reconcile/operator/v1alpha1/
+- [ ] Add pkg/reconcile/configinjector/v1alpha1/
+- [ ] Add pkg/controller/v1alpha1/
+- [ ] Add cmd/operator/main.go
+- [ ] Add cmd/operator/controller.go
+- [ ] Add to tools & integration tests
 
 #### References
 - [OEP on CSI](https://github.com/openebs/openebs/pull/2617/)
