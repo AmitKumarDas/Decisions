@@ -35,6 +35,8 @@ spec:
   # same name as that of operator
   config:
 
+  # disable is optional;
+  #
   # if set to true it disables reconciling the
   # operator
   disable:
