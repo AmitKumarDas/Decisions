@@ -29,7 +29,7 @@ spec:
   version:
 
   # config is optional; has detailed
-  # speciations of supported components
+  # specifications of supported components
   #
   # operator searches for a config with
   # same name as that of operator
