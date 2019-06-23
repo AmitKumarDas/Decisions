@@ -50,10 +50,11 @@ spec:
   # earlier installations
   components:
 
-  # if set to true it avoids installing or upgrading
-  # or un-installing openebs components. In other
-  # words it has no effect on existing components.
-  componentsNoEffect:
+  # crds
+  crds:
+  
+  # storageclasses:
+  storageclasses:
 ```
 
 #### Operator - Sample 2
@@ -92,6 +93,13 @@ spec:
   - name: MayaAPIServer
   - name: ExternalCSIProvisioner
   - name: NDM
+  crds:
+  - name: AllCRD
+  storageclasses:
+  - name: DefaultAllStorageClass
+  - name: DefaultJivaStorageClass
+  - name: DefaultCStorStorageClass
+  - name: DefaultLocalPVStorageClass
 ```
 
 #### Operator - Sample 5
@@ -112,11 +120,27 @@ metadata:
   name: the-one-and-only
   namespace: openebs
 spec:
-  version: 1.1.0
-  componentsNoEffect: true
+  version: 1.1.0  
+  crds:
+  - name: AllCRD
 ```
 
 #### Operator - Sample 7
+```yaml
+kind: Operator
+metadata:
+  name: the-one-and-only
+  namespace: openebs
+spec:
+  version: 1.1.0
+  storageclasses:
+  - name: DefaultAllStorageClass
+  - name: DefaultJivaStorageClass
+  - name: DefaultCStorStorageClass
+  - name: DefaultLocalPVStorageClass
+```
+
+#### Operator - Sample 8
 ```yaml
 kind: Operator
 metadata:
@@ -250,6 +274,21 @@ spec:
 #### ConfigInjector - Sample 1
 ```yaml
 ```
+
+#### Tasks
+##### Test Driven Development (TDD)
+- [ ] Operations based library in Maya
+- [ ] Improve pkg/kubernetes/client package
+
+##### Core Development
+- [ ] Dockerfile to build operator
+- [ ] Dockerfile to sync maya & operator
+- [ ] Travis file for operator
+- [ ] GolangCI file for operator
+- [ ] Minikube file for operator
+- [ ] Makefile for operator
+- [ ] tools folder in operator
+- [ ] Integration tests via above tools
 
 #### References
 - [OEP on CSI](https://github.com/openebs/openebs/pull/2617/)
