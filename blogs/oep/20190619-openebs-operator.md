@@ -43,17 +43,30 @@ spec:
   # installs or upgrades all components
   # if this is not set
   #
-  # can install specified components as-well
+  # can install specified components as well
   #
   # will un-install the ones that are not
   # specified and are running due to 
   # earlier installations
   components:
 
-  # crds
+  # crds is optional; operator installs or updates
+  # the crds
+  #
+  # can install or update specified crds as well
+  #
+  # will un-install the ones that are not specified
+  # and were installed due to earlier installations
   crds:
   
-  # storageclasses:
+  # storageclasses is optional; operator installs or
+  # updates the storageclasses
+  #
+  # can install or update specified storageclasses
+  # as well
+  #
+  # will un-install the ones that are not specified
+  # and were installed due to earlier installations
   storageclasses:
 ```
 
@@ -93,13 +106,6 @@ spec:
   - name: MayaAPIServer
   - name: ExternalCSIProvisioner
   - name: NDM
-  crds:
-  - name: AllCRD
-  storageclasses:
-  - name: DefaultAllStorageClass
-  - name: DefaultJivaStorageClass
-  - name: DefaultCStorStorageClass
-  - name: DefaultLocalPVStorageClass
 ```
 
 #### Operator - Sample 5
@@ -134,10 +140,10 @@ metadata:
 spec:
   version: 1.1.0
   storageclasses:
-  - name: DefaultAllStorageClass
-  - name: DefaultJivaStorageClass
-  - name: DefaultCStorStorageClass
-  - name: DefaultLocalPVStorageClass
+  - name: AllStorageClass
+  - name: JivaStorageClass
+  - name: CStorStorageClass
+  - name: LocalPVStorageClass
 ```
 
 #### Operator - Sample 8
