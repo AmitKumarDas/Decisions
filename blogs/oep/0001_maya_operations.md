@@ -279,7 +279,7 @@ func (p *Operation) errorOrNil() error {
 - This is implementation of pkg/ops/v1alpha1/ interfaces
 
 ```go
-// pkg/ops/kubernetes/pod/v1alpha1/pod.go
+// pkg/operation/kubernetes/pod/v1alpha1/operation.go
 
 import (
   pipe "github.com/openebs/maya/pkg/pipe/v1alpha1"
@@ -369,6 +369,10 @@ func (p *Operation) Run() error {
 
   return p.errorOrNil()
 }
+```
+
+```go
+// pkg/operation/kubernetes/pod/v1alpha1/steps.go
 
 // ShouldNotBeRunning adds should not be running check
 // as a step in the operation
@@ -419,30 +423,34 @@ func shouldBeRunning() OperationStep {
 
 ### Sample Usages
 ```go
-cspops.New().
+cspop.New().
   GetFromKubernetes(PoolName).
   SetLabel("openebs.io/version", TargetVersion).
-  UpdateToKubernetes()
+  UpdateToKubernetes().
+  Run()
 ```
 
 ```go
-unstructops.New().
-  WithStore(store).
-  WithGVK("openebs.io", "v1alpha1", "CStorPool").
-  WithNamespace(PoolNamespace).
+unstructop.
+  New(
+    commonop.WithStore(store),
+    commonop.WithGVK("openebs.io", "v1alpha1", "CStorPool"),
+    commonop.WithNamespace(PoolNamespace),
+  ).
   GetFromKubernetes(PoolName).
-  SaveUIDToStoreWithKey("pool.uid").
+  SaveUIDToStoreWithKey("mypool.uid").
   SaveToStore(
-    unstructops.GetValueFromPath(".spec.device"),
-    unstructops.WithStoreKey("pool.device"),
-  )
+    unstructop.GetValueFromPath(".spec.device"),
+    unstructop.WithStoreKey("mypool.device"),
+  ).
+  Run()
 ```
 
 ```go
-cspops.New().
-  WithStore(store).
+cspop.New(commonop.WithStore(store)).
   GetFromKubernetes(PoolName).
-  SaveUIDToStoreWithKey("csp.uid")
+  SaveUIDToStoreWithKey("mycsp.uid").
+  Run()
 ```
 
 ### Research
