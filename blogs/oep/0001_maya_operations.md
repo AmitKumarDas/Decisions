@@ -214,11 +214,6 @@ func (d *DefaultPipe) Start() error {
   return nil
 }
 
-
-// ----------------------------
-// TODO Refactor Below !!!
-// ----------------------------
-
 ```go
 // pkg/pipe/v1alpha1/operation.go
 
@@ -236,6 +231,24 @@ type Operation struct {
 // abstracts building the operation instance
 type OperationOption func(*Operation)
 
+// WithStore provides an in-memory store to do the following:
+//
+//  [1] store results of each step of an operation &
+//  [2] store config values if any
+func WithStore(store map[string]string) OperationOption {
+  return func(p *Operation) {
+    if store == nil {
+      p.Errors = append(
+        p.Errors, 
+        errors.New("failed to build operation: nil store provided"),
+      )
+      return
+    }
+
+    p.Store = store
+  }
+}
+
 // NewOperation returns a new instance of operation
 func NewOperation(opts ...OperationOption) *Operation {
   b := &Operation{}
@@ -244,6 +257,21 @@ func NewOperation(opts ...OperationOption) *Operation {
   }
 
   return b
+}
+
+// isContinue flags if this operation should continue 
+// executing
+func (p *Operation) isContinue() bool {
+  return !(len(p.Errors) > 0 || p.ShouldSkip)
+}
+
+// errorOrNil returns error if any
+func (p *Operation) errorOrNil() error {
+  if len(p.Errors) > 0 {
+    return errors.New("%v", p.Errors)
+  }
+  
+  return nil
 }
 ```
 
@@ -281,18 +309,14 @@ import (
 type Operation struct {
   pipe.Operation
   Pod          *Pod
-  RunSteps     []OpsStep
+  RunSteps     []OperationStep
 }
-
-// OperationOption abstracts building
-// an operation instance
-type OperationOption func(*Operation)
 
 // OperationStep is a typed function that abstracts 
 // implementating a step within the operation
 type OperationStep func(*Operation)
 
-func (o *Operation) withOptions(opts ...OperationOption) *Operation{
+func (o *Operation) withOptions(opts ...pipe.OperationOption) *Operation{
   for _, option := range opts {
     option(o)
   }
@@ -300,14 +324,14 @@ func (o *Operation) withOptions(opts ...OperationOption) *Operation{
 }
 
 // New returns a new instance of Ops
-func New(opts ...OperationOption) *Operation {
+func New(opts ...pipe.OperationOption) *Operation {
   o := &Operation{Operation: pipe.NewOperation()}
   return o.withOptions(opts...)
 }
 
 // From returns a new instance of operation by making use of
 // the provided common operation instance
-func From(common *pipe.Operation, opts ...OperationOption) *Operation {
+func From(common *pipe.Operation, opts ...pipe.OperationOption) *Operation {
   b := common
   if b == nil {
     b = pipe.NewOperation()
@@ -323,116 +347,73 @@ func From(common *pipe.Operation, opts ...OperationOption) *Operation {
 
 // Steps builds this operation instance with steps that get
 // executed as part of running this operation
-func (p *Ops) Steps(opts ...OpsStep) *Ops {
-  p.RunSteps = append(p.RunSteps, opts...)
+func (p *Operation) Steps(step ...OperationStep) *Operation {
+  p.RunSteps = append(p.RunSteps, step...)
   return p
 }
 
-// Run executes the operations as steps in an ordered
-// manner. The order that was used while creating
-// this ops instance is used to execute as well.
+// Run executes this operation by executing its steps in an ordered
+// manner. The order that was used while creating this operation
+// instance is used to execute as well.
 //
 // NOTE:
-//  Run is an implementation of ops.Runner 
-// interface
-func (p *Ops) Run() error {
-  if len(p.Errors) > 0 {
-    return errors.New("%v", p.Errors)
-  }
-
+//  Run is an implementation of pipe.Runner interface
+func (p *Operation) Run() error {
   for _, step := range p.RunSteps {
-    if len(p.Errors) > 0 {
-      return errors.New("%v", p.Errors)
-    }
-
-    if p.ShouldSkip {
+    if !p.isContinue() {
       break
     }
 
     step(p)
   }
 
-  return nil
+  return p.errorOrNil()
 }
 
-// Verify provides the status of previously 
-// executed operation steps
-//
-// NOTE:
-//  Verify is an implementation of ops.Verifier
-// interface
-func (p *Ops) Verify() error {
-  if len(p.Errors) > 0 {
-    return errors.New("%v", p.Errors)
-  }
-
-  return nil
-}
-
-// isContinue flags if this operation
-// should continue executing subsequent
-// steps
-func (p *Ops) isContinue() bool {
-  return !(len(p.Errors) > 0 || p.ShouldSkip)
-}
-
-// WithStore provides an in-memory store
-// to do the following:
-//
-//  [1] store results of operation steps &
-//  [2] store config values
-func WithStore(store map[string]string) OpsStep {
-  return func(p *Ops) {
-    p.WithStore(store)
-  }
-}
-
-// WithStore provides an in-memory store
-// to do the following:
-//
-//  [1] store results of operation steps &
-//  [2] store config values
-func (p *Ops) WithStore(store map[string]string) *Ops {
-  if !p.isContinue() {
-    return p
-  }
-  
-  if store == nil {
-    err := errors.New("nil store was provided")
-    p.Errors = append(p.Errors, err)
-    return p
-  }
-
-  p.Store = store
+// ShouldNotBeRunning adds should not be running check
+// as a step in the operation
+func (p *Operation) ShouldNotBeRunning() *Operation {
+  p.Steps(shouldNotBeRunning())
   return p
 }
 
-// ShouldBeRunning sets error if pod is not
-// running
-func ShouldBeRunning() OpsStep {
-  return func(p *Ops) {
-    p.ShouldBeRunning()
-  }
+// ShouldBeRunning adds should be running check
+// as a step in the operation
+func (p *Operation) ShouldBeRunning() *Operation {
+  p.Steps(shouldBeRunning())
+  return p
 }
 
-// ShouldBeRunning sets error if pod is not
-// running
-func (p *Ops) ShouldBeRunning() *Ops {
-  if !p.isContinue() {
-    return p
-  }
+// shouldNotBeRunning errors if pod is running
+func shouldNotBeRunning() OperationStep {
+  return func(p *Operation) {
+    isRunning := pod.From(p.Pod).IsRunning()
+    if isRunning {
+      err := errors.Errorf(
+        "want - pod should not run: actual - pod {%s/%s} phase {%s}", 
+        p.Pod.Namespace,
+        p.Pod.Name,
+        p.Pod.Status.Phase,
+      )
+      p.Errors = append(p.Errors, err)
+    }
+  }  
+}
 
-  isRunning := pod.From(p.Pod).IsRunning()
-  if !isRunning {
-    err := errors.Errorf(
-      "pod {%s} is not running in namespace {%s}", 
-      p.Pod.Name, 
-      p.Pod.Namespace,
-    )
-    p.Errors = append(p.Errors, err)
+// shouldBeRunning errors if pod is not running
+func shouldBeRunning() OperationStep {
+  return func(p *Operation) {
+    isRunning := pod.From(p.Pod).IsRunning()
+    if !isRunning {
+      err := errors.Errorf(
+        "want - pod should run: actual - pod {%s/%s} phase {%s}", 
+        p.Pod.Namespace,
+        p.Pod.Name,
+        p.Pod.Status.Phase,
+      )
+      p.Errors = append(p.Errors, err)
+    }
   }
-
-  return p
 }
 ```
 
