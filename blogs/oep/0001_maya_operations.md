@@ -116,6 +116,7 @@ func VerifyNDMDaemonSet() pipe.Operation{
 // Pipeline defines the contracts
 // supported by a pipeline
 type Pipeline interface {
+  // Start the pipeline of operations
   Start() error
 }
 
@@ -154,19 +155,19 @@ type (f *FailedPipe) Error() string {
 ```go
 // pkg/pipe/v1alpha1/pipe.go
 
-// Option abstracts setting of Default instance
-type Option func(*Default)
+// Option is a typed function that abstracts setting a 
+// DefaultPipe instance
+type Option func(*DefaultPipe)
 
-// Default is the default implementation
-// of a Pipeline
-type Default struct {
+// DefaultPipe is a default Pipeline implementation
+type DefaultPipe struct {
   Description string
   Operations []Operation
 }
 
-// New returns a new instance of Default
-func New(opts ...Option) Default {
-  d := &Default{Description: "default pipeline"}
+// New returns a new instance of DefaultPipe
+func New(opts ...Option) DefaultPipe {
+  d := &DefaultPipe{Description: "default pipeline"}
 
   for _, option := range opts {
     option(d)
@@ -174,7 +175,7 @@ func New(opts ...Option) Default {
   return d
 }
 
-func (d *Default) handleError(err error) error {
+func (d *DefaultPipe) handleError(err error) error {
   return &FailedPipe{
     Statement: d.Description,
     Result: "Failed",
@@ -183,18 +184,20 @@ func (d *Default) handleError(err error) error {
 }
 
 // Desc sets the description of this pipeline
-func (d *Default) Desc(msg string) *Default{
+func (d *DefaultPipe) Desc(msg string) *Default{
   d.Description = msg
   return d
 }
 
-// Add adds the given operation to the pipeline
-func (d *Default) Add(op Operation) *Default{
+// Add adds the given operation to this pipeline
+func (d *DefaultPipe) Add(op Operation) *Default{
   d.Operations = append(d.Operations, op)
   return d
 }
 
-func (d *Default) Start() error {
+// Start starts execution of this pipeline by
+// running its listed operations
+func (d *DefaultPipe) Start() error {
   var err error
   
   if len(d.Operations) == 0 {
