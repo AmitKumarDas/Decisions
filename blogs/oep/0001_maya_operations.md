@@ -36,22 +36,17 @@ err := pipe.
 // as pipe.Pipeline, which has the ability to add
 // operations and execute at the end
 
-type VerifyOpenEBS func() pipe.Operation
+// in pkg/pipe/v1alpha1
+//
+// type OperationInstance func() Operation
 
-var VerifyOpenEBSOps = []VerifyOpenEBS{
+var verifications = []OperationInstance{
   VerifyMayaAPIServer,
   VerifyNDMDaemonSet,
 }
 
-func VerifyOpenEBS() error {
-  for _, op := range VerifyOpenEBSOps {
-    err := op().Run()
-    if err != nil {
-      return err
-    }
-  }
-
-  return nil
+func Verify() error {
+  return pipe.AddAll(verifications).Start()
 }
 
 func VerifyMayaAPIServer() pipe.Operation {
@@ -62,8 +57,8 @@ func VerifyMayaAPIServer() pipe.Operation {
       server is installed and all its pods are in running
       state
     `).
-    Register(
-      podops.New().
+    Build(
+      podop.New().
         WithNamespace(openebs).
         List(pod.ListOpts(MayaAPIServerLabelSelector)).
         Filter(pod.IsRunning()).
@@ -78,8 +73,8 @@ func VerifyNDMDaemonSet() pipe.Operation{
       As an openebs admin, I want to test if NDM daemon set 
       is installed and all its pods are in running state
     `).
-    Register(
-      podops.New().
+    Build(
+      podop.New().
         WithNamespace(openebs).
         List(pod.ListOpts(NDMDaemonSetLabelSelector)).
         Filter(pod.IsRunning()).
@@ -116,6 +111,7 @@ func VerifyNDMDaemonSet() pipe.Operation{
 // Pipeline defines the contracts
 // supported by a pipeline
 type Pipeline interface {
+
   // Start the pipeline of operations
   Start() error
 }
@@ -128,6 +124,10 @@ type Operation interface {
   // a piped operation
   Run() error
 }
+
+// OperationInstance is a typed function that abstracts
+// fetching an instance of Operation
+type OperationInstance func() Operation
 ```
 
 ```go
@@ -192,6 +192,14 @@ func (d *DefaultPipe) Desc(msg string) *DefaultPipe{
 // Add adds the given operation to this pipeline
 func (d *DefaultPipe) Add(op Operation) *DefaultPipe{
   d.Operations = append(d.Operations, op)
+  return d
+}
+
+// AddAll adds all the given operations to this pipeline
+func (d *DefaultPipe) AddAll(ops []OperationInstance) *DefaultPipe{
+  for _, op := range ops {
+    d.Operations = append(d.Operations, op())
+  }
   return d
 }
 
