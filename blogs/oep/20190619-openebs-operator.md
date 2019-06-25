@@ -292,6 +292,7 @@ spec:
 - [ ] Add pkg/kubernetes/sts package
 - [ ] Add or Improve pkg/kubernetes/job package
 - [ ] Improve pkg/unstruct package
+- [ ] Add pkg/kubernetes/crd package in Maya
 - [ ] Add tools folder in maya
 - [ ] Add integration tests in maya that makes use of above tools
 
