@@ -56,13 +56,13 @@ func VerifyOpenEBS() error {
 
 func VerifyMayaAPIServer() pipe.Operation {
   return pipe.
-    OperationBuilder().
+    Operation().
     Desc(`
       As an openebs admin, I want to test if maya api 
       server is installed and all its pods are in running
       state
     `).
-    Operation(
+    Register(
       podops.New().
         WithNamespace(openebs).
         List(pod.ListOpts(MayaAPIServerLabelSelector)).
@@ -73,12 +73,12 @@ func VerifyMayaAPIServer() pipe.Operation {
 
 func VerifyNDMDaemonSet() pipe.Operation{
   return pipe.
-    OperationBuilder().
+    Operation().
     Desc(`
       As an openebs admin, I want to test if NDM daemon set 
       is installed and all its pods are in running state
     `).
-    Operation(
+    Register(
       podops.New().
         WithNamespace(openebs).
         List(pod.ListOpts(NDMDaemonSetLabelSelector)).
@@ -184,13 +184,13 @@ func (d *DefaultPipe) handleError(err error) error {
 }
 
 // Desc sets the description of this pipeline
-func (d *DefaultPipe) Desc(msg string) *Default{
+func (d *DefaultPipe) Desc(msg string) *DefaultPipe{
   d.Description = msg
   return d
 }
 
 // Add adds the given operation to this pipeline
-func (d *DefaultPipe) Add(op Operation) *Default{
+func (d *DefaultPipe) Add(op Operation) *DefaultPipe{
   d.Operations = append(d.Operations, op)
   return d
 }
@@ -219,72 +219,12 @@ func (d *DefaultPipe) Start() error {
 // TODO Refactor Below !!!
 // ----------------------------
 
-
-// OperationListRunner is a concrete implementation
-// of Runner interface. As the name suggests
-// it runs a list of operations
-type OperationListRunner struct {
-  Items []Runner
-}
-
-// NewOperationListRunner returns a new instance of
-// OperationListRunner
-func NewOperationListRunner(o ...Runner) *OperationListRunner {
-  m := &OperationListRunner{}
-  m.Items = append(m.Items, o...)
-  return m
-}
-
-// Run executes all the underlying operations
-// managed by this instance
-func (g *OperationListRunner) Run() error {
-  var err error
-  for _, op := range g.Items {
-    err = op.Run()
-    if err != nil {
-      return err
-    }
-  }
-  
-  return nil
-}
-
-// OperationListVerifier is a concrete implementation
-// of Verifier interface. As the name suggests
-// it verifies a list of already executed operations
-type OperationListVerifier struct {
-  Items []Verifier
-}
-
-// NewOperationListVerifier returns a new instance of
-// OperationListVerifier
-func NewOperationListVerifier(o ...Verifier) *OperationListVerifier {
-  m := &OperationListVerifier{}
-  m.Items = append(m.Items, o...)
-  return m
-}
-
-// Verify verifies if all its operations
-// were executed successfully
-func (g *OperationListVerifier) Verify() error {
-  var err error
-  for _, op := range g.Items {
-    err = op.Verify()
-    if err != nil {
-      return err
-    }
-  }
-
-  return nil
-}
-```
-
 ```go
-// pkg/ops/v1alpha1/ops.go
+// pkg/pipe/v1alpha1/operation.go
 
-// BaseOps composes of all common fields
-// required for any Ops structure
-type BaseOps struct {
+// Operation composes of all common fields
+// required for any operation
+type Operation struct {
   ID           string
   Namespace    string
   ShouldSkip   bool
@@ -292,16 +232,17 @@ type BaseOps struct {
   Store        map[string]string
 }
 
-// BaseOpsOption is a custom function that
-// abstracts building the BaseOps instance
-type BaseOpsOption func(*BaseOps)
+// OperationOption is a typed function that
+// abstracts building the operation instance
+type OperationOption func(*Operation)
 
-// New returns a new instance of BaseOps
-func New(opts ...BaseOpsOption) *BaseOps {
-  b := &BaseOps{}
+// NewOperation returns a new instance of operation
+func NewOperation(opts ...OperationOption) *Operation {
+  b := &Operation{}
   for _, o := range opts {
     o(b)
   }
+
   return b
 }
 ```
@@ -313,8 +254,8 @@ func New(opts ...BaseOpsOption) *BaseOps {
 // pkg/ops/kubernetes/pod/v1alpha1/pod.go
 
 import (
-  ops "github.com/openebs/maya/pkg/ops/v1alpha1"
-  pod "github.com/openebs/maya/pkg/kubernetes/pod/v1alpha1"
+  pipe "github.com/openebs/maya/pkg/pipe/v1alpha1"
+  pod  "github.com/openebs/maya/pkg/kubernetes/pod/v1alpha1"
 )
 
 // NOTE:
@@ -337,22 +278,21 @@ import (
 //  One can take the reference from BDD specs
 // to decide a name for any operation based step
 
-type Ops struct {
-  ops.Base
+type Operation struct {
+  pipe.Operation
   Pod          *Pod
   RunSteps     []OpsStep
 }
 
-// OpsOption abstracts building
-// an Ops instance
-type OpsOption func(*Ops)
+// OperationOption abstracts building
+// an operation instance
+type OperationOption func(*Operation)
 
-// OpsStep abstracts implementation
-// of a step participating in the
-// operation
-type OpsStep func(*Ops)
+// OperationStep is a typed function that abstracts 
+// implementating a step within the operation
+type OperationStep func(*Operation)
 
-func (o *Ops) withOptions(opts ...OpsOption) *Ops{
+func (o *Operation) withOptions(opts ...OperationOption) *Operation{
   for _, option := range opts {
     option(o)
   }
@@ -360,31 +300,29 @@ func (o *Ops) withOptions(opts ...OpsOption) *Ops{
 }
 
 // New returns a new instance of Ops
-func New(opts ...OpsOption) *Ops {
-  o := &Ops{ops.Base: ops.New()}
+func New(opts ...OperationOption) *Operation {
+  o := &Operation{Operation: pipe.NewOperation()}
   return o.withOptions(opts...)
 }
 
-// From returns a new instance of Ops
-// by making use of the provided base
-// Ops instance
-func From(base *BaseOps, opts ...OpsOption) *Ops {
-  b := base
+// From returns a new instance of operation by making use of
+// the provided common operation instance
+func From(common *pipe.Operation, opts ...OperationOption) *Operation {
+  b := common
   if b == nil {
-    b = ops.New()
-    b.Errors = append(b.Errors, errors.New("failed to init pod ops: nil base provided"))
+    b = pipe.NewOperation()
+    b.Errors = append(
+      b.Errors, 
+      errors.New("failed to init pod operation: nil common provided"),
+    )
   }
 
-  o := &Ops{ops.Base: b}
+  o := &Operation{Operation: b}
   return o.withOptions(opts...)
 }
 
-// Steps sets Ops instance with the
-// provided steps that will be run later
-//
-// NOTE:
-//  These steps form the core of pod 
-// operations
+// Steps builds this operation instance with steps that get
+// executed as part of running this operation
 func (p *Ops) Steps(opts ...OpsStep) *Ops {
   p.RunSteps = append(p.RunSteps, opts...)
   return p
