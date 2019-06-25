@@ -50,36 +50,32 @@ func Verify() error {
 }
 
 func VerifyMayaAPIServer() pipe.Operation {
-  return pipe.
-    Operation().
-    Desc(`
-      As an openebs admin, I want to test if maya api 
-      server is installed and all its pods are in running
-      state
-    `).
-    Build(
-      podop.New().
-        WithNamespace(openebs).
-        List(pod.ListOpts(MayaAPIServerLabelSelector)).
-        Filter(pod.IsRunning()).
-        VerifyLenEQ(MayaAPIServerPodCount)
-    )
+  return podop.
+    New(
+      op.Desc(`
+        As an openebs admin, I want to test if maya api 
+        server is installed and all its pods are in running
+        state
+      `)
+    ).
+    WithNamespace(openebs).
+    List(pod.ListOpts(MayaAPIServerLabelSelector)).
+    Filter(pod.IsRunning()).
+    VerifyLenEQ(MayaAPIServerPodCount)
 }
 
 func VerifyNDMDaemonSet() pipe.Operation{
-  return pipe.
-    Operation().
-    Desc(`
-      As an openebs admin, I want to test if NDM daemon set 
-      is installed and all its pods are in running state
-    `).
-    Build(
-      podop.New().
-        WithNamespace(openebs).
-        List(pod.ListOpts(NDMDaemonSetLabelSelector)).
-        Filter(pod.IsRunning()).
-        VerifyLenEQ(NDMDaemonSetPodCount)
-    )
+  return podop.
+    New(
+      op.Desc(`
+        As an openebs admin, I want to test if NDM daemon set 
+        is installed and all its pods are in running state    
+      `)
+    ).
+    WithNamespace(openebs).
+    List(pod.ListOpts(NDMDaemonSetLabelSelector)).
+    Filter(pod.IsRunning()).
+    VerifyLenEQ(NDMDaemonSetPodCount)
 }
 ```
 
