@@ -221,6 +221,7 @@ func (d *DefaultPipe) Start() error {
 
   return nil
 }
+```
 
 ```go
 // pkg/pipe/v1alpha1/operation.go
