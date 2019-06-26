@@ -312,51 +312,36 @@ import (
 
 type Operation struct {
   ops.Operation
-  List         *PodList
   Pod          *Pod
 }
 
+// Step is a typed function that abstracts 
+// implementating a step of an operation
+type Step func(*Operation)
+
 type OperationRunner struct {
-  Steps     []OperationStep
+  Operation *Operation
+  Steps     []Step
 }
 
-// OperationStep is a typed function that abstracts 
-// implementating a step within the operation
-type OperationStep func(*Operation)
+// New returns a new instance of Ops
+func New(opts ...ops.OperationOption) *OperationRunner {
+  o := &Operation{Operation: ops.NewOperation()}
+  r := &OperationRunner{Operation: o}
+  return r.withOptions(opts...)
+}
 
-func (o *Operation) withOptions(opts ...ops.OperationOption) *Operation{
+func (o *OperationRunner) withOptions(opts ...ops.OperationOption) *OperationRunner{
   for _, option := range opts {
     option(o)
   }
   return o
 }
 
-// New returns a new instance of Ops
-func New(opts ...ops.OperationOption) *Operation {
-  o := &Operation{Operation: pipe.NewOperation()}
-  return o.withOptions(opts...)
-}
-
-// From returns a new instance of operation by making use of
-// the provided common operation instance
-func From(common *ops.Operation, opts ...ops.OperationOption) *Operation {
-  b := common
-  if b == nil {
-    b = pipe.NewOperation()
-    b.Errors = append(
-      b.Errors, 
-      errors.New("failed to init pod operation: nil common provided"),
-    )
-  }
-
-  o := &Operation{Operation: b}
-  return o.withOptions(opts...)
-}
-
 // Steps builds this operation instance with steps that get
 // executed as part of running this operation
-func (p *Operation) Steps(step ...OperationStep) *Operation {
-  p.RunSteps = append(p.RunSteps, step...)
+func (p *OperationRunner) Steps(step ...OperationStep) *OperationRunner {
+  p.Steps = append(p.Steps, step...)
   return p
 }
 
@@ -365,9 +350,9 @@ func (p *Operation) Steps(step ...OperationStep) *Operation {
 // instance is used to execute as well.
 //
 // NOTE:
-//  Run is an implementation of pipe.Runner interface
-func (p *Operation) Run() error {
-  for _, step := range p.RunSteps {
+//  Run is an implementation of ops.Runner interface
+func (p *OperationRunner) Run() error {
+  for _, step := range p.Steps {
     if !p.isContinue() {
       break
     }
@@ -380,7 +365,7 @@ func (p *Operation) Run() error {
 ```
 
 ```go
-// pkg/operation/kubernetes/pod/v1alpha1/steps.go
+// pkg/ops/kubernetes/pod/v1alpha1/steps.go
 
 // ShouldNotBeRunning adds should not be running check
 // as a step in the operation
