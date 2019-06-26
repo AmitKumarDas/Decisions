@@ -9,7 +9,7 @@ Maya Ops represents a pipeline which is targeted to implement a set of ordered i
 ```go
 // pkg/tools/spc/health_check_csp/main.go
 
-err := pipe.
+err := ops.
   New().
   Desc(`
     As a test developer, I want to verify the number
@@ -17,7 +17,7 @@ err := pipe.
     expected value.
   `).
   Add(
-    cspops.New().
+    cspop.New().
       List(csp.ListOpts(string(apis.StoragePoolClaimCPK), spcName)).
       Filter(csp.IsStatus("Healthy")).
       VerifyLenEQ(count)
@@ -36,7 +36,7 @@ err := pipe.
 // as pipe.Pipeline, which has the ability to add
 // operations and execute at the end
 
-// in pkg/pipe/v1alpha1
+// in pkg/ops/v1alpha1
 //
 // type OperationInstance func() Operation
 
@@ -49,10 +49,10 @@ func Verify() error {
   return pipe.AddAll(verifications).Start()
 }
 
-func VerifyMayaAPIServer() pipe.Operation {
+func VerifyMayaAPIServer() ops.Operation {
   return podop.
     New(
-      op.Desc(`
+      ops.Desc(`
         As an openebs admin, I want to test if maya api 
         server is installed and all its pods are in running
         state
@@ -64,10 +64,10 @@ func VerifyMayaAPIServer() pipe.Operation {
     VerifyLenEQ(MayaAPIServerPodCount)
 }
 
-func VerifyNDMDaemonSet() pipe.Operation{
+func VerifyNDMDaemonSet() ops.Operation{
   return podop.
     New(
-      op.Desc(`
+      ops.Desc(`
         As an openebs admin, I want to test if NDM daemon set 
         is installed and all its pods are in running state    
       `)
@@ -93,16 +93,15 @@ func VerifyNDMDaemonSet() pipe.Operation{
   - To repeat, Ops builder differs from core builder due to its immediate execution style
 
 ```go
-// pkg/pipe/v1alpha1/doc.go
+// pkg/ops/v1alpha1/doc.go
 
-// What is a pipe?
+// What is Ops?
 //
-// Pipe can be thought of as a pipeline
-// of a set of ordered operations
+// Ops can be thought of as a pipeline of ordered operations
 ```
 
 ```go
-// pkg/pipe/v1alpha1/interface.go
+// pkg/ops/v1alpha1/interface.go
 
 // Pipeline defines the contracts
 // supported by a pipeline
@@ -127,7 +126,7 @@ type OperationInstance func() Operation
 ```
 
 ```go
-// pkg/pipe/v1alpha1/error.go
+// pkg/ops/v1alpha1/error.go
 
 // FailedPipe represents an error that occurred
 // while running a pipeline
@@ -149,7 +148,7 @@ type (f *FailedPipe) Error() string {
 ```
 
 ```go
-// pkg/pipe/v1alpha1/pipe.go
+// pkg/ops/v1alpha1/pipe.go
 
 // Option is a typed function that abstracts setting a 
 // DefaultPipe instance
@@ -220,7 +219,7 @@ func (d *DefaultPipe) Start() error {
 ```
 
 ```go
-// pkg/pipe/v1alpha1/operation.go
+// pkg/ops/v1alpha1/operation.go
 
 // Operation composes of all common fields
 // required for any operation
@@ -284,10 +283,10 @@ func (p *Operation) errorOrNil() error {
 - This is implementation of pkg/ops/v1alpha1/ interfaces
 
 ```go
-// pkg/operation/kubernetes/pod/v1alpha1/operation.go
+// pkg/ops/kubernetes/pod/v1alpha1/operation.go
 
 import (
-  pipe "github.com/openebs/maya/pkg/pipe/v1alpha1"
+  ops "github.com/openebs/maya/pkg/ops/v1alpha1"
   pod  "github.com/openebs/maya/pkg/kubernetes/pod/v1alpha1"
 )
 
@@ -312,16 +311,20 @@ import (
 // to decide a name for any operation based step
 
 type Operation struct {
-  pipe.Operation
+  ops.Operation
+  List         *PodList
   Pod          *Pod
-  RunSteps     []OperationStep
+}
+
+type OperationRunner struct {
+  Steps     []OperationStep
 }
 
 // OperationStep is a typed function that abstracts 
 // implementating a step within the operation
 type OperationStep func(*Operation)
 
-func (o *Operation) withOptions(opts ...pipe.OperationOption) *Operation{
+func (o *Operation) withOptions(opts ...ops.OperationOption) *Operation{
   for _, option := range opts {
     option(o)
   }
@@ -329,14 +332,14 @@ func (o *Operation) withOptions(opts ...pipe.OperationOption) *Operation{
 }
 
 // New returns a new instance of Ops
-func New(opts ...pipe.OperationOption) *Operation {
+func New(opts ...ops.OperationOption) *Operation {
   o := &Operation{Operation: pipe.NewOperation()}
   return o.withOptions(opts...)
 }
 
 // From returns a new instance of operation by making use of
 // the provided common operation instance
-func From(common *pipe.Operation, opts ...pipe.OperationOption) *Operation {
+func From(common *ops.Operation, opts ...ops.OperationOption) *Operation {
   b := common
   if b == nil {
     b = pipe.NewOperation()
