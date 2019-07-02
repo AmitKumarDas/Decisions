@@ -299,6 +299,7 @@ spec:
 ##### Core Development
 - [ ] Dockerfile to build operator
 - [ ] Dockerfile to sync maya & operator
+- [ ] pkg/build -- refer https://github.com/uber/makisu/tree/master/lib/utils
 - [ ] Travis file for operator
 - [ ] GolangCI file for operator
 - [ ] Minikube file for operator
