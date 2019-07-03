@@ -284,41 +284,5 @@ spec:
 ```yaml
 ```
 
-#### Tasks
-##### Test Driven Development (TDD)
-- [ ] Operations based library in Maya
-- [ ] Improve pkg/kubernetes/client package
-- [ ] Improve pkg/kubernetes/deployment package
-- [ ] Add pkg/kubernetes/sts package
-- [ ] Add or Improve pkg/kubernetes/job package
-- [ ] Improve pkg/unstruct package
-- [ ] Add pkg/kubernetes/crd package in Maya
-- [ ] Add tools folder in maya
-- [ ] Add integration tests in maya that makes use of above tools
-
-##### Core Development
-- [ ] Dockerfile to build operator
-- [ ] Dockerfile to sync maya & operator
-- [ ] pkg/build -- refer https://github.com/uber/makisu/tree/master/lib/utils
-- [ ] Travis file for operator
-- [ ] GolangCI file for operator
-- [ ] Minikube file for operator
-- [ ] Makefile for operator
-- [ ] Add tools folder in operator
-- [ ] Add integration tests in operator that makes use of above tools
-- [ ] Add pkg/apis/operator/v1alpha1/types_operator.go
-- [ ] Add pkg/apis/operator/v1alpha1/types_config.go
-- [ ] Add pkg/apis/operator/v1alpha1/types_configinjector.go
-- [ ] Update Makefile to include deepcopy code gen for apis package
-- [ ] Add pkg/core/v1alpha1/
-- [ ] Add pkg/core/config/v1alpha1/
-- [ ] Add pkg/core/configinjector/v1alpha1/
-- [ ] Add pkg/reconcile/operator/v1alpha1/
-- [ ] Add pkg/reconcile/configinjector/v1alpha1/
-- [ ] Add pkg/controller/v1alpha1/
-- [ ] Add cmd/operator/main.go
-- [ ] Add cmd/operator/controller.go
-- [ ] Add to tools & integration tests
-
 #### References
 - [OEP on CSI](https://github.com/openebs/openebs/pull/2617/)
