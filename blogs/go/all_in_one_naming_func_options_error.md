@@ -99,3 +99,112 @@ func SendRetry(options ...RetryOption) SendOption {
 	return func(o *sendOptions) { o.retry = retry }
 }
 ```
+
+### Usage - Defaults - Easy for Caller
+```go
+// Send sends an HTTP request. May return NetworkError or StatusError (see above).
+func Send(method, rawurl string, options ...SendOption) (resp *http.Response, err error) {
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		return nil, fmt.Errorf("parse url: %s", err)
+	}
+	opts := sendOptions{
+		body:                 nil,
+		timeout:              60 * time.Second,
+		acceptedCodes:        map[int]bool{http.StatusOK: true},
+		headers:              map[string]string{},
+		retry:                retryOptions{max: 1},
+		transport:            nil, // Use HTTP default.
+		ctx:                  context.Background(),
+		url:                  u,
+		httpFallbackDisabled: false,
+	}
+	for _, o := range options {
+		o(&opts)
+	}
+
+	req, err := newRequest(method, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	client := opts.client
+	if client == nil {
+		client = &http.Client{
+			Timeout:       opts.timeout,
+			CheckRedirect: opts.redirect,
+			Transport:     opts.transport,
+		}
+	}
+
+	interval := opts.retry.interval
+	for i := 0; i < opts.retry.max; i++ {
+		if i > 0 {
+			time.Sleep(interval)
+			interval = min(
+				time.Duration(float64(interval)*opts.retry.backoffMultiplier),
+				opts.retry.backoffMax)
+		}
+		resp, err = client.Do(req)
+		// Retry without tls. During migration there would be a time when the
+		// component receiving the tls request does not serve https response.
+		// TODO (@evelynl): disable retry after tls migration.
+		if err != nil && req.URL.Scheme == "https" && !opts.httpFallbackDisabled {
+			log.Warnf("Failed to send https request: %s. Retrying with http...", err)
+			var httpReq *http.Request
+			httpReq, err = newRequest(method, opts)
+			if err != nil {
+				return nil, err
+			}
+			httpReq.URL.Scheme = "http"
+			resp, err = client.Do(httpReq)
+		}
+		if err != nil {
+			continue
+		}
+		if resp.StatusCode >= 500 && !opts.acceptedCodes[resp.StatusCode] {
+			continue
+		}
+		break
+	}
+	if err != nil {
+		return nil, NetworkError{err}
+	}
+	if !opts.acceptedCodes[resp.StatusCode] {
+		return nil, NewStatusError(resp)
+	}
+	return resp, nil
+}
+```
+### More Caller Friendly
+```go
+// Get sends a GET http request.
+func Get(url string, options ...SendOption) (*http.Response, error) {
+	return Send("GET", url, options...)
+}
+
+// Head sends a HEAD http request.
+func Head(url string, options ...SendOption) (*http.Response, error) {
+	return Send("HEAD", url, options...)
+}
+
+// Post sends a POST http request.
+func Post(url string, options ...SendOption) (*http.Response, error) {
+	return Send("POST", url, options...)
+}
+
+// Put sends a PUT http request.
+func Put(url string, options ...SendOption) (*http.Response, error) {
+	return Send("PUT", url, options...)
+}
+
+// Patch sends a PATCH http request.
+func Patch(url string, options ...SendOption) (*http.Response, error) {
+	return Send("PATCH", url, options...)
+}
+
+// Delete sends a DELETE http request.
+func Delete(url string, options ...SendOption) (*http.Response, error) {
+	return Send("DELETE", url, options...)
+}
+```
