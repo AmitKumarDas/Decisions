@@ -401,5 +401,34 @@ spec:
         operator: Exists
 ```
 
+#### ConfigInjector - Sample 4
+- Add / Update node affinity of one or more Deployment(s)
+```yaml
+kind: ConfigInjector
+metadata:
+  name: 
+  namespace: 
+spec:
+  policies:
+  - name: update-node-affinity
+    select: 
+      kind: Deployment
+      labelSelector:
+        matchLabels: 
+          openebs.io/cas-type: jiva
+      namespace: openebs
+    apply:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - gce-node-1
+              - gce-node-2
+              - gce-node-3
+```
+
 #### References
 - [OEP on CSI](https://github.com/openebs/openebs/pull/2617/)
