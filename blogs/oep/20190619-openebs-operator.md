@@ -280,8 +280,93 @@ spec:
       imageTag: 1.0.0
 ```
 
-#### ConfigInjector - Sample 1
+#### ConfigInjector - Definition
 ```yaml
+kind: ConfigInjector
+metadata:
+  name:
+  namespace:
+spec:
+  policies:
+  - name:   # name given to this injection
+    select: # select kubernetes resource(s)
+    apply:  # apply values against above selected kubernetes resource(s) as target(s)
+```
+
+#### ConfigInjector - Sample 1
+- Update a container
+  - Where the container name is `cstor-istgt`
+  - Add or Update following env variables:
+    - QueueDepth
+    - Luworkers
+```yaml
+kind: ConfigInjector
+metadata:
+  name: 
+  namespace: 
+spec:
+  policies:
+  - name: inject-perf-tunables
+    select: 
+      kind: Deployment
+      name: my-cstor-deploy
+      namespace: openebs
+    apply:
+      containers:
+      - name: cstor-istgt
+        env:
+        - name: QueueDepth
+          value: 6
+        - name: Luworkers
+          value: 3
+```
+
+#### ConfigInjector - Sample 2
+- Remove an annotation from custom resource if exists
+- Where custom resource kind is `CStorVolumeReplica`
+```yaml
+kind: ConfigInjector
+metadata:
+  name: 
+  namespace: 
+spec:
+  policies:
+  - name: remove-ann
+    select: 
+      kind: CStorVolumeReplica
+      labelSelector:
+        matchLabels: 
+          openebs.io/pv: pvc-abc-abc
+      namespace: openebs
+    remove:
+      annotations:
+      - openebs.io/vsm
+```
+
+#### ConfigInjector - Sample 3
+- Remove an annotation from custom resource if exists
+- Add / Update an annotation from custom resource
+- Where custom resource kind is `CStorVolumeReplica`
+```yaml
+kind: ConfigInjector
+metadata:
+  name: 
+  namespace: 
+spec:
+  policies:
+  - name: update-annotations
+    select: 
+      kind: CStorVolumeReplica
+      labelSelector:
+        matchLabels: 
+          openebs.io/pv: pvc-abc-abc
+      namespace: openebs
+    remove:
+      annotations:
+      - openebs.io/vsm
+    apply:
+      annotations:
+        openebs.io/version: 1.0.0
 ```
 
 #### References
