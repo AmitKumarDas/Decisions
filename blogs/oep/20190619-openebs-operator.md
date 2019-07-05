@@ -369,5 +369,37 @@ spec:
         openebs.io/version: 1.0.0
 ```
 
+#### ConfigInjector - Sample 4
+- Add / Update tolerations of one or more Deployment(s)
+```yaml
+kind: ConfigInjector
+metadata:
+  name: 
+  namespace: 
+spec:
+  policies:
+  - name: update-tolerations
+    select: 
+      kind: Deployment
+      labelSelector:
+        matchLabels: 
+          openebs.io/cas-type: jiva
+      namespace: openebs
+    apply:
+      tolerations:
+      - effect: NoExecute
+        key: node.alpha.kubernetes.io/notReady
+        operator: Exists
+      - effect: NoExecute
+        key: node.alpha.kubernetes.io/unreachable
+        operator: Exists
+      - effect: NoExecute
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+      - effect: NoExecute
+        key: node.kubernetes.io/unreachable
+        operator: Exists
+```
+
 #### References
 - [OEP on CSI](https://github.com/openebs/openebs/pull/2617/)
