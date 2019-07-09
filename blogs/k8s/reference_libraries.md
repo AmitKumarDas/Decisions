@@ -8,6 +8,7 @@
 // https://github.com/nats-io/nats-operator/
 // https://github.com/jaegertracing/jaeger-operator/
 // https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/types.go
+// https://github.com/openebs/maya/blob/master/vendor/k8s.io/apimachinery/pkg/runtime/types.go
 // https://github.com/kubernetes-csi/csi-lib-utils/blob/master/leaderelection/leader_election.go
 // config management - https://github.com/pusher/wave
 // https://github.com/zalando-incubator/es-operator
