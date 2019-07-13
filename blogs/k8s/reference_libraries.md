@@ -17,4 +17,5 @@
 // https://github.com/portworx/sched-ops/blob/master/k8s/k8s.go
 // https://kubernetes.io/blog/2019/06/20/crd-structural-schema/
 // https://github.com/kubevirt/containerized-data-importer
+// https://github.com/kubernetes/kubernetes/blob/master/pkg/scheduler/scheduler.go
 ```
