@@ -1,7 +1,7 @@
 ### Essentials
 - JSON sugar
 - Like JSON Like YAML as well
-- **Tip** Create JSON with ease
+- **Tip** Field names with special chars must be within double quotes
 - **Tip** Folding helps creating JSON with ease
 - **Wow** Comments - Single line & block level as well
 - **ProTip** Number literals - e.g. 1.5Gi or 1_610_612_736 is 1610612736
@@ -9,3 +9,9 @@
 - **Tip** Bytes can be embedded into .cue & this is in turn displayed as base64 encoded json doc
 - **ProTip** References with Scope & Accessing fields give programmatic edge
 - **ProTip** Alias i.e. local macro provides a programmatic edge
+- **ProTip** Emit Values =~ Templating made easy
+- **Tip** Hidden fields follow go's syntax i.e. use _ as prefix; they should not be double quoted
+- **ProTip** Update via out-of-box merge ~ Clean Merge
+- **Wow** Validation is built in
+- **ProTip** Defaults =~ Templating made easy
+- **ProTip** Inbuilt Templating ~ Defaults, Validations ~ minus custom funcs
