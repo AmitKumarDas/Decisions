@@ -1,3 +1,11 @@
 ### Essentials
-- JSON sugar & other goodies
-- 
+- JSON sugar
+- Like JSON Like YAML as well
+- **Tip** Create JSON with ease
+- **Tip** Folding helps creating JSON with ease
+- **Wow** Comments - Single line & block level as well
+- **ProTip** Number literals - e.g. 1.5Gi or 1_610_612_736 is 1610612736
+- **ProTip** String literals && multi-line && unicode && escape sequences && interpolations
+- **Tip** Bytes can be embedded into .cue & this is in turn displayed as base64 encoded json doc
+- **ProTip** References with Scope & Accessing fields give programmatic edge
+- **ProTip** Alias i.e. local macro provides a programmatic edge
