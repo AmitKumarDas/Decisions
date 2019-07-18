@@ -44,3 +44,14 @@ deployment <Name>: {
 }
 EOF
 ```
+
+### NOTES
+- By replacing the service and deployment name with <Name> we have changed the definition into a template.
+- Templates are applied to (are unified with) all entries in the struct in which they are defined:
+  - so we need to either strip fields specific to the definition, 
+  - generalize them, or
+  - remove them.
+- One of the labels defined in the Kubernetes metadata seems to be always set to parent directory name. 
+  - We enforce this by defining component: string, 
+  - meaning that a field of name component must be set to some string value, and then define this later on. 
+
