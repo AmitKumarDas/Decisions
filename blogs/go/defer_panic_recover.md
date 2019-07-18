@@ -32,7 +32,7 @@ func TestConflictingAddKnownTypes(t *testing.T) {
 				panicked <- true
 			}
 		}()
-    // Below calls panic in its logic
+   	// Below calls panic in its logic
 		s.AddKnownTypeWithName(gv.WithKind("InternalSimple"), &runtimetesting.InternalSimple{})
 		s.AddKnownTypeWithName(gv.WithKind("InternalSimple"), &runtimetesting.ExternalSimple{})
 		panicked <- false
@@ -47,7 +47,7 @@ func TestConflictingAddKnownTypes(t *testing.T) {
 				panicked <- true
 			}
 		}()
-    // Below calls panic in its logic
+   	// Below calls panic in its logic
 		s.AddUnversionedTypes(gv, &runtimetesting.InternalSimple{})
 		s.AddUnversionedTypes(gv, &InternalSimple{})
 		panicked <- false
