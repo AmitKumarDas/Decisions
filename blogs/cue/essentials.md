@@ -15,3 +15,5 @@
 - **Wow** Validation is built in
 - **ProTip** Defaults =~ Templating made easy
 - **ProTip** Inbuilt Templating ~ Defaults, Validations ~ minus custom funcs
+- **Magical** List with Loops & Conditions ~ functional programming
+- **Debuggability** Cyclic dependencies detected
