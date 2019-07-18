@@ -22,38 +22,38 @@
 ### K8s Refer
 ```go
 func TestConflictingAddKnownTypes(t *testing.T) {
-	s := runtime.NewScheme()
-	gv := schema.GroupVersion{Group: "foo", Version: "v1"}
+  s := runtime.NewScheme()
+  gv := schema.GroupVersion{Group: "foo", Version: "v1"}
 
-	panicked := make(chan bool)
-	go func() {
-		defer func() {
-			if recover() != nil {
-				panicked <- true
-			}
-		}()
-   	// Below calls panic in its logic
-		s.AddKnownTypeWithName(gv.WithKind("InternalSimple"), &runtimetesting.InternalSimple{})
-		s.AddKnownTypeWithName(gv.WithKind("InternalSimple"), &runtimetesting.ExternalSimple{})
-		panicked <- false
-	}()
-	if !<-panicked {
-		t.Errorf("Expected AddKnownTypesWithName to panic with conflicting type registrations")
-	}
+  panicked := make(chan bool)
+  go func() {
+  	defer func() {
+  		if recover() != nil {
+  			panicked <- true
+  		}
+  	}()
+    // Below calls panic in its logic
+	  s.AddKnownTypeWithName(gv.WithKind("InternalSimple"), &runtimetesting.InternalSimple{})
+	  s.AddKnownTypeWithName(gv.WithKind("InternalSimple"), &runtimetesting.ExternalSimple{})
+	  panicked <- false
+  }()
+  if !<-panicked {
+	  t.Errorf("Expected AddKnownTypesWithName to panic with conflicting type registrations")
+  }
 
-	go func() {
-		defer func() {
-			if recover() != nil {
-				panicked <- true
-			}
-		}()
-   	// Below calls panic in its logic
-		s.AddUnversionedTypes(gv, &runtimetesting.InternalSimple{})
-		s.AddUnversionedTypes(gv, &InternalSimple{})
-		panicked <- false
-	}()
-	if !<-panicked {
-		t.Errorf("Expected AddUnversionedTypes to panic with conflicting type registrations")
-	}
+  go func() {
+	  defer func() {
+		  if recover() != nil {
+			  panicked <- true
+		  }
+	  }()
+    // Below calls panic in its logic
+	  s.AddUnversionedTypes(gv, &runtimetesting.InternalSimple{})
+	  s.AddUnversionedTypes(gv, &InternalSimple{})
+	  panicked <- false
+  }()
+  if !<-panicked {
+  	t.Errorf("Expected AddUnversionedTypes to panic with conflicting type registrations")
+  }
 }
 ```
