@@ -107,7 +107,7 @@ func getCStorPoolUID() ops.Verifier {
     SaveUIDToStoreWithKey("csp.uid")
 }
 
-func updateCStorPoolDeployment() ops.VerifierVerifier {
+func updateCStorPoolDeployment() ops.Verifier {
   return deployops.New().
     WithStore(store).
     GetFromKubernetes(PoolName, PoolNamespace).
