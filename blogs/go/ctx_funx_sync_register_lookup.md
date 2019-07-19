@@ -1,3 +1,16 @@
+### Review
+- Package just has this only file
+- It provides all that one needs from a package that is very **generic**
+  - Context definition
+  - 
+  - Constructor
+  - Interface
+  - Register
+  - Lookup
+- Constructor is special because:
+  - It is a **typed func** letting specific implementors to handle the rest
+
+
 ```go
 // https://github.com/cuelang/cue/blob/master/internal/task/task.go
 ```
