@@ -2,7 +2,6 @@
 - Package just has this only file
 - It provides all that one needs from a package that is very **generic**
   - Context definition
-  - 
   - Constructor
   - Interface
   - Register
