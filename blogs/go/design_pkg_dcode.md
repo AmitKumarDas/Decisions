@@ -18,7 +18,7 @@
   ```go
     dcoder := Field("field1", Field("field2", Field("field3", Int())))
     var i int
-  	Decode(dcoder, jsonBytes, &i)
+    Decode(dcoder, jsonBytes, &i)
   ```
 - NOTE on readability
   - Pure functional way vs. loop
