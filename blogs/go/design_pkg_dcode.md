@@ -29,3 +29,36 @@
   ```go
   dcoder := First("first").Then("second").Then("third").Into(Int())
   ```
+- Pure function No Interface
+  ```go
+  // decoder.go
+  
+  // note: 
+  //  name suffix with er typically points to
+  // interface but this is struct
+  type Decoder struct {
+    call func([]byte) (interface{}, error)
+  }
+  
+  // note:
+  //  when pure functional struct like above comes up
+  // it is usually complimented by an instantiation
+  // function i.e. constructor
+  newDecoder(fn func([]byte) (interface{}, error)) Decoder {
+    return Decoder{call: fn}
+  }
+  ```
+  ```go
+  // int.go
+  
+  // Int decodes any JSON field into an integer
+  func Int() Decoder {
+    return newDecoder(func(b []byte) (interface{}, error) {
+      var i int
+      if err := json.Unmarshal(b, &i); err != nil {
+        return 0, err
+      }
+      return i, nil
+    })
+  }
+  ```
